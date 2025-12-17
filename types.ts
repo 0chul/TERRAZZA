@@ -19,6 +19,27 @@ export interface CafeConfig {
   operatingDays: number;
 }
 
+export interface CafeSupplies {
+  hotCup: number;
+  hotLid: number;
+  stick: number;
+  iceCup: number;
+  iceLid: number;
+  straw: number;
+  holder: number;
+  carrier: number;
+  wipe: number;
+  napkin: number;
+  dishwashing: number;
+  
+  water: number;
+  ice: number;
+  syrup: number;
+  
+  beanGrams: number;
+  milkMl: number;
+}
+
 export interface SpaceConfig {
   hourlyRate: number;
   hoursPerDay: number;
@@ -52,6 +73,19 @@ export interface InitialInvestment {
 
 export interface MonthlyData {
   month: number;
+  // Revenue Breakdown
+  cafeRevenue: number;
+  spaceRevenue: number;
+  wineRevenue: number;
+  
+  // Cost Breakdown
+  cafeCOGS: number;
+  wineCOGS: number;
+  laborCost: number;
+  utilityCost: number;
+  otherFixedCost: number;
+
+  // Aggregates
   revenue: number;
   cogs: number;
   grossProfit: number;
@@ -62,6 +96,7 @@ export interface MonthlyData {
 
 export interface GlobalConfig {
   cafe: CafeConfig;
+  cafeSupplies: CafeSupplies;
   space: SpaceConfig;
   wine: WineConfig;
   fixed: FixedCosts;

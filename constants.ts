@@ -1,28 +1,28 @@
-import { GlobalConfig, TodoItem } from './types';
+import { GlobalConfig, TodoItem, CafeSupplies } from './types';
 
-// Based on the provided Excel images
-export const CAFE_UNIT_COSTS = {
+// Based on the provided Excel images, now editable
+export const DEFAULT_CAFE_SUPPLIES: CafeSupplies = {
   // Consumables (Won)
-  HOT_CUP: 39,
-  HOT_LID: 25,
-  STICK: 5,
-  ICE_CUP: 52,
-  ICE_LID: 26,
-  STRAW: 6,
-  HOLDER: 19,
-  CARRIER: 18, // 0.3 probability applied in logic if needed, or avg
-  WIPE: 18,
-  NAPKIN: 4,
-  DISHWASHING: 60, // Labor/Resource proxy for store
+  hotCup: 39,
+  hotLid: 25,
+  stick: 5,
+  iceCup: 52,
+  iceLid: 26,
+  straw: 6,
+  holder: 19,
+  carrier: 60, // Updated based on screenshot
+  wipe: 18,
+  napkin: 4,
+  dishwashing: 60, // Labor/Resource proxy for store
   
   // Ingredients (Volume/Weight base is dynamic, these are fixed add-ons)
-  WATER: 30,
-  ICE: 50,
-  SYRUP: 150, // Updated: Assumes decent quality syrup cost per serving (~30ml)
+  water: 30,
+  ice: 50,
+  syrup: 60, // Updated based on screenshot
   
   // Specs
-  BEAN_GRAMS: 20,
-  MILK_ML: 150,
+  beanGrams: 20,
+  milkMl: 150,
 };
 
 export const DEFAULT_CONFIG: GlobalConfig = {
@@ -46,6 +46,7 @@ export const DEFAULT_CONFIG: GlobalConfig = {
     iceRatio: 0.75,        
     operatingDays: 26,
   },
+  cafeSupplies: DEFAULT_CAFE_SUPPLIES,
   space: {
     hourlyRate: 50000,
     hoursPerDay: 8,

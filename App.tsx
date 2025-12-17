@@ -25,11 +25,12 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  Users
+  Users,
+  Settings
 } from 'lucide-react';
 
-import { DEFAULT_CONFIG, INITIAL_TODOS, CAFE_UNIT_COSTS } from './constants';
-import { GlobalConfig, MonthlyData, TodoItem } from './types';
+import { DEFAULT_CONFIG, INITIAL_TODOS } from './constants';
+import { GlobalConfig, MonthlyData, TodoItem, CafeSupplies } from './types';
 import { InfoCard } from './components/InfoCard';
 import { InputSection } from './components/InputSection';
 import { FinancialTable } from './components/FinancialTable';
@@ -41,11 +42,28 @@ enum Tab {
   TODO = 'todo',
 }
 
+const CHART_COLORS = {
+  revenue: {
+    cafe: '#1e3a8a',   // Indigo 900
+    space: '#2563eb',  // Blue 600
+    wine: '#60a5fa',   // Blue 400
+  },
+  cost: {
+    labor: '#7f1d1d',  // Red 900
+    cafe: '#b91c1c',   // Red 700
+    wine: '#ef4444',   // Red 500
+    utility: '#f87171', // Red 400
+    fixed: '#fca5a5',   // Red 300
+  },
+  profit: '#111827'
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(Tab.DASHBOARD);
   const [config, setConfig] = useState<GlobalConfig>(DEFAULT_CONFIG);
   const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
-  const [projectionMonths, setProjectionMonths] = useState(12);
+  // Changed projection months from 12 to 10 as requested
+  const [projectionMonths, setProjectionMonths] = useState(10);
   const [cafeDetailsOpen, setCafeDetailsOpen] = useState(true);
   const [expandedCostRows, setExpandedCostRows] = useState<Set<string>>(new Set());
 
@@ -63,28 +81,29 @@ export default function App() {
   // 2. Helper: Calculate Cafe Unit Costs dynamically with 8-way branching
   const cafeUnitCosts = useMemo(() => {
     const { beanPricePerKg, milkPricePerL, takeoutRatio, iceRatio } = config.cafe;
+    const s = config.cafeSupplies; // Use dynamic supplies config
     
     // Ingredients Cost
-    const bean = (beanPricePerKg / 1000) * CAFE_UNIT_COSTS.BEAN_GRAMS;
-    const milk = (milkPricePerL / 1000) * CAFE_UNIT_COSTS.MILK_ML;
-    const water = CAFE_UNIT_COSTS.WATER;
-    const ice = CAFE_UNIT_COSTS.ICE;
-    const syrup = CAFE_UNIT_COSTS.SYRUP;
+    const bean = (beanPricePerKg / 1000) * s.beanGrams;
+    const milk = (milkPricePerL / 1000) * s.milkMl;
+    const water = s.water;
+    const ice = s.ice;
+    const syrup = s.syrup;
 
     // Consumables Package Cost
     const packTakeoutHot = 
-      CAFE_UNIT_COSTS.HOT_CUP + CAFE_UNIT_COSTS.HOT_LID + CAFE_UNIT_COSTS.STICK + 
-      CAFE_UNIT_COSTS.HOLDER + CAFE_UNIT_COSTS.CARRIER + CAFE_UNIT_COSTS.WIPE + CAFE_UNIT_COSTS.NAPKIN;
+      s.hotCup + s.hotLid + s.stick + 
+      s.holder + s.carrier + s.wipe + s.napkin;
     
     const packTakeoutIce = 
-      CAFE_UNIT_COSTS.ICE_CUP + CAFE_UNIT_COSTS.ICE_LID + CAFE_UNIT_COSTS.STRAW + 
-      CAFE_UNIT_COSTS.HOLDER + CAFE_UNIT_COSTS.CARRIER + CAFE_UNIT_COSTS.WIPE + CAFE_UNIT_COSTS.NAPKIN;
+      s.iceCup + s.iceLid + s.straw + 
+      s.holder + s.carrier + s.wipe + s.napkin;
 
     const packStoreHot = 
-      CAFE_UNIT_COSTS.STICK + CAFE_UNIT_COSTS.WIPE + CAFE_UNIT_COSTS.NAPKIN + CAFE_UNIT_COSTS.DISHWASHING;
+      s.stick + s.wipe + s.napkin + s.dishwashing;
       
     const packStoreIce = 
-      CAFE_UNIT_COSTS.STRAW + CAFE_UNIT_COSTS.WIPE + CAFE_UNIT_COSTS.NAPKIN + CAFE_UNIT_COSTS.DISHWASHING;
+      s.straw + s.wipe + s.napkin + s.dishwashing;
 
     // Assemble Product Costs
     const products = {
@@ -134,7 +153,7 @@ export default function App() {
       finalCostSyrupLatte,
       products
     };
-  }, [config.cafe]);
+  }, [config.cafe, config.cafeSupplies]);
 
   // 3. Monthly Financial Data
   const monthlyData: MonthlyData[] = useMemo(() => {
@@ -178,18 +197,21 @@ export default function App() {
         config.wine.operatingDays;
       const wineCOGS = wineRevenue * config.wine.costOfGoodsSoldRate;
 
+      // Cost Breakdown
+      const laborCost = config.fixed.labor;
+      const utilityCost = config.fixed.utilities;
+      const otherFixedCost = 
+        config.fixed.internet + 
+        config.fixed.marketing + 
+        config.fixed.maintenance + 
+        config.fixed.misc;
+
       // Aggregations
       const totalRevenue = cafeRevenue + spaceRevenue + wineRevenue;
       const totalCOGS = cafeCOGS + spaceCOGS + wineCOGS;
       const grossProfit = totalRevenue - totalCOGS;
 
-      const totalFixedCosts =
-        config.fixed.labor +
-        config.fixed.utilities +
-        config.fixed.internet +
-        config.fixed.marketing +
-        config.fixed.maintenance +
-        config.fixed.misc;
+      const totalFixedCosts = laborCost + utilityCost + otherFixedCost;
 
       const netProfit = grossProfit - totalFixedCosts;
 
@@ -197,7 +219,18 @@ export default function App() {
 
       data.push({
         month: m,
+        cafeRevenue,
+        spaceRevenue,
+        wineRevenue,
         revenue: totalRevenue,
+        
+        // Detailed Costs
+        cafeCOGS,
+        wineCOGS,
+        laborCost,
+        utilityCost,
+        otherFixedCost,
+
         cogs: totalCOGS,
         grossProfit,
         fixedCosts: totalFixedCosts,
@@ -207,6 +240,18 @@ export default function App() {
     }
     return data;
   }, [config, projectionMonths, cafeUnitCosts, dailySalesCount]);
+
+  // 4. Chart Data (Negative costs for downward bars)
+  const chartData = useMemo(() => {
+    return monthlyData.map(d => ({
+      ...d,
+      cafeCOGS: -d.cafeCOGS,
+      wineCOGS: -d.wineCOGS,
+      laborCost: -d.laborCost,
+      utilityCost: -d.utilityCost,
+      otherFixedCost: -d.otherFixedCost,
+    }));
+  }, [monthlyData]);
 
   const bepMonth = useMemo(() => {
     const match = monthlyData.find(d => d.cumulativeProfit >= 0);
@@ -232,6 +277,16 @@ export default function App() {
     }));
   };
 
+  const handleSupplyChange = (field: keyof CafeSupplies, value: number) => {
+    setConfig(prev => ({
+      ...prev,
+      cafeSupplies: {
+        ...prev.cafeSupplies,
+        [field]: value
+      }
+    }));
+  };
+
   const toggleCostRow = (key: string) => {
     const newSet = new Set(expandedCostRows);
     if (newSet.has(key)) newSet.delete(key);
@@ -241,7 +296,6 @@ export default function App() {
 
   // --- Render Components ---
 
-  // ... CostDetailItem and CostDetailCard components remain the same ...
   const CostDetailItem = ({ label, value }: { label: string, value: number }) => (
     <div className="flex justify-between text-xs text-gray-600 mb-1">
       <span>{label}</span>
@@ -265,25 +319,26 @@ export default function App() {
   );
 
   const renderCostDetails = (menu: 'americano' | 'latte' | 'syrupLatte') => {
-      // ... logic for details (same as previous) ...
       const uc = cafeUnitCosts.unitCosts;
+      const s = config.cafeSupplies;
+      
       const commonTakeoutHot = [
-          { label: 'Hot 컵', value: CAFE_UNIT_COSTS.HOT_CUP },
-          { label: '뚜껑', value: CAFE_UNIT_COSTS.HOT_LID },
-          { label: '홀더', value: CAFE_UNIT_COSTS.HOLDER },
-          { label: '캐리어', value: CAFE_UNIT_COSTS.CARRIER },
-          { label: '스틱/냅킨', value: CAFE_UNIT_COSTS.STICK + CAFE_UNIT_COSTS.NAPKIN + CAFE_UNIT_COSTS.WIPE },
+          { label: 'Hot 컵', value: s.hotCup },
+          { label: '뚜껑', value: s.hotLid },
+          { label: '홀더', value: s.holder },
+          { label: '캐리어', value: s.carrier },
+          { label: '스틱/냅킨', value: s.stick + s.napkin + s.wipe },
       ];
       const commonTakeoutIce = [
-          { label: 'Ice 컵', value: CAFE_UNIT_COSTS.ICE_CUP },
-          { label: '뚜껑', value: CAFE_UNIT_COSTS.ICE_LID },
-          { label: '홀더', value: CAFE_UNIT_COSTS.HOLDER },
-          { label: '캐리어', value: CAFE_UNIT_COSTS.CARRIER },
-          { label: '빨대/냅킨', value: CAFE_UNIT_COSTS.STRAW + CAFE_UNIT_COSTS.NAPKIN + CAFE_UNIT_COSTS.WIPE },
+          { label: 'Ice 컵', value: s.iceCup },
+          { label: '뚜껑', value: s.iceLid },
+          { label: '홀더', value: s.holder },
+          { label: '캐리어', value: s.carrier },
+          { label: '빨대/냅킨', value: s.straw + s.napkin + s.wipe },
       ];
       const commonStore = [
-          { label: '세척/관리', value: CAFE_UNIT_COSTS.DISHWASHING },
-          { label: '물티슈/냅킨', value: CAFE_UNIT_COSTS.WIPE + CAFE_UNIT_COSTS.NAPKIN },
+          { label: '세척/관리', value: s.dishwashing },
+          { label: '물티슈/냅킨', value: s.wipe + s.napkin },
       ];
 
       let ingredientsBase: {label: string, value: number}[] = [];
@@ -295,8 +350,8 @@ export default function App() {
           let items = [...ingredientsBase];
           if (type === 'takeoutHot') items = [...items, ...commonTakeoutHot];
           if (type === 'takeoutIce') items = [...items, { label: '얼음', value: uc.ice }, ...commonTakeoutIce];
-          if (type === 'storeHot') items = [...items, {label: '스틱', value: CAFE_UNIT_COSTS.STICK}, ...commonStore];
-          if (type === 'storeIce') items = [...items, { label: '얼음', value: uc.ice }, {label: '빨대', value: CAFE_UNIT_COSTS.STRAW}, ...commonStore];
+          if (type === 'storeHot') items = [...items, {label: '스틱', value: s.stick}, ...commonStore];
+          if (type === 'storeIce') items = [...items, { label: '얼음', value: uc.ice }, {label: '빨대', value: s.straw}, ...commonStore];
           return items;
       };
 
@@ -335,29 +390,72 @@ export default function App() {
         <InfoCard
           title="손익분기점 (BEP)"
           value={bepMonth}
-          subValue={bepMonth !== '미도달' ? '누적 수익 전환 시점' : '1년 내 달성 불가'}
+          subValue={bepMonth !== '미도달' ? '누적 수익 전환 시점' : '10개월 내 달성 불가'}
           icon={<AlertCircle className="text-orange-500" />}
         />
       </div>
 
       {/* Charts */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-lg font-bold text-gray-800 mb-6">BEP 시점 및 수익 구조 분석</h2>
-        <div className="h-[400px] w-full">
+        <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-bold text-gray-800">BEP 시점 및 수익 구조 분석 (10개월)</h2>
+        </div>
+        
+        <div className="h-[450px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            {/* Removed right Y-axis, aligned everything to left */}
+            <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }} barGap={2}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
               <XAxis dataKey="month" tickFormatter={(val) => `M+${val}`} stroke="#9CA3AF" />
-              <YAxis yAxisId="left" orientation="left" stroke="#9CA3AF" tickFormatter={(val) => `${val / 10000}만`} />
-              <YAxis yAxisId="right" orientation="right" stroke="#9CA3AF" tickFormatter={(val) => `${val / 10000}만`} />
+              <YAxis yAxisId="left" stroke="#9CA3AF" tickFormatter={(val) => `${val / 10000}만`} />
               <Tooltip
-                formatter={(value: number) => `₩${value.toLocaleString()}`}
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                shared={false}
+                formatter={(value: number, name: string) => {
+                    // Display signed value for Cumulative Profit, but absolute value for costs (which are negative in data)
+                    if (name === '누적 손익') {
+                      return [`₩${Math.round(value).toLocaleString()}`, name];
+                    }
+                    return [`₩${Math.abs(Math.round(value)).toLocaleString()}`, name];
+                }}
+                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
+                cursor={{ fill: 'rgba(0,0,0,0.05)' }}
               />
-              <Legend wrapperStyle={{ paddingTop: '20px' }} />
-              <ReferenceLine y={0} yAxisId="right" stroke="#000" strokeDasharray="3 3" />
-              <Bar yAxisId="left" dataKey="netProfit" name="월 순이익" fill="#3B82F6" barSize={30} radius={[4, 4, 0, 0]} />
-              <Line yAxisId="right" type="monotone" dataKey="cumulativeProfit" name="누적 손익" stroke="#F97316" strokeWidth={3} dot={{ r: 4 }} />
+              <Legend 
+                verticalAlign="bottom"
+                height={36}
+                content={() => (
+                  <div className="flex justify-center gap-6 mt-4 text-xs text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3" style={{ backgroundColor: CHART_COLORS.revenue.space }}></div>
+                      <span>매출</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3" style={{ backgroundColor: CHART_COLORS.cost.wine }}></div>
+                      <span>비용</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-0.5" style={{ backgroundColor: CHART_COLORS.profit }}></div>
+                      <span>누적 손익</span>
+                    </div>
+                  </div>
+                )}
+              />
+              <ReferenceLine yAxisId="left" y={0} stroke="#000" strokeDasharray="3 3" />
+              
+              {/* Revenue Stack - Blue Theme (Positive) */}
+              <Bar yAxisId="left" dataKey="cafeRevenue" name="카페 매출" stackId="revenue" fill={CHART_COLORS.revenue.cafe} barSize={20} />
+              <Bar yAxisId="left" dataKey="spaceRevenue" name="공간대여 매출" stackId="revenue" fill={CHART_COLORS.revenue.space} barSize={20} />
+              <Bar yAxisId="left" dataKey="wineRevenue" name="와인바 매출" stackId="revenue" fill={CHART_COLORS.revenue.wine} barSize={20} radius={[4, 4, 0, 0]} />
+
+              {/* Cost Stack - Red Theme (Negative) */}
+              <Bar yAxisId="left" dataKey="laborCost" name="인건비" stackId="cost" fill={CHART_COLORS.cost.labor} barSize={20} />
+              <Bar yAxisId="left" dataKey="cafeCOGS" name="카페 재료비" stackId="cost" fill={CHART_COLORS.cost.cafe} barSize={20} />
+              <Bar yAxisId="left" dataKey="wineCOGS" name="와인 재료비" stackId="cost" fill={CHART_COLORS.cost.wine} barSize={20} />
+              <Bar yAxisId="left" dataKey="utilityCost" name="공과금" stackId="cost" fill={CHART_COLORS.cost.utility} barSize={20} />
+              <Bar yAxisId="left" dataKey="otherFixedCost" name="기타 고정비" stackId="cost" fill={CHART_COLORS.cost.fixed} barSize={20} radius={[0, 0, 4, 4]} />
+              
+              {/* Cumulative Profit Line - Moved to Left Axis */}
+              <Line yAxisId="left" type="monotone" dataKey="cumulativeProfit" name="누적 손익" stroke={CHART_COLORS.profit} strokeWidth={3} dot={{ r: 3, fill: CHART_COLORS.profit }} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -376,6 +474,8 @@ export default function App() {
     const isRatioValid = Math.abs(totalRatio - 1.0) < 0.01;
     const maxCapacity = Math.round(config.cafe.seatCount * (config.cafe.operatingHours / (config.cafe.stayDuration || 1)));
 
+    const currentCafeRevenue = monthlyData[0]?.cafeRevenue || 0;
+
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
         <button
@@ -389,7 +489,14 @@ export default function App() {
                 <span className="text-xs text-gray-500">테이크아웃/매장/HOT/ICE 및 좌석 회전율 기반 매출 예측</span>
              </div>
           </div>
-          {cafeDetailsOpen ? <ChevronDown size={24} className="text-amber-700" /> : <ChevronRight size={24} className="text-gray-400" />}
+          <div className="flex items-center gap-4">
+             <div className="text-right hidden sm:block">
+                <span className="text-sm text-blue-600 font-bold">
+                    월 예상 매출: ₩{Math.round(currentCafeRevenue).toLocaleString()}
+                </span>
+             </div>
+             {cafeDetailsOpen ? <ChevronDown size={24} className="text-amber-700" /> : <ChevronRight size={24} className="text-gray-400" />}
+          </div>
         </button>
         
         {cafeDetailsOpen && (
@@ -472,11 +579,11 @@ export default function App() {
                       <NumberInput label="우유 가격 (1L)" value={config.cafe.milkPricePerL} onChange={(v) => handleConfigChange('cafe', 'milkPricePerL', v)} unit="원" />
                       <div className="pt-2 text-xs text-gray-500 space-y-1">
                         <div className="flex justify-between">
-                            <span>원두 1잔({CAFE_UNIT_COSTS.BEAN_GRAMS}g)</span>
+                            <span>원두 1잔({config.cafeSupplies.beanGrams}g)</span>
                             <span className="font-bold">{Math.round(cafeUnitCosts.unitCosts.bean)}원</span>
                         </div>
                         <div className="flex justify-between">
-                            <span>우유 1잔({CAFE_UNIT_COSTS.MILK_ML}ml)</span>
+                            <span>우유 1잔({config.cafeSupplies.milkMl}ml)</span>
                             <span className="font-bold">{Math.round(cafeUnitCosts.unitCosts.milk)}원</span>
                         </div>
                          <div className="flex justify-between">
@@ -588,14 +695,56 @@ export default function App() {
                 * 매장: 설거지비용(수도/인건)/물티슈 포함 (일회용컵 제외)
               </p>
             </div>
+
+            {/* 3. Advanced Supply Costs (Closed by default) */}
+            <div className="mt-6">
+                <InputSection title="🛠 상세 재료/비품 단가 설정 (Advanced Settings)" isOpenDefault={false}>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <NumberInput label="핫컵 (13oz)" value={config.cafeSupplies.hotCup} onChange={(v) => handleSupplyChange('hotCup', v)} unit="원" />
+                        <NumberInput label="핫컵 뚜껑" value={config.cafeSupplies.hotLid} onChange={(v) => handleSupplyChange('hotLid', v)} unit="원" />
+                        <NumberInput label="아이스컵 (16oz)" value={config.cafeSupplies.iceCup} onChange={(v) => handleSupplyChange('iceCup', v)} unit="원" />
+                        <NumberInput label="아이스컵 뚜껑" value={config.cafeSupplies.iceLid} onChange={(v) => handleSupplyChange('iceLid', v)} unit="원" />
+                        
+                        <NumberInput label="홀더" value={config.cafeSupplies.holder} onChange={(v) => handleSupplyChange('holder', v)} unit="원" />
+                        <NumberInput label="캐리어 (2구)" value={config.cafeSupplies.carrier} onChange={(v) => handleSupplyChange('carrier', v)} unit="원" />
+                        <NumberInput label="빨대 (자바라)" value={config.cafeSupplies.straw} onChange={(v) => handleSupplyChange('straw', v)} unit="원" />
+                        <NumberInput label="커피스틱" value={config.cafeSupplies.stick} onChange={(v) => handleSupplyChange('stick', v)} unit="원" />
+                        
+                        <NumberInput label="냅킨" value={config.cafeSupplies.napkin} onChange={(v) => handleSupplyChange('napkin', v)} unit="원" />
+                        <NumberInput label="물티슈" value={config.cafeSupplies.wipe} onChange={(v) => handleSupplyChange('wipe', v)} unit="원" />
+                        <NumberInput label="식기세척비 (매장)" value={config.cafeSupplies.dishwashing} onChange={(v) => handleSupplyChange('dishwashing', v)} unit="원" />
+                        
+                        <NumberInput label="물 (1잔)" value={config.cafeSupplies.water} onChange={(v) => handleSupplyChange('water', v)} unit="원" />
+                        <NumberInput label="얼음 (1잔)" value={config.cafeSupplies.ice} onChange={(v) => handleSupplyChange('ice', v)} unit="원" />
+                        <NumberInput label="시럽 (60g)" value={config.cafeSupplies.syrup} onChange={(v) => handleSupplyChange('syrup', v)} unit="원" />
+                        
+                        <NumberInput label="원두 사용량 (1잔)" value={config.cafeSupplies.beanGrams} onChange={(v) => handleSupplyChange('beanGrams', v)} unit="g" />
+                        <NumberInput label="우유 사용량 (1잔)" value={config.cafeSupplies.milkMl} onChange={(v) => handleSupplyChange('milkMl', v)} unit="ml" />
+                    </div>
+                </InputSection>
+            </div>
           </div>
         )}
       </div>
     )
   }
 
-  const renderPlanner = () => (
-    <div className="space-y-6 max-w-4xl mx-auto">
+  const renderPlanner = () => {
+    // Recalculate explicitly for display in header
+    const spaceRev = config.space.hourlyRate * config.space.hoursPerDay * config.space.utilizationRate * config.space.operatingDays;
+    const wineRev = config.wine.avgTicketPrice * config.wine.dailyTables * config.wine.operatingDays;
+    const totalFixed = 
+      config.fixed.labor + 
+      config.fixed.utilities + 
+      config.fixed.internet + 
+      config.fixed.marketing + 
+      config.fixed.maintenance + 
+      config.fixed.misc;
+    
+    const formatSum = (n: number) => `₩${Math.round(n).toLocaleString()}`;
+
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto">
       <div className="bg-blue-50 p-4 rounded-lg text-blue-800 text-sm mb-6 flex items-start gap-2">
         <Calculator className="mt-0.5 flex-shrink-0" size={16}/>
         <p>각 사업별 상세 설정을 입력하세요. 카페는 테이크아웃, 아이스 비율 등 상세 조건에 따라 원가가 정밀하게 계산됩니다.</p>
@@ -604,7 +753,10 @@ export default function App() {
       {/* Render the specialized Cafe Submenu */}
       {renderCafeDetailPlanner()}
 
-      <InputSection title="🏠 공간대여 (Space Rental) 설정">
+      <InputSection 
+        title="🏠 공간대여 (Space Rental) 설정"
+        summary={<span className="text-sm text-blue-600 font-medium">월 예상 매출: {formatSum(spaceRev)}</span>}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <NumberInput label="시간당 대여료" value={config.space.hourlyRate} onChange={(v) => handleConfigChange('space', 'hourlyRate', v)} unit="원" />
           <NumberInput label="일 가용 시간" value={config.space.hoursPerDay} onChange={(v) => handleConfigChange('space', 'hoursPerDay', v)} unit="시간" />
@@ -620,7 +772,10 @@ export default function App() {
         </div>
       </InputSection>
 
-      <InputSection title="🍷 와인바 (Wine Bar) 설정">
+      <InputSection 
+        title="🍷 와인바 (Wine Bar) 설정"
+        summary={<span className="text-sm text-blue-600 font-medium">월 예상 매출: {formatSum(wineRev)}</span>}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <NumberInput label="테이블당 평균 단가" value={config.wine.avgTicketPrice} onChange={(v) => handleConfigChange('wine', 'avgTicketPrice', v)} unit="원" />
           <NumberInput label="일 평균 테이블 수" value={config.wine.dailyTables} onChange={(v) => handleConfigChange('wine', 'dailyTables', v)} unit="팀" />
@@ -629,7 +784,16 @@ export default function App() {
         </div>
       </InputSection>
 
-      <InputSection title="🏢 고정비 및 초기투자 (Fixed & Initial Cost)">
+      <InputSection 
+        title="🏢 고정비 및 초기투자 (Fixed & Initial Cost)"
+        summary={
+          <div className="flex flex-col text-xs md:text-sm md:flex-row md:gap-4 text-right font-medium">
+             <span className="text-indigo-600">초기 투자: {formatSum(totalInvestment)}</span>
+             <span className="hidden md:inline text-gray-300">|</span>
+             <span className="text-blue-600">월 고정비: {formatSum(totalFixed)}</span>
+          </div>
+        }
+      >
         <div className="space-y-6">
             <h4 className="font-medium text-gray-700 border-b pb-2">월 고정 비용</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -651,7 +815,7 @@ export default function App() {
         </div>
       </InputSection>
     </div>
-  );
+  )};
 
   const renderTodo = () => {
     // Group by category
