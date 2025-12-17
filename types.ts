@@ -35,7 +35,6 @@ export interface WineConfig {
 }
 
 export interface FixedCosts {
-  rent: number;
   labor: number;
   utilities: number;
   internet: number;
@@ -45,7 +44,6 @@ export interface FixedCosts {
 }
 
 export interface InitialInvestment {
-  deposit: number;
   interior: number;
   equipment: number;
   design: number;

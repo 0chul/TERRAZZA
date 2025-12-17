@@ -140,7 +140,6 @@ export default function App() {
   const monthlyData: MonthlyData[] = useMemo(() => {
     const data: MonthlyData[] = [];
     const totalInitialCost =
-      config.initial.deposit +
       config.initial.interior +
       config.initial.equipment +
       config.initial.design +
@@ -185,7 +184,6 @@ export default function App() {
       const grossProfit = totalRevenue - totalCOGS;
 
       const totalFixedCosts =
-        config.fixed.rent +
         config.fixed.labor +
         config.fixed.utilities +
         config.fixed.internet +
@@ -331,7 +329,7 @@ export default function App() {
         <InfoCard
           title="초기 투자비용"
           value={`₩${Math.round(totalInvestment / 10000).toLocaleString()}만`}
-          subValue="보증금 포함"
+          subValue="건물주 직영 (보증금/임대료 제외)"
           icon={<Calculator className="text-purple-500" />}
         />
         <InfoCard
@@ -611,7 +609,14 @@ export default function App() {
           <NumberInput label="시간당 대여료" value={config.space.hourlyRate} onChange={(v) => handleConfigChange('space', 'hourlyRate', v)} unit="원" />
           <NumberInput label="일 가용 시간" value={config.space.hoursPerDay} onChange={(v) => handleConfigChange('space', 'hoursPerDay', v)} unit="시간" />
           <NumberInput label="월 영업일수" value={config.space.operatingDays} onChange={(v) => handleConfigChange('space', 'operatingDays', v)} unit="일" />
-          <NumberInput label="가동률 (예약률)" value={config.space.utilizationRate} onChange={(v) => handleConfigChange('space', 'utilizationRate', v)} step={0.1} />
+          <SliderInput 
+            label="가동률 (예약률)" 
+            value={config.space.utilizationRate} 
+            onChange={(v) => handleConfigChange('space', 'utilizationRate', v)} 
+            step={0.05} 
+            min={0}
+            max={1}
+          />
         </div>
       </InputSection>
 
@@ -628,18 +633,20 @@ export default function App() {
         <div className="space-y-6">
             <h4 className="font-medium text-gray-700 border-b pb-2">월 고정 비용</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <NumberInput label="월 임대료" value={config.fixed.rent} onChange={(v) => handleConfigChange('fixed', 'rent', v)} unit="원" />
                 <NumberInput label="인건비 (총액)" value={config.fixed.labor} onChange={(v) => handleConfigChange('fixed', 'labor', v)} unit="원" />
                 <NumberInput label="공과금 (수도/전기)" value={config.fixed.utilities} onChange={(v) => handleConfigChange('fixed', 'utilities', v)} unit="원" />
                 <NumberInput label="마케팅비" value={config.fixed.marketing} onChange={(v) => handleConfigChange('fixed', 'marketing', v)} unit="원" />
+                <NumberInput label="유지보수비" value={config.fixed.maintenance} onChange={(v) => handleConfigChange('fixed', 'maintenance', v)} unit="원" />
+                <NumberInput label="기타 잡비" value={config.fixed.misc} onChange={(v) => handleConfigChange('fixed', 'misc', v)} unit="원" />
+                <NumberInput label="인터넷/통신" value={config.fixed.internet} onChange={(v) => handleConfigChange('fixed', 'internet', v)} unit="원" />
             </div>
 
             <h4 className="font-medium text-gray-700 border-b pb-2 pt-4">초기 투자 비용</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <NumberInput label="보증금" value={config.initial.deposit} onChange={(v) => handleConfigChange('initial', 'deposit', v)} unit="원" />
                 <NumberInput label="인테리어" value={config.initial.interior} onChange={(v) => handleConfigChange('initial', 'interior', v)} unit="원" />
                 <NumberInput label="설비/집기" value={config.initial.equipment} onChange={(v) => handleConfigChange('initial', 'equipment', v)} unit="원" />
                 <NumberInput label="디자인/브랜딩" value={config.initial.design} onChange={(v) => handleConfigChange('initial', 'design', v)} unit="원" />
+                <NumberInput label="초도물품/기타" value={config.initial.supplies} onChange={(v) => handleConfigChange('initial', 'supplies', v)} unit="원" />
             </div>
         </div>
       </InputSection>
