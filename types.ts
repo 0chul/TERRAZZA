@@ -110,3 +110,32 @@ export interface TodoItem {
   note?: string;
   completed: boolean;
 }
+
+export interface ProductCost {
+  americano: number;
+  latte: number;
+  syrupLatte: number;
+}
+
+export interface CafeUnitCosts {
+  unitCosts: {
+    bean: number;
+    milk: number;
+    water: number;
+    ice: number;
+    syrup: number;
+  };
+  finalCostAmericano: number;
+  finalCostLatte: number;
+  finalCostSyrupLatte: number;
+  products: {
+    takeout: {
+      hot: ProductCost;
+      ice: ProductCost;
+    };
+    store: {
+      hot: ProductCost;
+      ice: ProductCost;
+    };
+  };
+}
