@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Coffee,
@@ -7,7 +8,8 @@ import {
   Calculator,
   ChevronDown,
   ChevronRight,
-  ChevronUp
+  ChevronUp,
+  Briefcase
 } from 'lucide-react';
 import { GlobalConfig, MonthlyData, CafeSupplies, CafeUnitCosts } from '../types';
 import { InputSection } from './InputSection';
@@ -21,7 +23,11 @@ interface PlannerTabProps {
   dailySalesCount: number;
   cafeUnitCosts: CafeUnitCosts;
   totalInvestment: number;
+  calculatedLaborCost: number;
 }
+
+const WEEKDAY_RATE = 2156880;
+const WEEKEND_RATE = 861200;
 
 export const PlannerTab: React.FC<PlannerTabProps> = ({
   config,
@@ -30,7 +36,8 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
   monthlyData,
   dailySalesCount,
   cafeUnitCosts,
-  totalInvestment
+  totalInvestment,
+  calculatedLaborCost
 }) => {
   const [cafeDetailsOpen, setCafeDetailsOpen] = useState(true);
   const [expandedCostRows, setExpandedCostRows] = useState<Set<string>>(new Set());
@@ -42,7 +49,8 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
     setExpandedCostRows(newSet);
   }
 
-  const CostDetailItem = ({ label, value }: { label: string, value: number }) => (
+  // Fix: Explicitly type CostDetailItem as React.FC to allow magic React props like 'key' in mapping
+  const CostDetailItem: React.FC<{ label: string, value: number }> = ({ label, value }) => (
     <div className="flex justify-between text-xs text-gray-600 mb-1">
       <span>{label}</span>
       <span>{Math.round(value)}원</span>
@@ -375,7 +383,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
   const spaceRev = config.space.hourlyRate * config.space.hoursPerDay * config.space.utilizationRate * config.space.operatingDays;
   const wineRev = config.wine.avgTicketPrice * config.wine.dailyTables * config.wine.operatingDays;
   const totalFixed = 
-    config.fixed.labor + 
+    calculatedLaborCost + 
     config.fixed.utilities + 
     config.fixed.internet + 
     config.fixed.marketing + 
@@ -436,9 +444,56 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
         }
       >
         <div className="space-y-6">
-            <h4 className="font-medium text-gray-700 border-b pb-2">월 고정 비용</h4>
+            {/* Improved Labor Calculator Section */}
+            <div className="bg-blue-50/50 rounded-xl p-5 border border-blue-100">
+               <h4 className="font-bold text-blue-900 flex items-center gap-2 mb-4">
+                  <Briefcase size={18}/> 2026년 기준 인건비 계산기 (시급 10,320원)
+               </h4>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                      <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
+                         <div className="flex justify-between items-start mb-2">
+                            <span className="text-sm font-semibold text-gray-700">주중 풀타임 근무자 (주 40시간)</span>
+                            <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">209시간 기준</span>
+                         </div>
+                         <div className="text-lg font-bold text-gray-900 mb-3">{WEEKDAY_RATE.toLocaleString()}원 <span className="text-xs font-normal text-gray-500">/ 1인</span></div>
+                         <NumberInput label="주중 인원수" value={config.fixed.weekdayStaff} onChange={(v) => onConfigChange('fixed', 'weekdayStaff', v)} unit="명" />
+                      </div>
+                      <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
+                         <div className="flex justify-between items-start mb-2">
+                            <span className="text-sm font-semibold text-gray-700">주말 근무자 (토/일 16시간)</span>
+                            <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">83.45시간 기준</span>
+                         </div>
+                         <div className="text-lg font-bold text-gray-900 mb-3">{WEEKEND_RATE.toLocaleString()}원 <span className="text-xs font-normal text-gray-500">/ 1인</span></div>
+                         <NumberInput label="주말 인원수" value={config.fixed.weekendStaff} onChange={(v) => onConfigChange('fixed', 'weekendStaff', v)} unit="명" />
+                      </div>
+                  </div>
+                  <div className="flex flex-col justify-between">
+                      <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-50 flex-1 flex flex-col justify-center">
+                         <div className="text-center">
+                            <div className="text-sm text-gray-500 mb-1">총 인건비 합계</div>
+                            <div className="text-3xl font-black text-blue-700">{Math.round(calculatedLaborCost).toLocaleString()}원</div>
+                            <div className="mt-4 pt-4 border-t border-gray-50 space-y-2">
+                               <div className="flex justify-between text-xs text-gray-500">
+                                  <span>주중 ({config.fixed.weekdayStaff}명)</span>
+                                  <span>{(config.fixed.weekdayStaff * WEEKDAY_RATE).toLocaleString()}원</span>
+                               </div>
+                               <div className="flex justify-between text-xs text-gray-500">
+                                  <span>주말 ({config.fixed.weekendStaff}명)</span>
+                                  <span>{(config.fixed.weekendStaff * WEEKEND_RATE).toLocaleString()}원</span>
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                      <div className="mt-4">
+                         <NumberInput label="기타 추가 인건비 (관리/보너스 등)" value={config.fixed.additionalLabor} onChange={(v) => onConfigChange('fixed', 'additionalLabor', v)} unit="원" />
+                      </div>
+                  </div>
+               </div>
+            </div>
+
+            <h4 className="font-medium text-gray-700 border-b pb-2 pt-4">기타 월 고정 비용</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <NumberInput label="인건비 (총액)" value={config.fixed.labor} onChange={(v) => onConfigChange('fixed', 'labor', v)} unit="원" />
                 <NumberInput label="공과금 (수도/전기)" value={config.fixed.utilities} onChange={(v) => onConfigChange('fixed', 'utilities', v)} unit="원" />
                 <NumberInput label="마케팅비" value={config.fixed.marketing} onChange={(v) => onConfigChange('fixed', 'marketing', v)} unit="원" />
                 <NumberInput label="유지보수비" value={config.fixed.maintenance} onChange={(v) => onConfigChange('fixed', 'maintenance', v)} unit="원" />

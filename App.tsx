@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import {
   Coffee,
@@ -18,11 +19,15 @@ enum Tab {
   TODO = 'todo',
 }
 
+// 2026 Labor Cost Constants
+const WAGE_2026 = 10320;
+const WEEKDAY_MONTHLY_RATE = 2156880; // 209h * 10320
+const WEEKEND_MONTHLY_RATE = 861200;  // 83.45h * 10320 (rounded)
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(Tab.DASHBOARD);
   const [config, setConfig] = useState<GlobalConfig>(DEFAULT_CONFIG);
   const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
-  // Changed projection months from 12 to 10 as requested
   const [projectionMonths, setProjectionMonths] = useState(10);
 
   // --- Calculations ---
@@ -36,10 +41,16 @@ export default function App() {
     return Math.round(maxDailyCapacity * turnoverTarget);
   }, [config.cafe]);
 
+  // 1.5 Derived Labor Cost
+  const calculatedLaborCost = useMemo(() => {
+    const { weekdayStaff, weekendStaff, additionalLabor } = config.fixed;
+    return (weekdayStaff * WEEKDAY_MONTHLY_RATE) + (weekendStaff * WEEKEND_MONTHLY_RATE) + additionalLabor;
+  }, [config.fixed]);
+
   // 2. Helper: Calculate Cafe Unit Costs dynamically with 8-way branching
   const cafeUnitCosts: CafeUnitCosts = useMemo(() => {
     const { beanPricePerKg, milkPricePerL, takeoutRatio, iceRatio } = config.cafe;
-    const s = config.cafeSupplies; // Use dynamic supplies config
+    const s = config.cafeSupplies; 
     
     // Ingredients Cost
     const bean = (beanPricePerKg / 1000) * s.beanGrams;
@@ -156,7 +167,7 @@ export default function App() {
       const wineCOGS = wineRevenue * config.wine.costOfGoodsSoldRate;
 
       // Cost Breakdown
-      const laborCost = config.fixed.labor;
+      const laborCost = calculatedLaborCost;
       const utilityCost = config.fixed.utilities;
       const otherFixedCost = 
         config.fixed.internet + 
@@ -197,7 +208,7 @@ export default function App() {
       });
     }
     return data;
-  }, [config, projectionMonths, cafeUnitCosts, dailySalesCount]);
+  }, [config, projectionMonths, cafeUnitCosts, dailySalesCount, calculatedLaborCost]);
 
   const bepMonth = useMemo(() => {
     const match = monthlyData.find(d => d.cumulativeProfit >= 0);
@@ -205,7 +216,8 @@ export default function App() {
   }, [monthlyData]);
 
   const totalInvestment = useMemo(() => {
-    return Object.values(config.initial).reduce((a, b) => a + b, 0);
+    // Fix: Explicitly cast Object.values to number[] to handle type inference issues with reduce
+    return (Object.values(config.initial) as number[]).reduce((a, b) => a + b, 0);
   }, [config.initial]);
 
   // --- Handlers ---
@@ -290,6 +302,7 @@ export default function App() {
             dailySalesCount={dailySalesCount}
             cafeUnitCosts={cafeUnitCosts}
             totalInvestment={totalInvestment}
+            calculatedLaborCost={calculatedLaborCost}
           />
         )}
 

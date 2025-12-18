@@ -1,3 +1,4 @@
+
 import { GlobalConfig, TodoItem, CafeSupplies } from './types';
 
 // Based on the provided Excel images, now editable
@@ -60,7 +61,9 @@ export const DEFAULT_CONFIG: GlobalConfig = {
     operatingDays: 24,
   },
   fixed: {
-    labor: 5800000, 
+    weekdayStaff: 2, // 2 full-time staff
+    weekendStaff: 1, // 1 weekend staff
+    additionalLabor: 0,
     utilities: 500000,
     internet: 40000,
     marketing: 1000000,

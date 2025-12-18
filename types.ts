@@ -1,3 +1,4 @@
+
 export interface CafeConfig {
   avgPriceAmericano: number;
   avgPriceLatte: number;
@@ -56,7 +57,9 @@ export interface WineConfig {
 }
 
 export interface FixedCosts {
-  labor: number;
+  weekdayStaff: number;  // Number of weekday full-time staff
+  weekendStaff: number;  // Number of weekend staff
+  additionalLabor: number; // Bonus/Management/Owner draw
   utilities: number;
   internet: number;
   marketing: number;

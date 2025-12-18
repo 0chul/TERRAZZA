@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CheckSquare } from 'lucide-react';
 import { TodoItem } from '../types';
@@ -30,7 +31,8 @@ export const TodoTab: React.FC<TodoTabProps> = ({ todos, onToggle }) => {
             {category}
           </div>
           <div className="divide-y divide-gray-100">
-            {items.map((item) => (
+            {/* Fix: Explicitly cast items to TodoItem[] to resolve 'unknown' property access error */}
+            {(items as TodoItem[]).map((item) => (
               <div key={item.id} className="flex items-center p-4 hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => onToggle(item.id)}>
                 <div className={`w-6 h-6 rounded border flex items-center justify-center mr-4 transition-all ${item.completed ? 'bg-blue-500 border-blue-500' : 'border-gray-300 bg-white'}`}>
                   {item.completed && <CheckSquare className="text-white w-4 h-4" />}
