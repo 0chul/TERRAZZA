@@ -51,7 +51,7 @@ export const DEFAULT_CONFIG: GlobalConfig = {
   space: {
     hourlyRate: 50000,
     hoursPerDay: 8,
-    operatingDays: 20,
+    operatingDays: 30, // Updated from 20 to 30
     utilizationRate: 0.5,
   },
   wine: {
@@ -64,11 +64,11 @@ export const DEFAULT_CONFIG: GlobalConfig = {
     weekdayStaff: 2, // 2 full-time staff
     weekendStaff: 1, // 1 weekend staff
     additionalLabor: 0,
-    utilities: 500000,
+    utilities: 2000000,
     internet: 40000,
     marketing: 1000000,
-    maintenance: 200000,
-    misc: 300000,
+    maintenance: 100000,
+    misc: 100000,
   },
   initial: {
     interior: 50000000,
