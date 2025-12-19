@@ -2,19 +2,16 @@
 export interface CafeConfig {
   avgPriceAmericano: number;
   avgPriceLatte: number;
-  avgPriceSyrupLatte: number; // For Vanilla Latte, Caramel Macchiato, etc.
+  avgPriceSyrupLatte: number;
   beanPricePerKg: number; 
   milkPricePerL: number; 
-  
-  // Dynamic Capacity Logic
-  seatCount: number;      // Total seats
-  operatingHours: number; // Daily open hours
-  stayDuration: number;   // Avg hours per customer
-  turnoverTarget: number; // 0.0 to 1.0 (Turnover rate)
-
+  seatCount: number;      
+  operatingHours: number; 
+  stayDuration: number;   
+  turnoverTarget: number; 
   ratioAmericano: number; 
-  ratioLatte: number;     // Explicit ratio for Cafe Latte
-  ratioSyrupLatte: number; // Explicit ratio for Syrup Latte
+  ratioLatte: number;     
+  ratioSyrupLatte: number; 
   takeoutRatio: number;   
   iceRatio: number;       
   operatingDays: number;
@@ -32,11 +29,9 @@ export interface CafeSupplies {
   wipe: number;
   napkin: number;
   dishwashing: number;
-  
   water: number;
   ice: number;
   syrup: number;
-  
   beanGrams: number;
   milkMl: number;
 }
@@ -53,13 +48,12 @@ export interface WineConfig {
   costOfGoodsSoldRate: number; 
   dailyTables: number;
   operatingDays: number;
-  utilizationRate?: number; // Optional if needed for wine later
 }
 
 export interface FixedCosts {
-  weekdayStaff: number;  // Number of weekday full-time staff
-  weekendStaff: number;  // Number of weekend staff
-  additionalLabor: number; // Bonus/Management/Owner draw
+  weekdayStaff: number;
+  weekendStaff: number;
+  additionalLabor: number;
   utilities: number;
   internet: number;
   marketing: number;
@@ -76,19 +70,14 @@ export interface InitialInvestment {
 
 export interface MonthlyData {
   month: number;
-  // Revenue Breakdown
   cafeRevenue: number;
   spaceRevenue: number;
   wineRevenue: number;
-  
-  // Cost Breakdown
   cafeCOGS: number;
   wineCOGS: number;
   laborCost: number;
   utilityCost: number;
   otherFixedCost: number;
-
-  // Aggregates
   revenue: number;
   cogs: number;
   grossProfit: number;
@@ -141,4 +130,9 @@ export interface CafeUnitCosts {
       ice: ProductCost;
     };
   };
+}
+
+export interface BusinessReport {
+  content: string;
+  timestamp: string;
 }
