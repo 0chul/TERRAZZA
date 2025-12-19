@@ -132,14 +132,14 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
               <Tooltip formatter={(value: number, name: string) => name === '누적 손익' ? [`₩${Math.round(value).toLocaleString()}`, name] : [`₩${Math.abs(Math.round(value)).toLocaleString()}`, name]} />
               <Legend verticalAlign="bottom" height={36} content={() => (<div className="flex justify-center gap-6 mt-4 text-[11px] font-bold text-[#5d4037]"><div className="flex items-center gap-2"><div className="w-3 h-3 bg-orange-600"></div><span>매출원</span></div><div className="flex items-center gap-2"><div className="w-3 h-3 bg-[#d7ccc8]"></div><span>지출원</span></div><div className="flex items-center gap-2"><div className="w-4 h-0.5 bg-[#3e2723]"></div><span>누적 자산 추이</span></div></div>)} />
               <ReferenceLine yAxisId="left" y={0} stroke="#5d4037" strokeDasharray="3 3" />
-              <Bar yAxisId="left" dataKey="cafeRevenue" stackId="revenue" fill={CHART_COLORS.revenue.cafe} barSize={20} />
-              <Bar yAxisId="left" dataKey="spaceRevenue" stackId="revenue" fill={CHART_COLORS.revenue.space} barSize={20} />
-              <Bar yAxisId="left" dataKey="wineRevenue" stackId="revenue" fill={CHART_COLORS.revenue.wine} barSize={20} radius={[4, 4, 0, 0]} />
-              <Bar yAxisId="left" dataKey="laborCost" stackId="cost" fill={CHART_COLORS.cost.labor} barSize={20} />
-              <Bar yAxisId="left" dataKey="cafeCOGS" stackId="cost" fill={CHART_COLORS.cost.cafe} barSize={20} />
-              <Bar yAxisId="left" dataKey="wineCOGS" stackId="cost" fill={CHART_COLORS.cost.wine} barSize={20} />
-              <Bar yAxisId="left" dataKey="utilityCost" stackId="cost" fill={CHART_COLORS.cost.utility} barSize={20} />
-              <Bar yAxisId="left" dataKey="otherFixedCost" stackId="cost" fill={CHART_COLORS.cost.fixed} barSize={20} radius={[0, 0, 4, 4]} />
+              <Bar yAxisId="left" dataKey="cafeRevenue" name="카페 매출" stackId="revenue" fill={CHART_COLORS.revenue.cafe} barSize={20} />
+              <Bar yAxisId="left" dataKey="spaceRevenue" name="공간대여 매출" stackId="revenue" fill={CHART_COLORS.revenue.space} barSize={20} />
+              <Bar yAxisId="left" dataKey="wineRevenue" name="와인바 매출" stackId="revenue" fill={CHART_COLORS.revenue.wine} barSize={20} radius={[4, 4, 0, 0]} />
+              <Bar yAxisId="left" dataKey="laborCost" name="인건비" stackId="cost" fill={CHART_COLORS.cost.labor} barSize={20} />
+              <Bar yAxisId="left" dataKey="cafeCOGS" name="카페 재료비" stackId="cost" fill={CHART_COLORS.cost.cafe} barSize={20} />
+              <Bar yAxisId="left" dataKey="wineCOGS" name="와인바 원가" stackId="cost" fill={CHART_COLORS.cost.wine} barSize={20} />
+              <Bar yAxisId="left" dataKey="utilityCost" name="공과금" stackId="cost" fill={CHART_COLORS.cost.utility} barSize={20} />
+              <Bar yAxisId="left" dataKey="otherFixedCost" name="기타 고정비" stackId="cost" fill={CHART_COLORS.cost.fixed} barSize={20} radius={[0, 0, 4, 4]} />
               <Line yAxisId="left" type="monotone" dataKey="cumulativeProfit" name="누적 손익" stroke={CHART_COLORS.profit} strokeWidth={3} dot={{ r: 3, fill: CHART_COLORS.profit }} />
             </ComposedChart>
           </ResponsiveContainer>
