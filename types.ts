@@ -95,6 +95,13 @@ export interface GlobalConfig {
   initial: InitialInvestment;
 }
 
+export interface Scenario {
+  id: string;
+  name: string;
+  config: GlobalConfig;
+  timestamp: number;
+}
+
 export interface TodoItem {
   id: string;
   category: string;

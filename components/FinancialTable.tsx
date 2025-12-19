@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MonthlyData } from '../types';
 
@@ -67,10 +68,10 @@ export const FinancialTable: React.FC<FinancialTableProps> = ({ data }) => {
             ))}
           </tr>
           <tr className="bg-blue-50/50 border-t-2 border-blue-100">
-            <td className="px-4 py-3 text-left font-bold text-blue-900 sticky left-0 bg-blue-50 border-r border-blue-200 whitespace-nowrap z-10">순이익</td>
+            <td className="px-4 py-3 text-left font-bold text-blue-900 sticky left-0 bg-blue-50 border-r border-blue-200 whitespace-nowrap z-10">순이익 (Net)</td>
             {data.map((row) => (
               <td key={row.month} className={`px-4 py-3 font-bold ${row.netProfit >= 0 ? 'text-blue-700' : 'text-red-600'}`}>
-                {formatCurrency(row.netProfit)}
+                {row.netProfit >= 0 ? '+' : ''}{formatCurrency(row.netProfit)}
               </td>
             ))}
           </tr>

@@ -2,15 +2,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  // 상대 경로를 사용하여 GitHub Pages의 하위 경로에서도 정적 자산이 올바르게 로드되도록 합니다.
-  base: './',
+  plugins: [react()],
+  base: './', // GitHub Pages 배포를 위한 상대 경로 설정
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+  },
   server: {
     port: 3000,
   },
-  build: {
-    outDir: 'dist',
-    sourcemap: true,
-  }
 });

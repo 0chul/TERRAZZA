@@ -1,17 +1,20 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Coffee,
   Calculator,
   CheckSquare,
   TrendingUp,
   Sparkles,
-  Loader2
+  Save,
+  Trash2,
+  Copy,
+  Plus
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
 import { DEFAULT_CONFIG, INITIAL_TODOS } from './constants';
-import { GlobalConfig, MonthlyData, TodoItem, CafeSupplies, CafeUnitCosts, BusinessReport } from './types';
+import { GlobalConfig, MonthlyData, TodoItem, CafeSupplies, CafeUnitCosts, BusinessReport, Scenario } from './types';
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
@@ -29,10 +32,53 @@ const WEEKEND_MONTHLY_RATE = 861200;
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(Tab.DASHBOARD);
   const [config, setConfig] = useState<GlobalConfig>(DEFAULT_CONFIG);
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
   const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
   const [projectionMonths, setProjectionMonths] = useState(10);
   const [report, setReport] = useState<BusinessReport | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Load scenarios from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('bizplanner_scenarios');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setScenarios(parsed);
+      } catch (e) {
+        console.error("Failed to parse saved scenarios");
+      }
+    }
+  }, []);
+
+  const saveCurrentScenario = (name: string) => {
+    const newScenario: Scenario = {
+      id: crypto.randomUUID(),
+      name,
+      config: JSON.parse(JSON.stringify(config)),
+      timestamp: Date.now()
+    };
+    const updated = [...scenarios, newScenario];
+    setScenarios(updated);
+    localStorage.setItem('bizplanner_scenarios', JSON.stringify(updated));
+    setActiveScenarioId(newScenario.id);
+  };
+
+  const loadScenario = (id: string) => {
+    const scenario = scenarios.find(s => s.id === id);
+    if (scenario) {
+      setConfig(JSON.parse(JSON.stringify(scenario.config)));
+      setActiveScenarioId(id);
+    }
+  };
+
+  const deleteScenario = (id: string) => {
+    const updated = scenarios.filter(s => s.id !== id);
+    setScenarios(updated);
+    localStorage.setItem('bizplanner_scenarios', JSON.stringify(updated));
+    if (activeScenarioId === id) setActiveScenarioId(null);
+  };
 
   const dailySalesCount = useMemo(() => {
     const { seatCount, operatingHours, stayDuration, turnoverTarget } = config.cafe;
@@ -118,6 +164,10 @@ export default function App() {
   }, [config, projectionMonths, cafeUnitCosts, dailySalesCount, calculatedLaborCost]);
 
   const generateAIReport = async () => {
+    if (!process.env.API_KEY) {
+      alert("API Key가 설정되어 있지 않습니다.");
+      return;
+    }
     setIsGenerating(true);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -151,7 +201,7 @@ export default function App() {
       });
     } catch (error) {
       console.error("Failed to generate report:", error);
-      alert("Report generation failed. Please check your connection.");
+      alert("Report generation failed. Please check your connection or API key.");
     } finally {
       setIsGenerating(false);
     }
@@ -168,7 +218,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-20">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center space-x-2">
@@ -194,6 +244,47 @@ export default function App() {
                 </button>
               ))}
             </nav>
+          </div>
+        </div>
+
+        {/* Scenarios Toolbar (Secondary Header) */}
+        <div className="bg-gray-50 border-b border-gray-200 py-2">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-2 pr-4">
+              <span className="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-wider">계획안 (Scenarios):</span>
+              <div className="flex gap-2">
+                {scenarios.map(s => (
+                  <div key={s.id} className="flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden h-8 shadow-sm">
+                    <button 
+                      onClick={() => loadScenario(s.id)}
+                      className={`px-3 text-xs font-medium transition-colors ${activeScenarioId === s.id ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 text-gray-700'}`}
+                    >
+                      {s.name}
+                    </button>
+                    <button 
+                      onClick={() => deleteScenario(s.id)}
+                      className="px-2 border-l border-gray-100 hover:text-red-500 text-gray-300 transition-colors"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+                <button 
+                  onClick={() => {
+                    const name = prompt("새 계획안의 이름을 입력하세요:", `계획 ${scenarios.length + 1}`);
+                    if (name) saveCurrentScenario(name);
+                  }}
+                  className="flex items-center gap-1 px-3 h-8 bg-white border border-dashed border-gray-300 rounded-lg text-xs font-medium text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-all"
+                >
+                  <Plus size={14} /> 추가
+                </button>
+              </div>
+            </div>
+            {activeScenarioId && (
+              <div className="text-[10px] text-gray-400 font-mono italic whitespace-nowrap">
+                Active: {scenarios.find(s => s.id === activeScenarioId)?.name} (Modified values are not autosaved)
+              </div>
+            )}
           </div>
         </div>
       </header>
