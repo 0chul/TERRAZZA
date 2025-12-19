@@ -5,7 +5,6 @@ import {
   Calculator,
   CheckSquare,
   TrendingUp,
-  Sparkles,
   Trash2,
   Plus,
   BarChart2,
@@ -23,13 +22,11 @@ import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
 import { ComparisonTab } from './components/ComparisonTab';
-import { StrategyTab } from './components/StrategyTab';
 
 enum Tab {
   DASHBOARD = 'dashboard',
   PLANNER = 'planner',
   COMPARISON = 'comparison',
-  STRATEGY = 'strategy',
   TODO = 'todo',
 }
 
@@ -353,7 +350,6 @@ export default function App() {
                 { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={16} /> },
                 { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={16} /> },
                 { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={16} /> },
-                { id: Tab.STRATEGY, label: 'AI 전략', icon: <Sparkles size={16} /> },
                 { id: Tab.TODO, label: '준비물', icon: <CheckSquare size={16} /> },
               ].map((tab) => (
                 <button
@@ -470,10 +466,6 @@ export default function App() {
             currentConfig={config}
             calculateFinancials={calculateFinancialsForScenario} 
           />
-        )}
-
-        {activeTab === Tab.STRATEGY && (
-          <StrategyTab config={config} financials={currentFinancials} bepMonth={bepMonth} />
         )}
 
         {activeTab === Tab.TODO && (
