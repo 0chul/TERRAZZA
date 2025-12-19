@@ -12,10 +12,9 @@ import {
   Save,
   Copy
 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 
 import { DEFAULT_CONFIG, INITIAL_TODOS, PLAN_PRESETS } from './constants';
-import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, BusinessReport, Scenario } from './types';
+import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, Scenario } from './types';
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
@@ -38,8 +37,6 @@ export default function App() {
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
   const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
   const [projectionMonths, setProjectionMonths] = useState(12);
-  const [report, setReport] = useState<BusinessReport | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('bizplanner_scenarios');
@@ -224,36 +221,6 @@ export default function App() {
     return data;
   }, [currentFinancials, projectionMonths, config]);
 
-  const generateAIReport = async () => {
-    if (!process.env.API_KEY) {
-      alert("API Key가 설정되어 있지 않습니다.");
-      return;
-    }
-    setIsGenerating(true);
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `복합 사업 모델(카페, 공간대여, 와인바) 분석:
-      - 월 총매출: ₩${Math.round(currentFinancials.totalRevenue).toLocaleString()}
-      - 월 순이익: ₩${Math.round(currentFinancials.netProfit).toLocaleString()}
-      - 초기 투자: ₩${Math.round(currentFinancials.totalInvestment).toLocaleString()}
-      - 매출 비중: 카페(${Math.round(currentFinancials.cafeRevenue/currentFinancials.totalRevenue*100)}%), 공간(${Math.round(currentFinancials.spaceRevenue/currentFinancials.totalRevenue*100)}%), 와인(${Math.round(currentFinancials.wineRevenue/currentFinancials.totalRevenue*100)}%)
-      
-      이 비즈니스 모델의 강점, 약점, 그리고 수익성을 극대화하기 위한 3단계 로드맵을 한국어로 전문적이고 창의적으로 작성해줘.`;
-      
-      const response = await ai.models.generateContent({ 
-        model: 'gemini-3-flash-preview', 
-        contents: prompt,
-        config: { thinkingConfig: { thinkingBudget: 0 } }
-      });
-      setReport({ content: response.text || "분석 실패", timestamp: new Date().toLocaleTimeString() });
-    } catch (error) {
-      console.error(error);
-      alert("AI 리포트 생성 중 오류가 발생했습니다.");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const bepMonth = useMemo(() => {
     const match = monthlyData.find(d => d.cumulativeProfit >= 0);
     return match ? `M+${match.month}` : '측정 불가';
@@ -389,9 +356,6 @@ export default function App() {
             monthlyData={monthlyData}
             totalInvestment={currentFinancials.totalInvestment}
             bepMonth={bepMonth}
-            onGenerateReport={generateAIReport}
-            isGenerating={isGenerating}
-            report={report}
           />
         )}
         

@@ -138,8 +138,3 @@ export interface CafeUnitCosts {
     };
   };
 }
-
-export interface BusinessReport {
-  content: string;
-  timestamp: string;
-}

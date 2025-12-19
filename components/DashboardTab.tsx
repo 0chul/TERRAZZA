@@ -21,11 +21,8 @@ import {
   AlertCircle,
   Calculator,
   PieChart as PieChartIcon,
-  Sparkles,
-  Loader2,
-  FileText
 } from 'lucide-react';
-import { MonthlyData, BusinessReport } from '../types';
+import { MonthlyData } from '../types';
 import { InfoCard } from './InfoCard';
 import { FinancialTable } from './FinancialTable';
 
@@ -39,18 +36,12 @@ interface DashboardTabProps {
   monthlyData: MonthlyData[];
   totalInvestment: number;
   bepMonth: string;
-  onGenerateReport: () => void;
-  isGenerating: boolean;
-  report: BusinessReport | null;
 }
 
 export const DashboardTab: React.FC<DashboardTabProps> = ({ 
   monthlyData, 
   totalInvestment, 
   bepMonth,
-  onGenerateReport,
-  isGenerating,
-  report
 }) => {
   const mainChartData = useMemo(() => {
     return monthlyData.map(d => ({
@@ -94,46 +85,6 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
         <InfoCard title="월 예상 순이익" value={`₩${Math.round((monthlyData[0]?.netProfit || 0) / 10000).toLocaleString()}만`} subValue={`마진율 ${totalRevenue ? Math.round((monthlyData[0].netProfit / totalRevenue) * 100) : 0}%`} icon={<DollarSign className="text-green-500" />} />
         <InfoCard title="초기 투자비용" value={`₩${Math.round(totalInvestment / 10000).toLocaleString()}만`} subValue="건물주 직영 (보증금 제외)" icon={<Calculator className="text-purple-500" />} />
         <InfoCard title="손익분기점 (BEP)" value={bepMonth} subValue={bepMonth !== '미도달' ? '누적 수익 전환 시점' : '10개월 내 달성 불가'} icon={<AlertCircle className="text-orange-500" />} />
-      </div>
-
-      {/* AI Strategy Report Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-1 rounded-2xl shadow-lg transition-all hover:shadow-xl">
-        <div className="bg-white rounded-xl p-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Sparkles size={24} className="text-amber-500" /> AI 사업 전략 보고서
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">Gemini AI가 현재 설정값을 기반으로 비즈니스 모델을 분석합니다.</p>
-            </div>
-            <button 
-              onClick={onGenerateReport}
-              disabled={isGenerating}
-              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white rounded-xl font-bold shadow-md transition-all active:scale-95 whitespace-nowrap"
-            >
-              {isGenerating ? <Loader2 size={20} className="animate-spin" /> : <Sparkles size={20} />}
-              {report ? '보고서 갱신하기' : 'AI 전략 리포트 생성'}
-            </button>
-          </div>
-
-          {report ? (
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-100 relative">
-              <div className="absolute top-4 right-4 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
-                Generated at {report.timestamp}
-              </div>
-              <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
-                {report.content}
-              </div>
-            </div>
-          ) : (
-            <div className="border-2 border-dashed border-gray-100 rounded-xl p-12 text-center">
-              <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="text-gray-300" size={32} />
-              </div>
-              <p className="text-gray-400 text-sm">리포트 생성 버튼을 눌러 AI 컨설팅을 시작하세요.</p>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

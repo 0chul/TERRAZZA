@@ -1,7 +1,8 @@
+
 {
   "name": "bizplanner-3-in-1",
   "version": "1.1.0",
-  "description": "Comprehensive business planning tool with AI strategy generation and multi-scenario comparison.",
+  "description": "Comprehensive business planning tool for Cafe, Space Rental, and Wine Bar integration.",
   "main": "index.tsx",
   "type": "module",
   "scripts": {
@@ -15,8 +16,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.0",
-    "lucide-react": "^0.475.0",
-    "@google/genai": "^1.34.0"
+    "lucide-react": "^0.475.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
