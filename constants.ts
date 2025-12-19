@@ -20,6 +20,7 @@ export const DEFAULT_CAFE_SUPPLIES: CafeSupplies = {
   milkMl: 150,
 };
 
+// Default Config updated to "Cafe Focused" model
 export const DEFAULT_CONFIG: GlobalConfig = {
   cafe: {
     avgPriceAmericano: 4500,
@@ -27,10 +28,10 @@ export const DEFAULT_CONFIG: GlobalConfig = {
     avgPriceSyrupLatte: 5500,
     beanPricePerKg: 30000, 
     milkPricePerL: 2500,
-    seatCount: 40,
+    seatCount: 60, // Increased for Cafe Focus
     operatingHours: 9,
     stayDuration: 2,
-    turnoverTarget: 0.6,
+    turnoverTarget: 1.2, // High turnover for Cafe Focus
     ratioAmericano: 0.5,
     ratioLatte: 0.3,
     ratioSyrupLatte: 0.2,
@@ -43,16 +44,16 @@ export const DEFAULT_CONFIG: GlobalConfig = {
     hourlyRate: 40000,
     hoursPerDay: 8,
     operatingDays: 30,
-    utilizationRate: 0.4,
+    utilizationRate: 0.2, // Lower utilization for space
   },
   wine: {
     avgTicketPrice: 70000,
     costOfGoodsSoldRate: 0.35,
-    dailyTables: 4,
+    dailyTables: 2, // Lower volume for wine
     operatingDays: 24,
   },
   fixed: {
-    weekdayStaff: 2,
+    weekdayStaff: 3, // Increased staff for cafe volume
     weekendStaff: 1,
     additionalLabor: 0,
     utilities: 1500000,
@@ -69,28 +70,8 @@ export const DEFAULT_CONFIG: GlobalConfig = {
   },
 };
 
-export const PLAN_PRESETS: Record<string, Partial<GlobalConfig>> = {
-  "균형 모델": {
-    cafe: { ...DEFAULT_CONFIG.cafe, turnoverTarget: 0.6 },
-    space: { ...DEFAULT_CONFIG.space, utilizationRate: 0.4 },
-    wine: { ...DEFAULT_CONFIG.wine, dailyTables: 4 }
-  },
-  "카페 집중형": {
-    cafe: { ...DEFAULT_CONFIG.cafe, turnoverTarget: 1.2, seatCount: 60 },
-    space: { ...DEFAULT_CONFIG.space, utilizationRate: 0.2 },
-    wine: { ...DEFAULT_CONFIG.wine, dailyTables: 2 },
-    fixed: { ...DEFAULT_CONFIG.fixed, weekdayStaff: 3 }
-  },
-  "와인/심야 집중형": {
-    cafe: { ...DEFAULT_CONFIG.cafe, turnoverTarget: 0.3, operatingHours: 6 },
-    space: { ...DEFAULT_CONFIG.space, utilizationRate: 0.6 },
-    wine: { ...DEFAULT_CONFIG.wine, dailyTables: 8, avgTicketPrice: 85000 },
-    fixed: { ...DEFAULT_CONFIG.fixed, weekdayStaff: 2, weekendStaff: 2 }
-  }
-};
-
 export const INITIAL_TODOS: TodoItem[] = [
-  // 영업 신고 관련 서류 (요청하신 항목 반영)
+  // 영업 신고 관련 서류
   { id: 'doc-1', category: '영업 신고', task: '영업 신고', note: '관할 구청 위생과', completed: false },
   { id: 'doc-2', category: '영업 신고', task: '위생 교육 필증', note: '한국외식업중앙회 온라인 수료', completed: false },
   { id: 'doc-3', category: '영업 신고', task: '위생관리책임자 지정 확인서', note: '', completed: false },
@@ -103,7 +84,7 @@ export const INITIAL_TODOS: TodoItem[] = [
   { id: 'doc-10', category: '영업 신고', task: '대리인 신분증', note: '대리인 방문 시 필요', completed: false },
   { id: 'doc-11', category: '영업 신고', task: '사업자등록증', note: '세무서 (영업신고증 지참 후 방문)', completed: false },
   
-  // 기타 필수 항목 유지
+  // 기타 필수 항목
   { id: 'fin-1', category: '금융', task: '통장 개설', note: '사업자용', completed: false },
   { id: 'fin-2', category: '금융', task: '카드 가맹 신청', note: 'POS 업체 대행', completed: false },
   { id: 'fac-1', category: '시설', task: '인테리어 공사', note: '3주 소요 예정', completed: false },

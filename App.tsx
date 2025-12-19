@@ -13,15 +13,16 @@ import {
   Layout,
   RefreshCw,
   RotateCcw,
-  BookTemplate
+  Database
 } from 'lucide-react';
 
-import { DEFAULT_CONFIG, INITIAL_TODOS, PLAN_PRESETS } from './constants';
+import { DEFAULT_CONFIG, INITIAL_TODOS } from './constants';
 import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, Scenario } from './types';
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
 import { ComparisonTab } from './components/ComparisonTab';
+import { dbService } from './db';
 
 enum Tab {
   DASHBOARD = 'dashboard',
@@ -39,7 +40,7 @@ const generateId = () => Math.random().toString(36).substring(2, 11);
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(Tab.DASHBOARD);
   
-  // FIXED: Load current draft from localStorage or fallback to default preset
+  // Load current draft from localStorage or fallback to DEFAULT_CONFIG (Cafe Focused)
   const [config, setConfig] = useState<GlobalConfig>(() => {
     try {
       const savedDraft = localStorage.getItem('terrazza_current_draft');
@@ -49,26 +50,30 @@ export default function App() {
     } catch (e) {
       console.error("Failed to load draft", e);
     }
-    const preset = PLAN_PRESETS["카페 집중형"];
-    return { ...DEFAULT_CONFIG, ...preset };
+    return { ...DEFAULT_CONFIG };
   });
 
-  // FIXED: Initialize scenarios lazily
-  const [scenarios, setScenarios] = useState<Scenario[]>(() => {
-    try {
-      const saved = localStorage.getItem('terrazza_scenarios');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error("Failed to load scenarios from localStorage", e);
-      return [];
-    }
-  });
+  // Load scenarios from Database
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+
+  useEffect(() => {
+    // Initial load from DB
+    const loadScenarios = async () => {
+      try {
+        const loadedPlans = await dbService.getAllPlans();
+        setScenarios(loadedPlans);
+      } catch (e) {
+        console.error("Failed to load plans from DB", e);
+      }
+    };
+    loadScenarios();
+  }, []);
 
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
   const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
   const [projectionMonths, setProjectionMonths] = useState(12);
 
-  // FIXED: Automatically persist current draft whenever it changes
+  // Automatically persist current draft whenever it changes (auto-save draft only)
   useEffect(() => {
     try {
       localStorage.setItem('terrazza_current_draft', JSON.stringify(config));
@@ -77,16 +82,7 @@ export default function App() {
     }
   }, [config]);
 
-  // FIXED: Automatically persist scenarios whenever they change
-  useEffect(() => {
-    try {
-      localStorage.setItem('terrazza_scenarios', JSON.stringify(scenarios));
-    } catch (e) {
-      console.error("Failed to save scenarios to localStorage", e);
-    }
-  }, [scenarios]);
-
-  const saveCurrentScenario = (name: string) => {
+  const saveCurrentScenario = async (name: string) => {
     if (!name.trim()) return;
     const newScenario: Scenario = {
       id: generateId(),
@@ -94,27 +90,31 @@ export default function App() {
       config: JSON.parse(JSON.stringify(config)),
       timestamp: Date.now()
     };
-    setScenarios(prev => [...prev, newScenario]);
-    setActiveScenarioId(newScenario.id);
+    
+    try {
+      await dbService.savePlan(newScenario);
+      setScenarios(prev => [...prev, newScenario]);
+      setActiveScenarioId(newScenario.id);
+    } catch (e) {
+      alert("DB 저장 실패");
+    }
   };
 
-  const updateCurrentScenario = () => {
+  const updateCurrentScenario = async () => {
     if (!activeScenarioId) return;
-    setScenarios(prev => prev.map(s => 
-      s.id === activeScenarioId 
-        ? { ...s, config: JSON.parse(JSON.stringify(config)), timestamp: Date.now() }
-        : s
-    ));
-    alert("현재 계획이 업데이트되었습니다.");
-  };
+    const updatedScenario: Scenario = {
+      id: activeScenarioId,
+      name: scenarios.find(s => s.id === activeScenarioId)?.name || 'Unknown',
+      config: JSON.parse(JSON.stringify(config)),
+      timestamp: Date.now()
+    };
 
-  const applyPreset = (presetName: string) => {
-    if (window.confirm(`'${presetName}' 모델을 적용하시겠습니까?\n현재 입력된 값들이 선택한 표준 모델 값으로 변경됩니다.`)) {
-      const preset = PLAN_PRESETS[presetName];
-      if (preset) {
-        setConfig(prev => ({ ...prev, ...preset }));
-        setActiveScenarioId(null); // Presets are start of a new draft, so detach from saved ID
-      }
+    try {
+      await dbService.savePlan(updatedScenario);
+      setScenarios(prev => prev.map(s => s.id === activeScenarioId ? updatedScenario : s));
+      alert("현재 계획이 DB에 업데이트되었습니다.");
+    } catch (e) {
+      alert("DB 업데이트 실패");
     }
   };
 
@@ -128,18 +128,22 @@ export default function App() {
     }
   };
 
-  const deleteScenario = (id: string, e: React.MouseEvent) => {
+  const deleteScenario = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm("정말 이 계획을 삭제하시겠습니까?")) {
-      setScenarios(prev => prev.filter(s => s.id !== id));
-      if (activeScenarioId === id) setActiveScenarioId(null);
+      try {
+        await dbService.deletePlan(id);
+        setScenarios(prev => prev.filter(s => s.id !== id));
+        if (activeScenarioId === id) setActiveScenarioId(null);
+      } catch (err) {
+        alert("삭제 중 오류가 발생했습니다.");
+      }
     }
   };
 
   const resetConfig = () => {
     if (window.confirm("현재 작업 중인 내용을 초기화하시겠습니까?\n저장되지 않은 변경사항은 삭제됩니다.")) {
-       const preset = PLAN_PRESETS["카페 집중형"];
-       setConfig({ ...DEFAULT_CONFIG, ...preset });
+       setConfig({ ...DEFAULT_CONFIG });
        setActiveScenarioId(null);
     }
   };
@@ -386,28 +390,16 @@ export default function App() {
         <div className="bg-[#fff9f5] border-b border-orange-100 py-2.5">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
             
-            {/* Left Side: Standard Models (Presets) */}
-            <div className="flex items-center gap-3 w-full md:w-auto overflow-hidden">
-              <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest whitespace-nowrap flex items-center gap-1">
-                 <BookTemplate size={12}/> Standard Models:
-              </span>
-              <div className="flex gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
-                {Object.keys(PLAN_PRESETS).map(name => (
-                  <button 
-                    key={name}
-                    onClick={() => applyPreset(name)}
-                    className="px-3 py-1 bg-white border border-orange-200 rounded-lg text-[10px] font-bold text-[#5d4037] hover:bg-orange-50 hover:border-orange-500 transition-all shadow-sm whitespace-nowrap"
-                  >
-                    {name}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center gap-2 text-xs text-orange-800 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100">
+               <Database size={14} className="text-orange-500"/>
+               <span className="font-bold">Database:</span>
+               <span>Local IndexedDB Active</span>
             </div>
 
             {/* Right Side: Saved Plans & Draft Actions */}
             <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-2.5 md:pt-0 border-orange-100">
                <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest whitespace-nowrap flex items-center gap-1">
-                 <Copy size={12}/> My Plans:
+                 <Copy size={12}/> My Plans (DB):
                </span>
                
                {/* Saved Scenarios List */}
@@ -429,7 +421,7 @@ export default function App() {
                    <button 
                       onClick={resetConfig}
                       className="px-2 h-7 bg-slate-100 border border-slate-200 text-slate-500 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm hover:bg-slate-200 transition-all whitespace-nowrap"
-                      title="입력값 초기화 (현재 드래프트 비우기)"
+                      title="입력값 초기화 (현재 드래프트 리셋)"
                     >
                       <RotateCcw size={10} />
                    </button>
@@ -438,7 +430,7 @@ export default function App() {
                     <button 
                       onClick={updateCurrentScenario}
                       className="px-2 h-7 bg-emerald-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm hover:bg-emerald-700 transition-all whitespace-nowrap"
-                      title="현재 계획 덮어쓰기"
+                      title="현재 계획 DB 업데이트"
                     >
                       <RefreshCw size={10}/>
                     </button>
@@ -447,7 +439,7 @@ export default function App() {
                     onClick={() => { const name = prompt("새로운 계획 이름을 입력하세요:"); if(name) saveCurrentScenario(name); }} 
                     className="px-3 h-7 bg-[#5d4037] text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow-sm hover:bg-[#4e342e] transition-all transform hover:-translate-y-0.5 whitespace-nowrap"
                    >
-                    <Plus size={12}/> {activeScenarioId ? '새로 저장' : '저장'}
+                    <Plus size={12}/> {activeScenarioId ? '새로 저장' : 'DB 저장'}
                    </button>
                 </div>
             </div>
@@ -477,7 +469,6 @@ export default function App() {
           />
         )}
 
-        {/* FIXED: Passed currentConfig to ComparisonTab to allow real-time comparison */}
         {activeTab === Tab.COMPARISON && (
           <ComparisonTab 
             scenarios={scenarios} 
