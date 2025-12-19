@@ -144,6 +144,24 @@ export default function App() {
     }
   };
 
+  // Todo Actions
+  const handleAddTodo = (category: string, task: string, note: string) => {
+    const newTodo: TodoItem = {
+      id: generateId(),
+      category,
+      task,
+      note,
+      completed: false
+    };
+    setTodos(prev => [newTodo, ...prev]);
+  };
+
+  const handleDeleteTodo = (id: string) => {
+    if (window.confirm("항목을 삭제하시겠습니까?")) {
+      setTodos(prev => prev.filter(t => t.id !== id));
+    }
+  };
+
   const cafeUnitCosts: CafeUnitCosts = useMemo(() => {
     const { beanPricePerKg, milkPricePerL, iceRatio, takeoutRatio } = config.cafe;
     const s = config.cafeSupplies;
@@ -350,7 +368,7 @@ export default function App() {
                 { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={16} /> },
                 { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={16} /> },
                 { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={16} /> },
-                { id: Tab.TODO, label: '준비물', icon: <CheckSquare size={16} /> },
+                { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={16} /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -469,7 +487,12 @@ export default function App() {
         )}
 
         {activeTab === Tab.TODO && (
-          <TodoTab todos={todos} onToggle={(id) => setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))} />
+          <TodoTab 
+            todos={todos} 
+            onToggle={(id) => setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))} 
+            onAdd={handleAddTodo}
+            onDelete={handleDeleteTodo}
+          />
         )}
       </main>
     </div>

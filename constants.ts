@@ -90,18 +90,28 @@ export const PLAN_PRESETS: Record<string, Partial<GlobalConfig>> = {
 };
 
 export const INITIAL_TODOS: TodoItem[] = [
-  { id: '1', category: '행정', task: '위생 교육 필증', note: '위생관리책임자 선임', completed: true },
-  { id: '2', category: '행정', task: '보건증', note: '전 직원 필수', completed: true },
-  { id: '3', category: '행정', task: '사업자 등록증', note: '세무서 방문', completed: false },
-  { id: '4', category: '행정', task: '영업 신고', note: '관할 구청 위생과', completed: false },
-  { id: '5', category: '금융', task: '통장 개설', note: '사업자용', completed: false },
-  { id: '6', category: '금융', task: '카드 가맹 신청', note: '단말기 업체 대행', completed: false },
-  { id: '7', category: '시설', task: '인테리어 공사', note: '3주 소요 예정', completed: false },
-  { id: '8', category: '시설', task: '인터넷/CCTV 설치', note: '', completed: false },
-  { id: '9', category: '시설', task: '전기 승압 확인', note: '계약전력 확인', completed: false },
-  { id: '10', category: '인력', task: '알바 채용 공고', note: '알바천국/알바몬', completed: false },
-  { id: '11', category: '인력', task: '근로계약서 작성', note: '', completed: false },
-  { id: '12', category: '운영', task: '메뉴판 디자인', note: '', completed: false },
-  { id: '13', category: '운영', task: '초도 물품 발주', note: '원두, 우유, 컵 등', completed: false },
-  { id: '14', category: '운영', task: '네이버 지도 등록', note: '스마트플레이스', completed: false },
+  // 영업 신고 관련 서류 (요청하신 항목 반영)
+  { id: 'doc-1', category: '영업 신고', task: '영업 신고', note: '관할 구청 위생과', completed: false },
+  { id: 'doc-2', category: '영업 신고', task: '위생 교육 필증', note: '한국외식업중앙회 온라인 수료', completed: false },
+  { id: 'doc-3', category: '영업 신고', task: '위생관리책임자 지정 확인서', note: '', completed: false },
+  { id: 'doc-4', category: '영업 신고', task: '등기부등본', note: '건물/토지', completed: false },
+  { id: 'doc-5', category: '영업 신고', task: '보건증', note: '보건소 (발급 1주 소요)', completed: false },
+  { id: 'doc-6', category: '영업 신고', task: '보험가입증권', note: '재난배상책임보험', completed: false },
+  { id: 'doc-7', category: '영업 신고', task: '인감 도장', note: '대표자 본인', completed: false },
+  { id: 'doc-8', category: '영업 신고', task: '인감 증명서', note: '주민센터 발급', completed: false },
+  { id: 'doc-9', category: '영업 신고', task: '위임장', note: '대리인 방문 시 필요', completed: false },
+  { id: 'doc-10', category: '영업 신고', task: '대리인 신분증', note: '대리인 방문 시 필요', completed: false },
+  { id: 'doc-11', category: '영업 신고', task: '사업자등록증', note: '세무서 (영업신고증 지참 후 방문)', completed: false },
+  
+  // 기타 필수 항목 유지
+  { id: 'fin-1', category: '금융', task: '통장 개설', note: '사업자용', completed: false },
+  { id: 'fin-2', category: '금융', task: '카드 가맹 신청', note: 'POS 업체 대행', completed: false },
+  { id: 'fac-1', category: '시설', task: '인테리어 공사', note: '3주 소요 예정', completed: false },
+  { id: 'fac-2', category: '시설', task: '인터넷/CCTV 설치', note: '', completed: false },
+  { id: 'fac-3', category: '시설', task: '전기 승압 확인', note: '계약전력 확인', completed: false },
+  { id: 'hr-1', category: '인력', task: '알바 채용 공고', note: '알바천국/알바몬', completed: false },
+  { id: 'hr-2', category: '인력', task: '근로계약서 작성', note: '', completed: false },
+  { id: 'op-1', category: '운영', task: '메뉴판 디자인', note: '', completed: false },
+  { id: 'op-2', category: '운영', task: '초도 물품 발주', note: '원두, 우유, 컵 등', completed: false },
+  { id: 'op-3', category: '운영', task: '네이버 지도 등록', note: '스마트플레이스', completed: false },
 ];
