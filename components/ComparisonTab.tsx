@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { Scenario, GlobalConfig } from '../types';
-import { BarChart2, TrendingUp, DollarSign, Wallet, ArrowRight } from 'lucide-react';
+import { BarChart2, TrendingUp, DollarSign, Wallet } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -9,13 +9,13 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   Cell
 } from 'recharts';
 
 interface ComparisonTabProps {
   scenarios: Scenario[];
+  currentConfig: GlobalConfig;
   calculateFinancials: (config: GlobalConfig) => {
     totalRevenue: number;
     netProfit: number;
@@ -23,33 +23,32 @@ interface ComparisonTabProps {
   };
 }
 
-export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, calculateFinancials }) => {
-  const scenarioResults = useMemo(() => {
-    return scenarios.map(s => ({
+export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, currentConfig, calculateFinancials }) => {
+  const comparisonData = useMemo(() => {
+    // 1. Convert Saved Scenarios
+    const saved = scenarios.map(s => ({
+      id: s.id,
       name: s.name,
       ...calculateFinancials(s.config),
-      margin: 0,
-      bep: 0
-    })).map(res => ({
-      ...res,
-      margin: (res.netProfit / res.totalRevenue) * 100,
-      bep: res.netProfit > 0 ? res.totalInvestment / res.netProfit : 99 // Cap at 99 for chart
+      isCurrent: false
     }));
-  }, [scenarios, calculateFinancials]);
 
-  if (scenarios.length < 2) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-200 shadow-sm">
-        <div className="bg-slate-50 p-6 rounded-full mb-6">
-          <BarChart2 size={48} className="text-slate-300" />
-        </div>
-        <h3 className="text-xl font-bold text-slate-800">시나리오 비교를 위해 2개 이상의 계획을 저장해주세요.</h3>
-        <p className="text-slate-500 mt-2 text-center max-w-md">
-          '상세 설정' 탭에서 여러 수치를 변경한 후 상단 바의 <b>저장</b> 버튼을 눌러 시나리오를 추가할 수 있습니다.
-        </p>
-      </div>
-    );
-  }
+    // 2. Add Current Draft (always included for comparison)
+    // Only add if it doesn't look exactly like a saved scenario? 
+    // Actually better to always show it so user knows "This is what I am editing right now".
+    const current = {
+      id: 'current-draft',
+      name: '현재 편집 중 (Draft)',
+      ...calculateFinancials(currentConfig),
+      isCurrent: true
+    };
+
+    return [...saved, current].map(res => ({
+      ...res,
+      margin: res.totalRevenue > 0 ? (res.netProfit / res.totalRevenue) * 100 : 0,
+      bep: res.netProfit > 0 ? res.totalInvestment / res.netProfit : 99 // Cap/Flag for chart
+    }));
+  }, [scenarios, currentConfig, calculateFinancials]);
 
   const formatKrw = (val: number) => `₩${Math.round(val / 10000).toLocaleString()}만`;
 
@@ -63,7 +62,7 @@ export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, calcula
           </h3>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={scenarioResults} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+              <BarChart data={comparisonData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
                 <YAxis hide />
@@ -71,10 +70,12 @@ export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, calcula
                   cursor={{fill: '#f8fafc'}}
                   content={({active, payload}) => {
                     if (active && payload && payload.length) {
+                      const data = payload[0].payload;
                       return (
                         <div className="bg-slate-900 text-white p-3 rounded-xl text-xs shadow-xl">
-                          <p className="font-bold mb-1">{payload[0].payload.name}</p>
-                          <p className="text-emerald-400">순이익: {formatKrw(payload[0].value as number)}</p>
+                          <p className="font-bold mb-1">{data.name}</p>
+                          <p className="text-emerald-400">순이익: {formatKrw(data.netProfit as number)}</p>
+                          {data.isCurrent && <p className="text-orange-300 mt-1 italic">* 현재 편집 중인 설정</p>}
                         </div>
                       )
                     }
@@ -82,12 +83,21 @@ export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, calcula
                   }}
                 />
                 <Bar dataKey="netProfit" radius={[8, 8, 0, 0]} barSize={40}>
-                  {scenarioResults.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.netProfit > 0 ? '#10b981' : '#f43f5e'} />
+                  {comparisonData.map((entry, index) => (
+                    <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.isCurrent ? '#f97316' : (entry.netProfit > 0 ? '#10b981' : '#f43f5e')} 
+                        stroke={entry.isCurrent ? '#c2410c' : 'none'}
+                        strokeWidth={entry.isCurrent ? 2 : 0}
+                    />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-center mt-4 flex justify-center gap-4 text-xs text-slate-500">
+             <span className="flex items-center gap-1"><div className="w-3 h-3 bg-emerald-500 rounded-sm"></div> 저장된 계획</span>
+             <span className="flex items-center gap-1"><div className="w-3 h-3 bg-orange-500 rounded-sm border border-orange-700"></div> 현재 편집 중 (Draft)</span>
           </div>
         </div>
 
@@ -98,7 +108,7 @@ export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, calcula
           </h3>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={scenarioResults} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+              <BarChart data={comparisonData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
                 <YAxis hide />
@@ -116,7 +126,14 @@ export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, calcula
                     return null;
                   }}
                 />
-                <Bar dataKey="bep" fill="#6366f1" radius={[8, 8, 0, 0]} barSize={40} />
+                <Bar dataKey="bep" fill="#6366f1" radius={[8, 8, 0, 0]} barSize={40}>
+                     {comparisonData.map((entry, index) => (
+                        <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.isCurrent ? '#f97316' : '#6366f1'} 
+                        />
+                      ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -143,11 +160,13 @@ export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, calcula
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {scenarioResults.map((res, idx) => (
-                <tr key={idx} className="hover:bg-indigo-50/20 transition-colors group">
+              {comparisonData.map((res, idx) => (
+                <tr key={idx} className={`transition-colors group ${res.isCurrent ? 'bg-orange-50/30 hover:bg-orange-50' : 'hover:bg-indigo-50/20'}`}>
                   <td className="px-8 py-6">
-                    <div className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{res.name}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">Scenario #{idx + 1}</div>
+                    <div className={`font-bold transition-colors flex items-center gap-2 ${res.isCurrent ? 'text-orange-700' : 'text-slate-900 group-hover:text-indigo-600'}`}>
+                        {res.name}
+                        {res.isCurrent && <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded-full">DRAFT</span>}
+                    </div>
                   </td>
                   <td className="px-6 py-6 text-right text-slate-700 font-semibold">{formatKrw(res.totalRevenue)}</td>
                   <td className="px-6 py-6 text-right font-black text-emerald-600">{formatKrw(res.netProfit)}</td>
@@ -172,9 +191,9 @@ export const ComparisonTab: React.FC<ComparisonTabProps> = ({ scenarios, calcula
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: '최대 수익 계획', value: scenarioResults.sort((a,b) => b.netProfit - a.netProfit)[0].name, icon: <DollarSign className="text-emerald-500"/>, bg: 'bg-emerald-50' },
-          { label: '최고 마진율', value: scenarioResults.sort((a,b) => b.margin - a.margin)[0].name, icon: <TrendingUp className="text-amber-500"/>, bg: 'bg-amber-50' },
-          { label: '최단기 BEP', value: scenarioResults.sort((a,b) => a.bep - b.bep)[0].name, icon: <Wallet className="text-indigo-500"/>, bg: 'bg-indigo-50' },
+          { label: '최대 수익 계획', value: comparisonData.sort((a,b) => b.netProfit - a.netProfit)[0].name, icon: <DollarSign className="text-emerald-500"/>, bg: 'bg-emerald-50' },
+          { label: '최고 마진율', value: comparisonData.sort((a,b) => b.margin - a.margin)[0].name, icon: <TrendingUp className="text-amber-500"/>, bg: 'bg-amber-50' },
+          { label: '최단기 BEP', value: comparisonData.sort((a,b) => a.bep - b.bep)[0].name, icon: <Wallet className="text-indigo-500"/>, bg: 'bg-indigo-50' },
         ].map((stat, i) => (
           <div key={i} className={`p-6 rounded-3xl border border-slate-200 ${stat.bg} shadow-sm flex items-center justify-between`}>
             <div>
