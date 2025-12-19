@@ -11,7 +11,9 @@ import {
   BarChart2,
   Save,
   Copy,
-  Layout
+  Layout,
+  BrainCircuit,
+  FileText
 } from 'lucide-react';
 
 import { DEFAULT_CONFIG, INITIAL_TODOS, PLAN_PRESETS } from './constants';
@@ -20,11 +22,13 @@ import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
 import { ComparisonTab } from './components/ComparisonTab';
+import { StrategyTab } from './components/StrategyTab';
 
 enum Tab {
   DASHBOARD = 'dashboard',
   PLANNER = 'planner',
   COMPARISON = 'comparison',
+  STRATEGY = 'strategy',
   TODO = 'todo',
 }
 
@@ -277,71 +281,86 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] font-sans text-[#3e2723] pb-20">
-      <header className="bg-white border-b border-orange-100 sticky top-0 z-30 shadow-sm">
+      <header className="bg-white border-b border-orange-100 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center space-x-3">
-              <div className="bg-[#5d4037] p-2 rounded-xl shadow-orange-100 shadow-lg">
-                <Layout className="text-white h-6 w-6" />
+          <div className="flex justify-between h-24 items-center">
+            <div className="flex items-center space-x-6">
+              <div className="relative group cursor-pointer py-2">
+                <img 
+                  src="Terrazza_logo1.png" 
+                  alt="Terrazza Logo" 
+                  className="h-16 w-auto object-contain transition-all duration-500 group-hover:scale-105"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      const fallback = document.createElement('div');
+                      fallback.className = "bg-[#5d4037] p-2 rounded-xl shadow-orange-100 shadow-lg";
+                      fallback.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>`;
+                      parent.appendChild(fallback);
+                    }
+                  }}
+                />
               </div>
-              <div>
-                <span className="font-bold text-xl tracking-tight block leading-none text-[#5d4037]">Terrazza</span>
-                <span className="text-[10px] text-orange-600 font-bold uppercase tracking-widest">Business Planner</span>
+              <div className="hidden sm:block border-l border-orange-100 pl-6 py-1">
+                <span className="font-bold text-xl tracking-tight block leading-tight text-[#5d4037]">Terrazza Lounge</span>
+                <span className="text-[10px] text-orange-600 font-black uppercase tracking-[0.2em]">Strategy Intelligence System</span>
               </div>
             </div>
             
-            <nav className="flex space-x-1 bg-orange-50/50 p-1 rounded-xl">
+            <nav className="flex space-x-1.5 bg-orange-50/70 p-1.5 rounded-2xl">
               {[
-                { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={16} /> },
-                { id: Tab.PLANNER, label: '사업 설정', icon: <Calculator size={16} /> },
-                { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={16} /> },
-                { id: Tab.TODO, label: '준비물', icon: <CheckSquare size={16} /> },
+                { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={18} /> },
+                { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={18} /> },
+                { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={18} /> },
+                { id: Tab.STRATEGY, label: 'AI 전략 분석', icon: <BrainCircuit size={18} />, highlight: true },
+                { id: Tab.TODO, label: '준비물', icon: <CheckSquare size={18} /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as Tab)}
-                  className={`flex items-center space-x-2 px-3 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab.id ? 'bg-white text-[#5d4037] shadow-sm ring-1 ring-orange-100' : 'text-slate-500 hover:text-[#5d4037]'}`}
+                  className={`flex items-center space-x-2 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === tab.id ? 'bg-[#5d4037] text-white shadow-lg scale-105' : tab.highlight ? 'text-orange-600 hover:bg-orange-100' : 'text-slate-500 hover:text-[#5d4037] hover:bg-white'}`}
                 >
                   {tab.icon}
-                  <span className="hidden md:inline">{tab.label}</span>
+                  <span className="hidden lg:inline">{tab.label}</span>
                 </button>
               ))}
             </nav>
           </div>
         </div>
 
-        <div className="bg-[#fff9f5] border-b border-orange-100 py-2.5">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <span className="text-[10px] font-black text-orange-300 uppercase whitespace-nowrap">Plan Presets:</span>
-              <div className="flex gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
+        <div className="bg-[#fff9f5] border-b border-orange-100 py-3">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest whitespace-nowrap">Plan Presets:</span>
+              <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
                 {Object.keys(PLAN_PRESETS).map(name => (
                   <button 
                     key={name}
                     onClick={() => applyPreset(name)}
-                    className="px-3 py-1 bg-white border border-orange-100 rounded-full text-[11px] font-bold text-[#5d4037] hover:border-orange-300 hover:bg-orange-50 transition-colors whitespace-nowrap shadow-sm"
+                    className="px-4 py-1.5 bg-white border border-orange-100 rounded-full text-[11px] font-bold text-[#5d4037] hover:border-orange-500 hover:text-orange-600 transition-all shadow-sm whitespace-nowrap"
                   >
                     {name}
                   </button>
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-2 md:pt-0 border-orange-50">
-               <span className="text-[10px] font-black text-orange-300 uppercase whitespace-nowrap">Saved Plans:</span>
-               <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-4 w-full md:w-auto border-t md:border-t-0 pt-3 md:pt-0 border-orange-50/50">
+               <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest whitespace-nowrap">Saved Plans:</span>
+               <div className="flex gap-2 overflow-x-auto scrollbar-hide items-center">
                 {scenarios.map(s => (
-                  <div key={s.id} className={`flex items-center bg-white border rounded-full pl-3 pr-1 h-7 shadow-sm transition-all ${activeScenarioId === s.id ? 'border-orange-500 ring-2 ring-orange-50' : 'border-orange-100'}`}>
+                  <div key={s.id} className={`flex items-center bg-white border rounded-full pl-4 pr-1.5 h-8 shadow-sm transition-all ${activeScenarioId === s.id ? 'border-orange-500 ring-4 ring-orange-50' : 'border-orange-100'}`}>
                     <button onClick={() => loadScenario(s.id)} className={`text-[11px] font-bold mr-2 ${activeScenarioId === s.id ? 'text-orange-700' : 'text-[#5d4037]'}`}>
                       {s.name}
                     </button>
-                    <button onClick={() => deleteScenario(s.id)} className="p-1 text-orange-200 hover:text-rose-500 rounded-full hover:bg-rose-50"><Trash2 size={12} /></button>
+                    <button onClick={() => deleteScenario(s.id)} className="p-1 text-orange-200 hover:text-rose-500 rounded-full hover:bg-rose-50 transition-colors"><Trash2 size={12} /></button>
                   </div>
                 ))}
                 <button 
                   onClick={() => { const name = prompt("계획 이름을 입력하세요:"); if(name) saveCurrentScenario(name); }} 
-                  className="px-3 h-7 bg-[#5d4037] text-white rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-md hover:bg-[#4e342e] transition-all"
+                  className="px-4 h-8 bg-[#5d4037] text-white rounded-full text-[11px] font-bold flex items-center gap-2 shadow-md hover:bg-[#4e342e] transition-all transform hover:-translate-y-0.5"
                 >
-                  <Save size={12}/> 저장
+                  <Save size={14}/> 새 계획 저장
                 </button>
               </div>
             </div>
@@ -349,7 +368,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-10">
         {activeTab === Tab.DASHBOARD && (
           <DashboardTab 
             monthlyData={monthlyData}
@@ -375,10 +394,26 @@ export default function App() {
           <ComparisonTab scenarios={scenarios} calculateFinancials={calculateFinancialsForScenario} />
         )}
 
+        {activeTab === Tab.STRATEGY && (
+          <StrategyTab config={config} financials={currentFinancials} bepMonth={bepMonth} />
+        )}
+
         {activeTab === Tab.TODO && (
           <TodoTab todos={todos} onToggle={(id) => setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))} />
         )}
       </main>
+
+      <footer className="max-w-7xl mx-auto px-4 py-8 border-t border-orange-100 flex flex-col md:flex-row justify-between items-center text-xs text-orange-300 font-bold uppercase tracking-widest gap-4">
+          <div className="flex items-center gap-2">
+              <img src="Terrazza_logo1.png" alt="Logo Small" className="h-6 grayscale opacity-50" />
+              <span>© 2026 Terrazza Lounge Business Intelligence</span>
+          </div>
+          <div className="flex gap-6">
+              <a href="#" className="hover:text-orange-600 transition-colors">Documentation</a>
+              <a href="#" className="hover:text-orange-600 transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-orange-600 transition-colors">Support</a>
+          </div>
+      </footer>
     </div>
   );
 }
