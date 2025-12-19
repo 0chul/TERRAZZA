@@ -89,12 +89,87 @@ export default function App() {
     if (activeScenarioId === id) setActiveScenarioId(null);
   };
 
-  const calculateFinancials = (cfg: GlobalConfig) => {
-    const { seatCount, operatingHours, stayDuration, turnoverTarget, beanPricePerKg, milkPricePerL, takeoutRatio, iceRatio, ratioAmericano, ratioLatte, ratioSyrupLatte, avgPriceAmericano, avgPriceLatte, avgPriceSyrupLatte, operatingDays: cafeDays } = cfg.cafe;
+  const cafeUnitCosts: CafeUnitCosts = useMemo(() => {
+    const { beanPricePerKg, milkPricePerL, iceRatio, takeoutRatio } = config.cafe;
+    const s = config.cafeSupplies;
+    
+    const bean = (beanPricePerKg / 1000) * s.beanGrams;
+    const milk = (milkPricePerL / 1000) * s.milkMl;
+    const water = s.water;
+    const ice = s.ice;
+    const syrup = s.syrup;
+
+    const getMenuCost = (menu: 'am' | 'lt' | 'sl', type: 'to' | 'st', temp: 'h' | 'i') => {
+      let ing = bean;
+      if (menu === 'am') ing += water;
+      else if (menu === 'lt') ing += milk;
+      else ing += milk + syrup;
+      
+      if (temp === 'i') ing += ice;
+
+      let pkg = 0;
+      if (type === 'to') {
+        pkg = temp === 'h' 
+          ? (s.hotCup + s.hotLid + s.stick + s.holder + s.carrier + s.wipe + s.napkin) 
+          : (s.iceCup + s.iceLid + s.straw + s.holder + s.carrier + s.wipe + s.napkin);
+      } else {
+        pkg = s.wipe + s.napkin + s.dishwashing + (temp === 'h' ? s.stick : s.straw);
+      }
+      return ing + pkg;
+    };
+
+    const products = {
+      takeout: {
+        hot: {
+          americano: getMenuCost('am', 'to', 'h'),
+          latte: getMenuCost('lt', 'to', 'h'),
+          syrupLatte: getMenuCost('sl', 'to', 'h'),
+        },
+        ice: {
+          americano: getMenuCost('am', 'to', 'i'),
+          latte: getMenuCost('lt', 'to', 'i'),
+          syrupLatte: getMenuCost('sl', 'to', 'i'),
+        }
+      },
+      store: {
+        hot: {
+          americano: getMenuCost('am', 'st', 'h'),
+          latte: getMenuCost('lt', 'st', 'h'),
+          syrupLatte: getMenuCost('sl', 'st', 'h'),
+        },
+        ice: {
+          americano: getMenuCost('am', 'st', 'i'),
+          latte: getMenuCost('lt', 'st', 'i'),
+          syrupLatte: getMenuCost('sl', 'st', 'i'),
+        }
+      }
+    };
+
+    const calcWeighted = (m: 'americano' | 'latte' | 'syrupLatte') => {
+      const toH = products.takeout.hot[m];
+      const toI = products.takeout.ice[m];
+      const stH = products.store.hot[m];
+      const stI = products.store.ice[m];
+
+      const toWeighted = toI * iceRatio + toH * (1 - iceRatio);
+      const stWeighted = stI * iceRatio + stH * (1 - iceRatio);
+      return toWeighted * takeoutRatio + stWeighted * (1 - takeoutRatio);
+    };
+
+    return {
+      unitCosts: { bean, milk, water, ice, syrup },
+      finalCostAmericano: calcWeighted('americano'),
+      finalCostLatte: calcWeighted('latte'),
+      finalCostSyrupLatte: calcWeighted('syrupLatte'),
+      products
+    };
+  }, [config.cafe, config.cafeSupplies]);
+
+  const calculateFinancials = (cfg: GlobalConfig, uc: CafeUnitCosts) => {
+    const { seatCount, operatingHours, stayDuration, turnoverTarget, ratioAmericano, ratioLatte, ratioSyrupLatte, avgPriceAmericano, avgPriceLatte, avgPriceSyrupLatte, operatingDays: cafeDays } = cfg.cafe;
     const { hourlyRate, hoursPerDay, operatingDays: spaceDays, utilizationRate } = cfg.space;
     const { avgTicketPrice, dailyTables, operatingDays: wineDays, costOfGoodsSoldRate } = cfg.wine;
     const { weekdayStaff, weekendStaff, additionalLabor, utilities, internet, marketing, maintenance, misc } = cfg.fixed;
-    const s = cfg.cafeSupplies;
 
     const safeStayDuration = stayDuration > 0 ? stayDuration : 1;
     const maxDailyCapacity = seatCount * (operatingHours / safeStayDuration);
@@ -102,31 +177,8 @@ export default function App() {
 
     const laborCost = (weekdayStaff * WEEKDAY_MONTHLY_RATE) + (weekendStaff * WEEKEND_MONTHLY_RATE) + additionalLabor;
     
-    const beanCost = (beanPricePerKg / 1000) * s.beanGrams;
-    const milkCost = (milkPricePerL / 1000) * s.milkMl;
-    
-    const getCost = (menu: 'am' | 'lt' | 'sl', type: 'to' | 'st', temp: 'h' | 'i') => {
-      let ing = beanCost;
-      if (menu === 'am') ing += s.water;
-      else if (menu === 'lt') ing += milkCost;
-      else ing += milkCost + s.syrup;
-      if (temp === 'i') ing += s.ice;
-
-      let pkg = 0;
-      if (type === 'to') {
-        pkg = temp === 'h' ? (s.hotCup + s.hotLid + s.stick + s.holder + s.carrier + s.wipe + s.napkin) : (s.iceCup + s.iceLid + s.straw + s.holder + s.carrier + s.wipe + s.napkin);
-      } else {
-        pkg = s.wipe + s.napkin + s.dishwashing + (temp === 'h' ? s.stick : s.straw);
-      }
-      return ing + pkg;
-    };
-
-    const costAm = (getCost('am', 'to', 'i') * iceRatio + getCost('am', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('am', 'st', 'i') * iceRatio + getCost('am', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
-    const costLt = (getCost('lt', 'to', 'i') * iceRatio + getCost('lt', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('lt', 'st', 'i') * iceRatio + getCost('lt', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
-    const costSl = (getCost('sl', 'to', 'i') * iceRatio + getCost('sl', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('sl', 'st', 'i') * iceRatio + getCost('sl', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
-
     const weightedAvgPrice = avgPriceAmericano * ratioAmericano + avgPriceLatte * ratioLatte + avgPriceSyrupLatte * ratioSyrupLatte;
-    const weightedAvgCost = costAm * ratioAmericano + costLt * ratioLatte + costSl * ratioSyrupLatte;
+    const weightedAvgCost = uc.finalCostAmericano * ratioAmericano + uc.finalCostLatte * ratioLatte + uc.finalCostSyrupLatte * ratioSyrupLatte;
 
     const cafeRevenue = weightedAvgPrice * salesCount * cafeDays;
     const cafeCOGS = weightedAvgCost * salesCount * cafeDays;
@@ -143,7 +195,7 @@ export default function App() {
     return { totalRevenue, netProfit, totalInvestment, salesCount, cafeRevenue, spaceRevenue, wineRevenue, laborCost, totalFixed, cafeCOGS, wineCOGS, totalCOGS };
   };
 
-  const currentFinancials = useMemo(() => calculateFinancials(config), [config]);
+  const currentFinancials = useMemo(() => calculateFinancials(config, cafeUnitCosts), [config, cafeUnitCosts]);
 
   const monthlyData: MonthlyData[] = useMemo(() => {
     const data: MonthlyData[] = [];
@@ -206,6 +258,56 @@ export default function App() {
     const match = monthlyData.find(d => d.cumulativeProfit >= 0);
     return match ? `M+${match.month}` : '측정 불가';
   }, [monthlyData]);
+
+  // Comparison helper for ComparisonTab
+  const calculateFinancialsForScenario = (cfg: GlobalConfig) => {
+    // We need to re-calculate uc for each scenario being compared
+    const tempUc = (() => {
+      const { beanPricePerKg, milkPricePerL, iceRatio, takeoutRatio } = cfg.cafe;
+      const s = cfg.cafeSupplies;
+      const bean = (beanPricePerKg / 1000) * s.beanGrams;
+      const milk = (milkPricePerL / 1000) * s.milkMl;
+      const water = s.water;
+      const ice = s.ice;
+      const syrup = s.syrup;
+
+      const getMenuCost = (menu: 'am' | 'lt' | 'sl', type: 'to' | 'st', temp: 'h' | 'i') => {
+        let ing = bean;
+        if (menu === 'am') ing += water; else if (menu === 'lt') ing += milk; else ing += milk + syrup;
+        if (temp === 'i') ing += ice;
+        let pkg = 0;
+        if (type === 'to') {
+          pkg = temp === 'h' ? (s.hotCup + s.hotLid + s.stick + s.holder + s.carrier + s.wipe + s.napkin) : (s.iceCup + s.iceLid + s.straw + s.holder + s.carrier + s.wipe + s.napkin);
+        } else {
+          pkg = s.wipe + s.napkin + s.dishwashing + (temp === 'h' ? s.stick : s.straw);
+        }
+        return ing + pkg;
+      };
+
+      const calcWeighted = (m: 'am' | 'lt' | 'sl') => {
+        const toH = getMenuCost(m, 'to', 'h');
+        const toI = getMenuCost(m, 'to', 'i');
+        const stH = getMenuCost(m, 'st', 'h');
+        const stI = getMenuCost(m, 'st', 'i');
+        const toWeighted = toI * iceRatio + toH * (1 - iceRatio);
+        const stWeighted = stI * iceRatio + stH * (1 - iceRatio);
+        return toWeighted * takeoutRatio + stWeighted * (1 - takeoutRatio);
+      };
+
+      return {
+        finalCostAmericano: calcWeighted('am'),
+        finalCostLatte: calcWeighted('lt'),
+        finalCostSyrupLatte: calcWeighted('sl'),
+      };
+    })();
+
+    const fin = calculateFinancials(cfg, tempUc as any);
+    return {
+      totalRevenue: fin.totalRevenue,
+      netProfit: fin.netProfit,
+      totalInvestment: fin.totalInvestment
+    };
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
@@ -300,14 +402,14 @@ export default function App() {
             onSupplyChange={(f, v) => setConfig(prev => ({...prev, cafeSupplies: {...prev.cafeSupplies, [f]: v}}))}
             monthlyData={monthlyData}
             dailySalesCount={currentFinancials.salesCount}
-            cafeUnitCosts={{} as any} 
+            cafeUnitCosts={cafeUnitCosts} 
             totalInvestment={currentFinancials.totalInvestment}
             calculatedLaborCost={currentFinancials.laborCost}
           />
         )}
 
         {activeTab === Tab.COMPARISON && (
-          <ComparisonTab scenarios={scenarios} calculateFinancials={calculateFinancials} />
+          <ComparisonTab scenarios={scenarios} calculateFinancials={calculateFinancialsForScenario} />
         )}
 
         {activeTab === Tab.TODO && (
