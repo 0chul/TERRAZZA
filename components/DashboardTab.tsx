@@ -21,15 +21,16 @@ import {
   AlertCircle,
   Calculator,
   PieChart as PieChartIcon,
+  FileText
 } from 'lucide-react';
 import { MonthlyData } from '../types';
 import { InfoCard } from './InfoCard';
 import { FinancialTable } from './FinancialTable';
 
 const CHART_COLORS = {
-  revenue: { cafe: '#1e3a8a', space: '#2563eb', wine: '#60a5fa' },
-  cost: { labor: '#7f1d1d', cafe: '#b91c1c', wine: '#ef4444', utility: '#f87171', fixed: '#fca5a5' },
-  profit: '#111827'
+  revenue: { cafe: '#795548', space: '#fb8c00', wine: '#bf360c' },
+  cost: { labor: '#5d4037', cafe: '#8d6e63', wine: '#a1887f', utility: '#d7ccc8', fixed: '#efebe9' },
+  profit: '#3e2723'
 };
 
 interface DashboardTabProps {
@@ -79,17 +80,17 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
   }, [pieChartData]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-12">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <InfoCard title="월 예상 매출" value={`₩${Math.round(totalRevenue / 10000).toLocaleString()}만`} subValue="3가지 사업 합산" icon={<TrendingUp className="text-blue-500" />} />
-        <InfoCard title="월 예상 순이익" value={`₩${Math.round((monthlyData[0]?.netProfit || 0) / 10000).toLocaleString()}만`} subValue={`마진율 ${totalRevenue ? Math.round((monthlyData[0].netProfit / totalRevenue) * 100) : 0}%`} icon={<DollarSign className="text-green-500" />} />
-        <InfoCard title="초기 투자비용" value={`₩${Math.round(totalInvestment / 10000).toLocaleString()}만`} subValue="건물주 직영 (보증금 제외)" icon={<Calculator className="text-purple-500" />} />
-        <InfoCard title="손익분기점 (BEP)" value={bepMonth} subValue={bepMonth !== '미도달' ? '누적 수익 전환 시점' : '10개월 내 달성 불가'} icon={<AlertCircle className="text-orange-500" />} />
+        <InfoCard title="월 예상 총 매출" value={`₩${Math.round(totalRevenue / 10000).toLocaleString()}만`} subValue="사업부별 합산 결과" icon={<TrendingUp className="text-orange-600" />} />
+        <InfoCard title="월 예상 순수익" value={`₩${Math.round((monthlyData[0]?.netProfit || 0) / 10000).toLocaleString()}만`} subValue={`영업이익률 ${totalRevenue ? Math.round((monthlyData[0].netProfit / totalRevenue) * 100) : 0}%`} icon={<DollarSign className="text-orange-800" />} />
+        <InfoCard title="초기 투자 예산" value={`₩${Math.round(totalInvestment / 10000).toLocaleString()}만`} subValue="시설 및 집기류 포함" icon={<Calculator className="text-brown-500" />} />
+        <InfoCard title="회수 시점 (BEP)" value={bepMonth} subValue={bepMonth !== '측정 불가' ? '수익 전환 예상 시점' : '운영 전략 재검토 권장'} icon={<AlertCircle className="text-orange-400" />} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-           <div className="flex justify-between items-center mb-4"><h2 className="text-lg font-bold text-gray-800 flex items-center gap-2"><PieChartIcon size={20} className="text-blue-600"/> 매출 구성</h2></div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+           <div className="flex justify-between items-center mb-4"><h2 className="text-lg font-bold text-[#5d4037] flex items-center gap-2"><PieChartIcon size={20} className="text-orange-600"/> 매출 비중</h2></div>
            <div className="h-[250px] w-full relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -97,14 +98,14 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
                     {pieChartData.revenue.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} stroke="white" strokeWidth={2} />))}
                   </Pie>
                   <Tooltip formatter={(value: number, name: string) => [`₩${Math.round(value).toLocaleString()}`, name]} />
-                  <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{fontSize: '12px'}}/>
+                  <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{fontSize: '11px'}}/>
                 </PieChart>
               </ResponsiveContainer>
-              <div className="absolute top-0 right-0 text-right bg-white/90 p-2 rounded-lg border border-blue-100 shadow-sm"><div className="text-xs text-gray-500">Total</div><div className="text-lg font-bold text-blue-900">₩{Math.round(totalRevenue / 10000).toLocaleString()}만</div></div>
+              <div className="absolute top-0 right-0 text-right bg-orange-50/50 p-2 rounded-lg border border-orange-100 shadow-sm"><div className="text-[10px] text-orange-600 font-bold uppercase">Total Revenue</div><div className="text-lg font-bold text-[#5d4037]">₩{Math.round(totalRevenue / 10000).toLocaleString()}만</div></div>
            </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-           <div className="flex justify-between items-center mb-4"><h2 className="text-lg font-bold text-gray-800 flex items-center gap-2"><PieChartIcon size={20} className="text-red-600"/> 비용 구조</h2></div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+           <div className="flex justify-between items-center mb-4"><h2 className="text-lg font-bold text-[#5d4037] flex items-center gap-2"><PieChartIcon size={20} className="text-orange-800"/> 지출 구조</h2></div>
            <div className="h-[250px] w-full relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -112,25 +113,25 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
                     {pieChartData.cost.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} stroke="white" strokeWidth={2} />))}
                   </Pie>
                   <Tooltip formatter={(value: number, name: string) => [`₩${Math.round(value).toLocaleString()}`, name]} />
-                  <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{fontSize: '12px'}}/>
+                  <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{fontSize: '11px'}}/>
                 </PieChart>
               </ResponsiveContainer>
-              <div className="absolute top-0 right-0 text-right bg-white/90 p-2 rounded-lg border border-red-100 shadow-sm"><div className="text-xs text-gray-500">Total</div><div className="text-lg font-bold text-red-900">₩{Math.round(totalCost / 10000).toLocaleString()}만</div></div>
+              <div className="absolute top-0 right-0 text-right bg-orange-50/50 p-2 rounded-lg border border-orange-100 shadow-sm"><div className="text-[10px] text-orange-600 font-bold uppercase">Total Costs</div><div className="text-lg font-bold text-[#5d4037]">₩{Math.round(totalCost / 10000).toLocaleString()}만</div></div>
            </div>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div className="flex justify-between items-center mb-6"><h2 className="text-lg font-bold text-gray-800">BEP 시점 및 수익 추이 (10개월)</h2></div>
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+        <div className="flex justify-between items-center mb-6"><h2 className="text-lg font-bold text-[#5d4037]">수익 추이 및 BEP 분석 (12개월 전망)</h2></div>
         <div className="h-[450px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={mainChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }} barGap={2}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-              <XAxis dataKey="month" tickFormatter={(val) => `M+${val}`} stroke="#9CA3AF" />
-              <YAxis yAxisId="left" stroke="#9CA3AF" tickFormatter={(val) => `${val / 10000}만`} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f9f2ed" />
+              <XAxis dataKey="month" tickFormatter={(val) => `M+${val}`} stroke="#8d6e63" />
+              <YAxis yAxisId="left" stroke="#8d6e63" tickFormatter={(val) => `${val / 10000}만`} />
               <Tooltip formatter={(value: number, name: string) => name === '누적 손익' ? [`₩${Math.round(value).toLocaleString()}`, name] : [`₩${Math.abs(Math.round(value)).toLocaleString()}`, name]} />
-              <Legend verticalAlign="bottom" height={36} content={() => (<div className="flex justify-center gap-6 mt-4 text-xs text-gray-700"><div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-600"></div><span>매출</span></div><div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-600"></div><span>비용</span></div><div className="flex items-center gap-2"><div className="w-4 h-0.5 bg-black"></div><span>누적 손익</span></div></div>)} />
-              <ReferenceLine yAxisId="left" y={0} stroke="#000" strokeDasharray="3 3" />
+              <Legend verticalAlign="bottom" height={36} content={() => (<div className="flex justify-center gap-6 mt-4 text-[11px] font-bold text-[#5d4037]"><div className="flex items-center gap-2"><div className="w-3 h-3 bg-orange-600"></div><span>매출원</span></div><div className="flex items-center gap-2"><div className="w-3 h-3 bg-[#d7ccc8]"></div><span>지출원</span></div><div className="flex items-center gap-2"><div className="w-4 h-0.5 bg-[#3e2723]"></div><span>누적 자산 추이</span></div></div>)} />
+              <ReferenceLine yAxisId="left" y={0} stroke="#5d4037" strokeDasharray="3 3" />
               <Bar yAxisId="left" dataKey="cafeRevenue" stackId="revenue" fill={CHART_COLORS.revenue.cafe} barSize={20} />
               <Bar yAxisId="left" dataKey="spaceRevenue" stackId="revenue" fill={CHART_COLORS.revenue.space} barSize={20} />
               <Bar yAxisId="left" dataKey="wineRevenue" stackId="revenue" fill={CHART_COLORS.revenue.wine} barSize={20} radius={[4, 4, 0, 0]} />
@@ -146,7 +147,13 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
       </div>
 
        <div className="space-y-4">
-        <h3 className="text-lg font-bold text-gray-800">월간 재무 상세 (Monthly P&L)</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-bold text-[#5d4037] flex items-center gap-2">
+            <FileText className="text-orange-600" size={24} /> 
+            월간 재무 리포트 상세
+          </h3>
+          <span className="text-[10px] text-orange-400 font-black uppercase tracking-widest bg-orange-50 px-3 py-1 rounded-full">Currency: KRW</span>
+        </div>
         <FinancialTable data={monthlyData} />
       </div>
     </div>

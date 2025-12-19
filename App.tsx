@@ -10,7 +10,8 @@ import {
   Plus,
   BarChart2,
   Save,
-  Copy
+  Copy,
+  Layout
 } from 'lucide-react';
 
 import { DEFAULT_CONFIG, INITIAL_TODOS, PLAN_PRESETS } from './constants';
@@ -39,7 +40,7 @@ export default function App() {
   const [projectionMonths, setProjectionMonths] = useState(12);
 
   useEffect(() => {
-    const saved = localStorage.getItem('bizplanner_scenarios');
+    const saved = localStorage.getItem('terrazza_scenarios');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -59,7 +60,7 @@ export default function App() {
     };
     const updated = [...scenarios, newScenario];
     setScenarios(updated);
-    localStorage.setItem('bizplanner_scenarios', JSON.stringify(updated));
+    localStorage.setItem('terrazza_scenarios', JSON.stringify(updated));
     setActiveScenarioId(newScenario.id);
   };
 
@@ -82,7 +83,7 @@ export default function App() {
   const deleteScenario = (id: string) => {
     const updated = scenarios.filter(s => s.id !== id);
     setScenarios(updated);
-    localStorage.setItem('bizplanner_scenarios', JSON.stringify(updated));
+    localStorage.setItem('terrazza_scenarios', JSON.stringify(updated));
     if (activeScenarioId === id) setActiveScenarioId(null);
   };
 
@@ -226,9 +227,7 @@ export default function App() {
     return match ? `M+${match.month}` : '측정 불가';
   }, [monthlyData]);
 
-  // Comparison helper for ComparisonTab
   const calculateFinancialsForScenario = (cfg: GlobalConfig) => {
-    // We need to re-calculate uc for each scenario being compared
     const tempUc = (() => {
       const { beanPricePerKg, milkPricePerL, iceRatio, takeoutRatio } = cfg.cafe;
       const s = cfg.cafeSupplies;
@@ -277,31 +276,31 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div className="min-h-screen bg-[#fdfcfb] font-sans text-[#3e2723] pb-20">
+      <header className="bg-white border-b border-orange-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center space-x-3">
-              <div className="bg-indigo-600 p-2 rounded-xl shadow-indigo-200 shadow-lg">
-                <BarChart2 className="text-white h-6 w-6" />
+              <div className="bg-[#5d4037] p-2 rounded-xl shadow-orange-100 shadow-lg">
+                <Layout className="text-white h-6 w-6" />
               </div>
               <div>
-                <span className="font-bold text-xl tracking-tight block leading-none">BizPlanner</span>
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Premium 3-in-1 Tool</span>
+                <span className="font-bold text-xl tracking-tight block leading-none text-[#5d4037]">Terrazza</span>
+                <span className="text-[10px] text-orange-600 font-bold uppercase tracking-widest">Business Planner</span>
               </div>
             </div>
             
-            <nav className="flex space-x-1 bg-slate-100 p-1 rounded-xl">
+            <nav className="flex space-x-1 bg-orange-50/50 p-1 rounded-xl">
               {[
                 { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={16} /> },
-                { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={16} /> },
+                { id: Tab.PLANNER, label: '사업 설정', icon: <Calculator size={16} /> },
                 { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={16} /> },
-                { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={16} /> },
+                { id: Tab.TODO, label: '준비물', icon: <CheckSquare size={16} /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as Tab)}
-                  className={`flex items-center space-x-2 px-3 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab.id ? 'bg-white text-indigo-600 shadow-md translate-y-[-1px]' : 'text-slate-500 hover:text-slate-700'}`}
+                  className={`flex items-center space-x-2 px-3 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab.id ? 'bg-white text-[#5d4037] shadow-sm ring-1 ring-orange-100' : 'text-slate-500 hover:text-[#5d4037]'}`}
                 >
                   {tab.icon}
                   <span className="hidden md:inline">{tab.label}</span>
@@ -311,36 +310,36 @@ export default function App() {
           </div>
         </div>
 
-        <div className="bg-slate-50 border-b border-slate-200 py-2.5">
+        <div className="bg-[#fff9f5] border-b border-orange-100 py-2.5">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-3 w-full md:w-auto">
-              <span className="text-[10px] font-black text-slate-400 uppercase whitespace-nowrap">Plan Presets:</span>
+              <span className="text-[10px] font-black text-orange-300 uppercase whitespace-nowrap">Plan Presets:</span>
               <div className="flex gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
                 {Object.keys(PLAN_PRESETS).map(name => (
                   <button 
                     key={name}
                     onClick={() => applyPreset(name)}
-                    className="px-3 py-1 bg-white border border-slate-200 rounded-full text-[11px] font-bold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors whitespace-nowrap shadow-sm"
+                    className="px-3 py-1 bg-white border border-orange-100 rounded-full text-[11px] font-bold text-[#5d4037] hover:border-orange-300 hover:bg-orange-50 transition-colors whitespace-nowrap shadow-sm"
                   >
                     {name}
                   </button>
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-2 md:pt-0">
-               <span className="text-[10px] font-black text-slate-400 uppercase whitespace-nowrap">My Saved Plans:</span>
+            <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-2 md:pt-0 border-orange-50">
+               <span className="text-[10px] font-black text-orange-300 uppercase whitespace-nowrap">Saved Plans:</span>
                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
                 {scenarios.map(s => (
-                  <div key={s.id} className={`flex items-center bg-white border rounded-full pl-3 pr-1 h-7 shadow-sm transition-all ${activeScenarioId === s.id ? 'border-indigo-500 ring-2 ring-indigo-50' : 'border-slate-200'}`}>
-                    <button onClick={() => loadScenario(s.id)} className={`text-[11px] font-bold mr-2 ${activeScenarioId === s.id ? 'text-indigo-600' : 'text-slate-600'}`}>
+                  <div key={s.id} className={`flex items-center bg-white border rounded-full pl-3 pr-1 h-7 shadow-sm transition-all ${activeScenarioId === s.id ? 'border-orange-500 ring-2 ring-orange-50' : 'border-orange-100'}`}>
+                    <button onClick={() => loadScenario(s.id)} className={`text-[11px] font-bold mr-2 ${activeScenarioId === s.id ? 'text-orange-700' : 'text-[#5d4037]'}`}>
                       {s.name}
                     </button>
-                    <button onClick={() => deleteScenario(s.id)} className="p-1 text-slate-300 hover:text-rose-500 rounded-full hover:bg-rose-50"><Trash2 size={12} /></button>
+                    <button onClick={() => deleteScenario(s.id)} className="p-1 text-orange-200 hover:text-rose-500 rounded-full hover:bg-rose-50"><Trash2 size={12} /></button>
                   </div>
                 ))}
                 <button 
                   onClick={() => { const name = prompt("계획 이름을 입력하세요:"); if(name) saveCurrentScenario(name); }} 
-                  className="px-3 h-7 bg-indigo-600 text-white rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-indigo-100 shadow-md hover:bg-indigo-700 active:scale-95 transition-all"
+                  className="px-3 h-7 bg-[#5d4037] text-white rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-md hover:bg-[#4e342e] transition-all"
                 >
                   <Save size={12}/> 저장
                 </button>
