@@ -11,9 +11,7 @@ import {
   BarChart2,
   Save,
   Copy,
-  Layout,
-  BrainCircuit,
-  FileText
+  Layout
 } from 'lucide-react';
 
 import { DEFAULT_CONFIG, INITIAL_TODOS, PLAN_PRESETS } from './constants';
@@ -22,13 +20,11 @@ import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
 import { ComparisonTab } from './components/ComparisonTab';
-import { StrategyTab } from './components/StrategyTab';
 
 enum Tab {
   DASHBOARD = 'dashboard',
   PLANNER = 'planner',
   COMPARISON = 'comparison',
-  STRATEGY = 'strategy',
   TODO = 'todo',
 }
 
@@ -304,7 +300,7 @@ export default function App() {
               </div>
               <div className="hidden sm:block border-l border-orange-100 pl-6 py-1">
                 <span className="font-bold text-xl tracking-tight block leading-tight text-[#5d4037]">Terrazza Lounge</span>
-                <span className="text-[10px] text-orange-600 font-black uppercase tracking-[0.2em]">Strategy Intelligence System</span>
+                <span className="text-[10px] text-orange-600 font-black uppercase tracking-[0.2em]">Premium Business Planner</span>
               </div>
             </div>
             
@@ -313,13 +309,12 @@ export default function App() {
                 { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={18} /> },
                 { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={18} /> },
                 { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={18} /> },
-                { id: Tab.STRATEGY, label: 'AI 전략 분석', icon: <BrainCircuit size={18} />, highlight: true },
                 { id: Tab.TODO, label: '준비물', icon: <CheckSquare size={18} /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as Tab)}
-                  className={`flex items-center space-x-2 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === tab.id ? 'bg-[#5d4037] text-white shadow-lg scale-105' : tab.highlight ? 'text-orange-600 hover:bg-orange-100' : 'text-slate-500 hover:text-[#5d4037] hover:bg-white'}`}
+                  className={`flex items-center space-x-2 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === tab.id ? 'bg-[#5d4037] text-white shadow-lg scale-105' : 'text-slate-500 hover:text-[#5d4037] hover:bg-white'}`}
                 >
                   {tab.icon}
                   <span className="hidden lg:inline">{tab.label}</span>
@@ -394,10 +389,6 @@ export default function App() {
           <ComparisonTab scenarios={scenarios} calculateFinancials={calculateFinancialsForScenario} />
         )}
 
-        {activeTab === Tab.STRATEGY && (
-          <StrategyTab config={config} financials={currentFinancials} bepMonth={bepMonth} />
-        )}
-
         {activeTab === Tab.TODO && (
           <TodoTab todos={todos} onToggle={(id) => setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))} />
         )}
@@ -406,7 +397,7 @@ export default function App() {
       <footer className="max-w-7xl mx-auto px-4 py-8 border-t border-orange-100 flex flex-col md:flex-row justify-between items-center text-xs text-orange-300 font-bold uppercase tracking-widest gap-4">
           <div className="flex items-center gap-2">
               <img src="Terrazza_logo1.png" alt="Logo Small" className="h-6 grayscale opacity-50" />
-              <span>© 2026 Terrazza Lounge Business Intelligence</span>
+              <span>© 2026 Terrazza Lounge Business Planner</span>
           </div>
           <div className="flex gap-6">
               <a href="#" className="hover:text-orange-600 transition-colors">Documentation</a>
