@@ -8,11 +8,13 @@ import {
   Sparkles,
   Trash2,
   Plus,
-  BarChart2
+  BarChart2,
+  Save,
+  Copy
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
-import { DEFAULT_CONFIG, INITIAL_TODOS } from './constants';
+import { DEFAULT_CONFIG, INITIAL_TODOS, PLAN_PRESETS } from './constants';
 import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, BusinessReport, Scenario } from './types';
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
@@ -35,7 +37,7 @@ export default function App() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
   const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
-  const [projectionMonths, setProjectionMonths] = useState(10);
+  const [projectionMonths, setProjectionMonths] = useState(12);
   const [report, setReport] = useState<BusinessReport | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -62,6 +64,14 @@ export default function App() {
     setScenarios(updated);
     localStorage.setItem('bizplanner_scenarios', JSON.stringify(updated));
     setActiveScenarioId(newScenario.id);
+  };
+
+  const applyPreset = (presetName: string) => {
+    const preset = PLAN_PRESETS[presetName];
+    if (preset) {
+      setConfig(prev => ({ ...prev, ...preset }));
+      setActiveScenarioId(null);
+    }
   };
 
   const loadScenario = (id: string) => {
@@ -92,45 +102,45 @@ export default function App() {
 
     const laborCost = (weekdayStaff * WEEKDAY_MONTHLY_RATE) + (weekendStaff * WEEKEND_MONTHLY_RATE) + additionalLabor;
     
-    const bean = (beanPricePerKg / 1000) * s.beanGrams;
-    const milk = (milkPricePerL / 1000) * s.milkMl;
-    const packTakeoutHot = s.hotCup + s.hotLid + s.stick + s.holder + s.carrier + s.wipe + s.napkin;
-    const packTakeoutIce = s.iceCup + s.iceLid + s.straw + s.holder + s.carrier + s.wipe + s.napkin;
-    const packStoreHot = s.stick + s.wipe + s.napkin + s.dishwashing;
-    const packStoreIce = s.straw + s.wipe + s.napkin + s.dishwashing;
-
+    const beanCost = (beanPricePerKg / 1000) * s.beanGrams;
+    const milkCost = (milkPricePerL / 1000) * s.milkMl;
+    
     const getCost = (menu: 'am' | 'lt' | 'sl', type: 'to' | 'st', temp: 'h' | 'i') => {
-      let ing = bean;
+      let ing = beanCost;
       if (menu === 'am') ing += s.water;
-      else if (menu === 'lt') ing += milk;
-      else ing += milk + s.syrup;
+      else if (menu === 'lt') ing += milkCost;
+      else ing += milkCost + s.syrup;
       if (temp === 'i') ing += s.ice;
 
       let pkg = 0;
-      if (type === 'to') pkg = temp === 'h' ? packTakeoutHot : packTakeoutIce;
-      else pkg = temp === 'h' ? packStoreHot : packStoreIce;
+      if (type === 'to') {
+        pkg = temp === 'h' ? (s.hotCup + s.hotLid + s.stick + s.holder + s.carrier + s.wipe + s.napkin) : (s.iceCup + s.iceLid + s.straw + s.holder + s.carrier + s.wipe + s.napkin);
+      } else {
+        pkg = s.wipe + s.napkin + s.dishwashing + (temp === 'h' ? s.stick : s.straw);
+      }
       return ing + pkg;
     };
 
-    const finalCostAm = (getCost('am', 'to', 'i') * iceRatio + getCost('am', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('am', 'st', 'i') * iceRatio + getCost('am', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
-    const finalCostLt = (getCost('lt', 'to', 'i') * iceRatio + getCost('lt', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('lt', 'st', 'i') * iceRatio + getCost('lt', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
-    const finalCostSl = (getCost('sl', 'to', 'i') * iceRatio + getCost('sl', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('sl', 'st', 'i') * iceRatio + getCost('sl', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
+    const costAm = (getCost('am', 'to', 'i') * iceRatio + getCost('am', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('am', 'st', 'i') * iceRatio + getCost('am', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
+    const costLt = (getCost('lt', 'to', 'i') * iceRatio + getCost('lt', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('lt', 'st', 'i') * iceRatio + getCost('lt', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
+    const costSl = (getCost('sl', 'to', 'i') * iceRatio + getCost('sl', 'to', 'h') * (1-iceRatio)) * takeoutRatio + (getCost('sl', 'st', 'i') * iceRatio + getCost('sl', 'st', 'h') * (1-iceRatio)) * (1-takeoutRatio);
 
     const weightedAvgPrice = avgPriceAmericano * ratioAmericano + avgPriceLatte * ratioLatte + avgPriceSyrupLatte * ratioSyrupLatte;
-    const weightedAvgCost = finalCostAm * ratioAmericano + finalCostLt * ratioLatte + finalCostSl * ratioSyrupLatte;
+    const weightedAvgCost = costAm * ratioAmericano + costLt * ratioLatte + costSl * ratioSyrupLatte;
 
     const cafeRevenue = weightedAvgPrice * salesCount * cafeDays;
     const cafeCOGS = weightedAvgCost * salesCount * cafeDays;
     const spaceRevenue = hourlyRate * hoursPerDay * utilizationRate * spaceDays;
     const wineRevenue = avgTicketPrice * dailyTables * wineDays;
     const wineCOGS = wineRevenue * costOfGoodsSoldRate;
+    
     const totalRevenue = cafeRevenue + spaceRevenue + wineRevenue;
     const totalCOGS = cafeCOGS + wineCOGS;
     const totalFixed = laborCost + utilities + internet + marketing + maintenance + misc;
     const netProfit = (totalRevenue - totalCOGS) - totalFixed;
-    const totalInvestment = Object.values(cfg.initial).reduce((a, b) => (a as number) + (b as number), 0);
+    const totalInvestment = Object.values(cfg.initial).reduce((a, b) => a + b, 0);
 
-    return { totalRevenue, netProfit, totalInvestment, salesCount, cafeRevenue, spaceRevenue, wineRevenue, laborCost, totalFixed };
+    return { totalRevenue, netProfit, totalInvestment, salesCount, cafeRevenue, spaceRevenue, wineRevenue, laborCost, totalFixed, cafeCOGS, wineCOGS, totalCOGS };
   };
 
   const currentFinancials = useMemo(() => calculateFinancials(config), [config]);
@@ -147,14 +157,20 @@ export default function App() {
         spaceRevenue: currentFinancials.spaceRevenue,
         wineRevenue: currentFinancials.wineRevenue,
         revenue: currentFinancials.totalRevenue,
-        cafeCOGS: 0, wineCOGS: 0, laborCost: currentFinancials.laborCost, utilityCost: 0, otherFixedCost: 0,
-        cogs: 0, grossProfit: 0, fixedCosts: currentFinancials.totalFixed,
+        cafeCOGS: currentFinancials.cafeCOGS,
+        wineCOGS: currentFinancials.wineCOGS,
+        laborCost: currentFinancials.laborCost,
+        utilityCost: config.fixed.utilities,
+        otherFixedCost: config.fixed.marketing + config.fixed.internet + config.fixed.maintenance + config.fixed.misc,
+        cogs: currentFinancials.totalCOGS,
+        grossProfit: currentFinancials.totalRevenue - currentFinancials.totalCOGS,
+        fixedCosts: currentFinancials.totalFixed,
         netProfit: currentFinancials.netProfit,
         cumulativeProfit,
       });
     }
     return data;
-  }, [currentFinancials, projectionMonths]);
+  }, [currentFinancials, projectionMonths, config]);
 
   const generateAIReport = async () => {
     if (!process.env.API_KEY) {
@@ -164,10 +180,22 @@ export default function App() {
     setIsGenerating(true);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `사업 기획서 분석: 카페/공간대여/와인바 복합 모델. 월 매출 ₩${Math.round(currentFinancials.totalRevenue).toLocaleString()}, 순이익 ₩${Math.round(currentFinancials.netProfit).toLocaleString()}. 이 데이터에 기반한 SWOT 분석과 핵심 성공 전략 3가지를 한국어로 작성해줘.`;
-      const response = await ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt });
+      const prompt = `복합 사업 모델(카페, 공간대여, 와인바) 분석:
+      - 월 총매출: ₩${Math.round(currentFinancials.totalRevenue).toLocaleString()}
+      - 월 순이익: ₩${Math.round(currentFinancials.netProfit).toLocaleString()}
+      - 초기 투자: ₩${Math.round(currentFinancials.totalInvestment).toLocaleString()}
+      - 매출 비중: 카페(${Math.round(currentFinancials.cafeRevenue/currentFinancials.totalRevenue*100)}%), 공간(${Math.round(currentFinancials.spaceRevenue/currentFinancials.totalRevenue*100)}%), 와인(${Math.round(currentFinancials.wineRevenue/currentFinancials.totalRevenue*100)}%)
+      
+      이 비즈니스 모델의 강점, 약점, 그리고 수익성을 극대화하기 위한 3단계 로드맵을 한국어로 전문적이고 창의적으로 작성해줘.`;
+      
+      const response = await ai.models.generateContent({ 
+        model: 'gemini-3-flash-preview', 
+        contents: prompt,
+        config: { thinkingConfig: { thinkingBudget: 0 } }
+      });
       setReport({ content: response.text || "분석 실패", timestamp: new Date().toLocaleTimeString() });
     } catch (error) {
+      console.error(error);
       alert("AI 리포트 생성 중 오류가 발생했습니다.");
     } finally {
       setIsGenerating(false);
@@ -176,56 +204,76 @@ export default function App() {
 
   const bepMonth = useMemo(() => {
     const match = monthlyData.find(d => d.cumulativeProfit >= 0);
-    return match ? `M+${match.month}` : '미도달';
+    return match ? `M+${match.month}` : '측정 불가';
   }, [monthlyData]);
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-20">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center space-x-2">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Coffee className="text-white h-5 w-5" />
+            <div className="flex items-center space-x-3">
+              <div className="bg-indigo-600 p-2 rounded-xl shadow-indigo-200 shadow-lg">
+                <BarChart2 className="text-white h-6 w-6" />
               </div>
-              <span className="font-bold text-xl tracking-tight">BizPlanner</span>
+              <div>
+                <span className="font-bold text-xl tracking-tight block leading-none">BizPlanner</span>
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Premium 3-in-1 Tool</span>
+              </div>
             </div>
             
-            <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg overflow-x-auto">
+            <nav className="flex space-x-1 bg-slate-100 p-1 rounded-xl">
               {[
                 { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={16} /> },
-                { id: Tab.PLANNER, label: '계획 설정', icon: <Calculator size={16} /> },
-                { id: Tab.COMPARISON, label: '비교 분석', icon: <BarChart2 size={16} /> },
+                { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={16} /> },
+                { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={16} /> },
                 { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={16} /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as Tab)}
-                  className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`flex items-center space-x-2 px-3 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab.id ? 'bg-white text-indigo-600 shadow-md translate-y-[-1px]' : 'text-slate-500 hover:text-slate-700'}`}
                 >
                   {tab.icon}
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="hidden md:inline">{tab.label}</span>
                 </button>
               ))}
             </nav>
           </div>
         </div>
 
-        <div className="bg-gray-50 border-b border-gray-200 py-2">
-          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between overflow-x-auto">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-gray-400 uppercase">My Scenarios:</span>
-              <div className="flex gap-1">
+        <div className="bg-slate-50 border-b border-slate-200 py-2.5">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <span className="text-[10px] font-black text-slate-400 uppercase whitespace-nowrap">Plan Presets:</span>
+              <div className="flex gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
+                {Object.keys(PLAN_PRESETS).map(name => (
+                  <button 
+                    key={name}
+                    onClick={() => applyPreset(name)}
+                    className="px-3 py-1 bg-white border border-slate-200 rounded-full text-[11px] font-bold text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors whitespace-nowrap shadow-sm"
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-2 md:pt-0">
+               <span className="text-[10px] font-black text-slate-400 uppercase whitespace-nowrap">My Saved Plans:</span>
+               <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
                 {scenarios.map(s => (
-                  <div key={s.id} className="flex items-center bg-white border rounded h-7 shadow-xs">
-                    <button onClick={() => loadScenario(s.id)} className={`px-2 text-[11px] font-medium ${activeScenarioId === s.id ? 'text-blue-600 font-bold' : 'text-gray-600'}`}>
+                  <div key={s.id} className={`flex items-center bg-white border rounded-full pl-3 pr-1 h-7 shadow-sm transition-all ${activeScenarioId === s.id ? 'border-indigo-500 ring-2 ring-indigo-50' : 'border-slate-200'}`}>
+                    <button onClick={() => loadScenario(s.id)} className={`text-[11px] font-bold mr-2 ${activeScenarioId === s.id ? 'text-indigo-600' : 'text-slate-600'}`}>
                       {s.name}
                     </button>
-                    <button onClick={() => deleteScenario(s.id)} className="px-1.5 text-gray-300 hover:text-red-500"><Trash2 size={10} /></button>
+                    <button onClick={() => deleteScenario(s.id)} className="p-1 text-slate-300 hover:text-rose-500 rounded-full hover:bg-rose-50"><Trash2 size={12} /></button>
                   </div>
                 ))}
-                <button onClick={() => { const name = prompt("이름:"); if(name) saveCurrentScenario(name); }} className="px-2 h-7 bg-blue-50 text-blue-600 border border-blue-200 rounded text-[11px] font-bold flex items-center gap-1">
-                  <Plus size={10}/> 저장
+                <button 
+                  onClick={() => { const name = prompt("계획 이름을 입력하세요:"); if(name) saveCurrentScenario(name); }} 
+                  className="px-3 h-7 bg-indigo-600 text-white rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-indigo-100 shadow-md hover:bg-indigo-700 active:scale-95 transition-all"
+                >
+                  <Save size={12}/> 저장
                 </button>
               </div>
             </div>
@@ -252,7 +300,7 @@ export default function App() {
             onSupplyChange={(f, v) => setConfig(prev => ({...prev, cafeSupplies: {...prev.cafeSupplies, [f]: v}}))}
             monthlyData={monthlyData}
             dailySalesCount={currentFinancials.salesCount}
-            cafeUnitCosts={{} as any} // Simplify for focus on deployment
+            cafeUnitCosts={{} as any} 
             totalInvestment={currentFinancials.totalInvestment}
             calculatedLaborCost={currentFinancials.laborCost}
           />

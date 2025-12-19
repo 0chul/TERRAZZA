@@ -1,9 +1,7 @@
 
 import { GlobalConfig, TodoItem, CafeSupplies } from './types';
 
-// Based on the provided Excel images, now editable
 export const DEFAULT_CAFE_SUPPLIES: CafeSupplies = {
-  // Consumables (Won)
   hotCup: 39,
   hotLid: 25,
   stick: 5,
@@ -11,17 +9,13 @@ export const DEFAULT_CAFE_SUPPLIES: CafeSupplies = {
   iceLid: 26,
   straw: 6,
   holder: 19,
-  carrier: 60, // Updated based on screenshot
+  carrier: 60,
   wipe: 18,
   napkin: 4,
-  dishwashing: 60, // Labor/Resource proxy for store
-  
-  // Ingredients (Volume/Weight base is dynamic, these are fixed add-ons)
+  dishwashing: 60,
   water: 30,
   ice: 50,
-  syrup: 60, // Updated based on screenshot
-  
-  // Specs
+  syrup: 60,
   beanGrams: 20,
   milkMl: 150,
 };
@@ -30,52 +24,69 @@ export const DEFAULT_CONFIG: GlobalConfig = {
   cafe: {
     avgPriceAmericano: 4500,
     avgPriceLatte: 5000,
-    avgPriceSyrupLatte: 5500, // Slightly higher than Latte
+    avgPriceSyrupLatte: 5500,
     beanPricePerKg: 30000, 
     milkPricePerL: 2500,
-    
-    // New Capacity Settings
-    seatCount: 60,
-    operatingHours: 9,    // 10am - 7pm
-    stayDuration: 2,      // 2 hours
-    turnoverTarget: 0.5,  // 50%
-    
-    ratioAmericano: 0.5,   // 50%
-    ratioLatte: 0.3,       // 30%
-    ratioSyrupLatte: 0.2,  // 20%
-    takeoutRatio: 0.7,     
-    iceRatio: 0.75,        
+    seatCount: 40,
+    operatingHours: 9,
+    stayDuration: 2,
+    turnoverTarget: 0.6,
+    ratioAmericano: 0.5,
+    ratioLatte: 0.3,
+    ratioSyrupLatte: 0.2,
+    takeoutRatio: 0.6,
+    iceRatio: 0.7,
     operatingDays: 26,
   },
   cafeSupplies: DEFAULT_CAFE_SUPPLIES,
   space: {
-    hourlyRate: 50000,
+    hourlyRate: 40000,
     hoursPerDay: 8,
-    operatingDays: 30, // Updated from 20 to 30
-    utilizationRate: 0.5,
+    operatingDays: 30,
+    utilizationRate: 0.4,
   },
   wine: {
-    avgTicketPrice: 65000,
+    avgTicketPrice: 70000,
     costOfGoodsSoldRate: 0.35,
-    dailyTables: 5,
+    dailyTables: 4,
     operatingDays: 24,
   },
   fixed: {
-    weekdayStaff: 2, // 2 full-time staff
-    weekendStaff: 1, // 1 weekend staff
+    weekdayStaff: 2,
+    weekendStaff: 1,
     additionalLabor: 0,
-    utilities: 2000000,
+    utilities: 1500000,
     internet: 40000,
     marketing: 1000000,
     maintenance: 100000,
     misc: 100000,
   },
   initial: {
-    interior: 50000000,
-    equipment: 15000000,
-    design: 2000000,
+    interior: 60000000,
+    equipment: 20000000,
+    design: 3000000,
     supplies: 5000000,
   },
+};
+
+export const PLAN_PRESETS: Record<string, Partial<GlobalConfig>> = {
+  "균형 모델": {
+    cafe: { ...DEFAULT_CONFIG.cafe, turnoverTarget: 0.6 },
+    space: { ...DEFAULT_CONFIG.space, utilizationRate: 0.4 },
+    wine: { ...DEFAULT_CONFIG.wine, dailyTables: 4 }
+  },
+  "카페 집중형": {
+    cafe: { ...DEFAULT_CONFIG.cafe, turnoverTarget: 1.2, seatCount: 60 },
+    space: { ...DEFAULT_CONFIG.space, utilizationRate: 0.2 },
+    wine: { ...DEFAULT_CONFIG.wine, dailyTables: 2 },
+    fixed: { ...DEFAULT_CONFIG.fixed, weekdayStaff: 3 }
+  },
+  "와인/심야 집중형": {
+    cafe: { ...DEFAULT_CONFIG.cafe, turnoverTarget: 0.3, operatingHours: 6 },
+    space: { ...DEFAULT_CONFIG.space, utilizationRate: 0.6 },
+    wine: { ...DEFAULT_CONFIG.wine, dailyTables: 8, avgTicketPrice: 85000 },
+    fixed: { ...DEFAULT_CONFIG.fixed, weekdayStaff: 2, weekendStaff: 2 }
+  }
 };
 
 export const INITIAL_TODOS: TodoItem[] = [
