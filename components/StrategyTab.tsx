@@ -12,7 +12,6 @@ import {
     Loader2,
     CheckCircle2,
     ArrowRight,
-    // Add missing FileText import
     FileText
 } from 'lucide-react';
 
