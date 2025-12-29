@@ -13,7 +13,8 @@ import {
   Layout,
   RefreshCw,
   RotateCcw,
-  Database
+  Database,
+  Presentation
 } from 'lucide-react';
 
 import { DEFAULT_CONFIG, INITIAL_TODOS } from './constants';
@@ -22,6 +23,7 @@ import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
 import { ComparisonTab } from './components/ComparisonTab';
+import { BusinessPlanTab } from './components/BusinessPlanTab';
 import { dbService } from './db';
 
 enum Tab {
@@ -29,6 +31,7 @@ enum Tab {
   PLANNER = 'planner',
   COMPARISON = 'comparison',
   TODO = 'todo',
+  PLAN = 'plan',
 }
 
 const WEEKDAY_MONTHLY_RATE = 2156880; 
@@ -373,6 +376,7 @@ export default function App() {
                 { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={16} /> },
                 { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={16} /> },
                 { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={16} /> },
+                { id: Tab.PLAN, label: '사업 계획', icon: <Presentation size={16} /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -484,6 +488,10 @@ export default function App() {
             onAdd={handleAddTodo}
             onDelete={handleDeleteTodo}
           />
+        )}
+        
+        {activeTab === Tab.PLAN && (
+          <BusinessPlanTab />
         )}
       </main>
     </div>
