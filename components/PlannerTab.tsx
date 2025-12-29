@@ -172,6 +172,34 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                   </div>
 
                   <NumberInput label="총 좌석 수" value={config.cafe.seatCount} onChange={(v) => onConfigChange('cafe', 'seatCount', v)} unit="석" />
+                  
+                  {/* Operating Days Selector */}
+                  <div className="flex flex-col">
+                     <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">운영 일수 (월 평균)</label>
+                     <div className="grid grid-cols-3 gap-1 bg-white p-1 rounded-md border border-gray-300 shadow-sm">
+                        {[
+                           { label: '주 5일', val: 21.7 },
+                           { label: '주 6일', val: 26.1 },
+                           { label: '365일', val: 30.4 }
+                        ].map((opt) => (
+                           <button
+                              key={opt.label}
+                              onClick={() => onConfigChange('cafe', 'operatingDays', opt.val)}
+                              className={`text-xs py-2 rounded font-bold transition-all ${
+                                 Math.abs(config.cafe.operatingDays - opt.val) < 0.5
+                                 ? 'bg-indigo-600 text-white shadow-sm'
+                                 : 'text-gray-500 hover:bg-gray-100 hover:text-indigo-600'
+                              }`}
+                           >
+                              {opt.label}
+                           </button>
+                        ))}
+                     </div>
+                     <div className="text-right text-[10px] text-indigo-400 mt-1 font-medium">
+                        * 월 평균 {config.cafe.operatingDays.toFixed(1)}일 영업
+                     </div>
+                  </div>
+
                   <NumberInput label="일 영업 시간" value={config.cafe.operatingHours} onChange={(v) => onConfigChange('cafe', 'operatingHours', v)} unit="시간" />
                   <NumberInput label="고객 평균 점유시간" value={config.cafe.stayDuration} onChange={(v) => onConfigChange('cafe', 'stayDuration', v)} unit="시간" step={0.5} />
                   
