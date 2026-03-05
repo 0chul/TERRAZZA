@@ -24,6 +24,7 @@ import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
 import { ComparisonTab } from './components/ComparisonTab';
 import { BusinessPlanTab } from './components/BusinessPlanTab';
+import { InteriorCostTab } from './components/InteriorCostTab';
 import { dbService } from './db';
 
 enum Tab {
@@ -32,6 +33,7 @@ enum Tab {
   COMPARISON = 'comparison',
   TODO = 'todo',
   PLAN = 'plan',
+  INTERIOR = 'interior',
 }
 
 const WEEKDAY_MONTHLY_RATE = 2156880; 
@@ -377,6 +379,7 @@ export default function App() {
                 { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={16} /> },
                 { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={16} /> },
                 { id: Tab.PLAN, label: '사업 계획', icon: <Presentation size={16} /> },
+                { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={16} /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -492,6 +495,10 @@ export default function App() {
         
         {activeTab === Tab.PLAN && (
           <BusinessPlanTab />
+        )}
+        
+        {activeTab === Tab.INTERIOR && (
+          <InteriorCostTab />
         )}
       </main>
     </div>

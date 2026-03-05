@@ -110,6 +110,14 @@ export interface TodoItem {
   completed: boolean;
 }
 
+export interface InteriorCost {
+  id: string;
+  category: string;
+  item: string;
+  cost: number;
+  date: string;
+}
+
 export interface ProductCost {
   americano: number;
   latte: number;
