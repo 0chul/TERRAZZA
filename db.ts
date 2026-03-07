@@ -20,13 +20,15 @@ const INTERIOR_STORE = 'interiorCosts';
 
 // Initialize DB
 export const initDB = async () => {
-  return openDB<TerrazzaDB>(DB_NAME, 2, {
+  return openDB<TerrazzaDB>(DB_NAME, 3, {
     upgrade(db, oldVersion) {
       if (oldVersion < 1) {
         db.createObjectStore(PLANS_STORE, { keyPath: 'id' });
       }
-      if (oldVersion < 2) {
-        db.createObjectStore(INTERIOR_STORE, { keyPath: 'id' });
+      if (oldVersion < 3) {
+        if (!db.objectStoreNames.contains(INTERIOR_STORE)) {
+          db.createObjectStore(INTERIOR_STORE, { keyPath: 'id' });
+        }
       }
     },
   });

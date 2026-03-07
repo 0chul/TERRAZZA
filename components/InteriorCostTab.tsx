@@ -102,11 +102,6 @@ export const InteriorCostTab: React.FC = () => {
           <h2 className="text-xl font-bold text-[#5d4037] flex items-center gap-2">
             <DollarSign className="text-orange-500" /> 인테리어 공사 비용 계산
           </h2>
-          <div className="text-sm font-bold text-orange-600 bg-orange-50 px-4 py-2 rounded-lg flex flex-col items-end">
-            <span>현재: {totalActual.toLocaleString()} 원</span>
-            <span>예상: {totalEstimated.toLocaleString()} 원</span>
-            <span className="text-lg">총액: {(totalActual + totalEstimated).toLocaleString()} 원</span>
-          </div>
         </div>
 
         <div className="mb-6 bg-orange-50 p-4 rounded-xl">
@@ -117,21 +112,24 @@ export const InteriorCostTab: React.FC = () => {
               {Object.entries(categoryTotals).map(([cat, totals]) => (
                 totals.actual > 0 && <div key={cat} className="flex justify-between text-sm py-1 border-b border-orange-100"><span>{cat}</span><span>{totals.actual.toLocaleString()}</span></div>
               ))}
-              <div className="flex justify-between text-sm py-2 font-bold text-gray-700 border-t border-orange-200 mt-2"><span>합계</span><span>{totalActual.toLocaleString()}</span></div>
             </div>
             <div>
               <h4 className="font-bold text-orange-500 mb-2">예상</h4>
               {Object.entries(categoryTotals).map(([cat, totals]) => (
                 totals.estimated > 0 && <div key={cat} className="flex justify-between text-sm py-1 border-b border-orange-100"><span>{cat}</span><span>{totals.estimated.toLocaleString()}</span></div>
               ))}
-              <div className="flex justify-between text-sm py-2 font-bold text-orange-600 border-t border-orange-200 mt-2"><span>합계</span><span>{totalEstimated.toLocaleString()}</span></div>
             </div>
             <div>
               <h4 className="font-bold text-[#5d4037] mb-2">합계 (현재+예상)</h4>
               {Object.entries(categoryTotals).map(([cat, totals]) => (
                 <div key={cat} className="flex justify-between text-sm py-1 border-b border-orange-100"><span>{cat}</span><span>{(totals.actual + totals.estimated).toLocaleString()}</span></div>
               ))}
-              <div className="flex justify-between text-sm py-2 font-bold text-[#5d4037] border-t border-orange-200 mt-2"><span>합계</span><span>{(totalActual + totalEstimated).toLocaleString()}</span></div>
+              
+              <div className="mt-6 pt-4 border-t-2 border-orange-200 flex flex-col items-end">
+                <div className="text-sm font-bold text-gray-600">현재: {totalActual.toLocaleString()} 원</div>
+                <div className="text-sm font-bold text-orange-500">예상: {totalEstimated.toLocaleString()} 원</div>
+                <div className="text-lg font-bold text-[#5d4037] mt-1">총액: {(totalActual + totalEstimated).toLocaleString()} 원</div>
+              </div>
             </div>
           </div>
         </div>
