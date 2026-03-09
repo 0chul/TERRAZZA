@@ -361,33 +361,35 @@ export default function App() {
     <div className="min-h-screen bg-[#fdfcfb] font-sans text-[#3e2723]">
       <header className="bg-white border-b border-orange-100 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
-            <div className="flex items-center space-x-4">
-              <div className="p-2.5 bg-[#5d4037] rounded-xl shadow-lg">
-                <Layout className="text-white" size={24} />
-              </div>
-              <div className="border-l border-orange-100 pl-4 py-1">
-                <span className="font-bold text-lg tracking-tight block leading-tight text-[#5d4037]">Terrazza Lounge</span>
-                <span className="text-[10px] text-orange-600 font-black uppercase tracking-[0.2em]">Business Planner</span>
+          <div className="flex flex-col w-full gap-4 py-4">
+            <div className="flex justify-between items-center w-full px-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-[#5d4037] rounded-lg shadow-sm">
+                  <Layout className="text-white" size={20} />
+                </div>
+                <div className="border-l border-orange-100 pl-3">
+                  <span className="font-bold text-base tracking-tight block leading-tight text-[#5d4037]">Terrazza Lounge</span>
+                  <span className="text-[9px] text-orange-600 font-black uppercase tracking-[0.1em]">Business Planner</span>
+                </div>
               </div>
             </div>
             
-            <nav className="flex space-x-1 bg-orange-50/70 p-1 rounded-xl overflow-x-auto">
+            <nav className="flex flex-wrap gap-1 bg-orange-50/70 p-1 rounded-xl justify-center mx-4">
               {[
-                { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={16} /> },
-                { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={16} /> },
-                { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={16} /> },
-                { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={16} /> },
-                { id: Tab.PLAN, label: '사업 계획', icon: <Presentation size={16} /> },
-                { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={16} /> },
+                { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={14} /> },
+                { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={14} /> },
+                { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={14} /> },
+                { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={14} /> },
+                { id: Tab.PLAN, label: '사업 계획', icon: <Presentation size={14} /> },
+                { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={14} /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as Tab)}
-                  className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[#5d4037] text-white shadow-md' : 'text-slate-500 hover:text-[#5d4037] hover:bg-white'}`}
+                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[#5d4037] text-white shadow-sm' : 'text-slate-500 hover:text-[#5d4037] hover:bg-white'}`}
                 >
                   {tab.icon}
-                  <span className="hidden lg:inline">{tab.label}</span>
+                  <span>{tab.label}</span>
                 </button>
               ))}
             </nav>

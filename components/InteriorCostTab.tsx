@@ -97,16 +97,16 @@ export const InteriorCostTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-orange-100">
-        <div className="flex justify-between items-center mb-4">
+      <div className="bg-white md:p-2 md:rounded-2xl md:shadow-sm md:border md:border-orange-100">
+        <div className="flex justify-between items-center mb-4 px-2">
           <h2 className="text-xl font-bold text-[#5d4037] flex items-center gap-2">
             <DollarSign className="text-orange-500" /> 인테리어 공사 비용 계산
           </h2>
         </div>
 
-        <div className="mb-6 bg-orange-50 p-4 rounded-xl">
-          <h3 className="font-bold text-[#5d4037] mb-4">카테고리별 요약</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mb-6 md:bg-orange-50 md:p-2 md:rounded-xl">
+          <h3 className="font-bold text-[#5d4037] mb-4 px-2">카테고리별 요약</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
             <div>
               <h4 className="font-bold text-gray-600 mb-2">현재까지</h4>
               {Object.entries(categoryTotals).map(([cat, totals]) => (
@@ -134,30 +134,32 @@ export const InteriorCostTab: React.FC = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-2 border rounded-lg" />
-          <input type="text" placeholder="카테고리 (예: 철거)" value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 border rounded-lg" />
-          <input type="text" placeholder="항목 (예: 폐기물 처리)" value={item} onChange={(e) => setItem(e.target.value)} className="p-2 border rounded-lg" />
-          <input type="number" placeholder="비용 (원)" value={cost} onChange={(e) => setCost(e.target.value)} className="p-2 border rounded-lg" />
-          <button onClick={addCost} className="bg-[#5d4037] text-white p-2 rounded-lg flex items-center justify-center gap-2 hover:bg-[#4e342e]">
+        <div className="grid grid-cols-1 gap-2 mb-6">
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-2 border rounded-lg w-full" />
+          <div className="grid grid-cols-2 gap-2">
+            <input type="text" placeholder="카테고리" value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 border rounded-lg w-full" />
+            <input type="text" placeholder="항목" value={item} onChange={(e) => setItem(e.target.value)} className="p-2 border rounded-lg w-full" />
+          </div>
+          <input type="number" placeholder="비용 (원)" value={cost} onChange={(e) => setCost(e.target.value)} className="p-2 border rounded-lg w-full" />
+          <button onClick={addCost} className="bg-[#5d4037] text-white p-2 rounded-lg flex items-center justify-center gap-2 hover:bg-[#4e342e] w-full">
             <Plus size={16} /> 추가
           </button>
         </div>
 
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-orange-100">
-              <th className="p-2 cursor-pointer hover:text-orange-600" onClick={() => handleSort('date')}>
+            <tr className="border-b border-orange-100 text-xs">
+              <th className="p-1 cursor-pointer hover:text-orange-600 whitespace-nowrap" onClick={() => handleSort('date')}>
                 날짜 {getSortIcon('date')}
               </th>
-              <th className="p-2 cursor-pointer hover:text-orange-600" onClick={() => handleSort('category')}>
+              <th className="p-1 cursor-pointer hover:text-orange-600 whitespace-nowrap" onClick={() => handleSort('category')}>
                 카테고리 {getSortIcon('category')}
               </th>
-              <th className="p-2 cursor-pointer hover:text-orange-600" onClick={() => handleSort('item')}>
+              <th className="p-1 cursor-pointer hover:text-orange-600 whitespace-nowrap" onClick={() => handleSort('item')}>
                 항목 {getSortIcon('item')}
               </th>
-              <th className="p-2 text-right">비용</th>
-              <th className="p-2 text-center">삭제</th>
+              <th className="p-1 text-right whitespace-nowrap">비용</th>
+              <th className="p-1 text-center whitespace-nowrap">삭제</th>
             </tr>
           </thead>
           <tbody>
@@ -176,13 +178,13 @@ export const InteriorCostTab: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <td className="p-2">{c.date} {c.date > today && <span className="text-[10px] font-bold bg-orange-100 px-1 rounded">예측</span>}</td>
-                    <td className="p-2">{c.category}</td>
-                    <td className="p-2">{c.item}</td>
-                    <td className="p-2 text-right">{c.cost.toLocaleString()} 원</td>
-                    <td className="p-2 text-center flex gap-2 justify-center">
-                      <button onClick={() => startEdit(c)} className="text-blue-500 hover:text-blue-700"><Edit2 size={16} /></button>
-                      <button onClick={() => deleteCost(c.id)} className="text-rose-500 hover:text-rose-700"><Trash2 size={16} /></button>
+                    <td className="p-1 text-xs whitespace-nowrap">{c.date.substring(5)} {c.date > today && <span className="text-[10px] font-bold bg-orange-100 px-1 rounded">예측</span>}</td>
+                    <td className="p-1 text-xs whitespace-nowrap">{c.category}</td>
+                    <td className="p-1 text-xs whitespace-nowrap">{c.item}</td>
+                    <td className="p-1 text-xs text-right whitespace-nowrap">{c.cost.toLocaleString()} 원</td>
+                    <td className="p-1 text-center flex gap-1 justify-center">
+                      <button onClick={() => startEdit(c)} className="text-blue-500 hover:text-blue-700"><Edit2 size={14} /></button>
+                      <button onClick={() => deleteCost(c.id)} className="text-rose-500 hover:text-rose-700"><Trash2 size={14} /></button>
                     </td>
                   </>
                 )}
