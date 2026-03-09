@@ -359,7 +359,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] font-sans text-[#3e2723]">
-      <header className="bg-white border-b border-orange-100 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/90">
+      <header className="bg-white border-b border-orange-100 shadow-sm backdrop-blur-md bg-white/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col w-full gap-4 py-4">
             <div className="flex justify-between items-center w-full px-4">
@@ -373,88 +373,88 @@ export default function App() {
                 </div>
               </div>
             </div>
-            
-            <nav className="flex flex-wrap gap-1 bg-orange-50/70 p-1 rounded-xl justify-center mx-4">
-              {[
-                { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={14} /> },
-                { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={14} /> },
-                { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={14} /> },
-                { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={14} /> },
-                { id: Tab.PLAN, label: '사업 계획', icon: <Presentation size={14} /> },
-                { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={14} /> },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as Tab)}
-                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[#5d4037] text-white shadow-sm' : 'text-slate-500 hover:text-[#5d4037] hover:bg-white'}`}
-                >
-                  {tab.icon}
-                  <span>{tab.label}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-
-        <div className="bg-[#fff9f5] border-b border-orange-100 py-2.5">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            
-            <div className="flex items-center gap-2 text-xs text-orange-800 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100">
-               <Database size={14} className="text-orange-500"/>
-               <span className="font-bold">Database:</span>
-               <span>Local IndexedDB Active</span>
-            </div>
-
-            {/* Right Side: Saved Plans & Draft Actions */}
-            <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-2.5 md:pt-0 border-orange-100">
-               <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest whitespace-nowrap flex items-center gap-1">
-                 <Copy size={12}/> My Plans (DB):
-               </span>
-               
-               {/* Saved Scenarios List */}
-               <div className="flex gap-1.5 overflow-x-auto scrollbar-hide items-center max-w-[200px] lg:max-w-none">
-                {scenarios.map(s => (
-                  <div key={s.id} className={`flex items-center bg-white border rounded-lg pl-2 pr-1 h-7 shadow-sm transition-all group ${activeScenarioId === s.id ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-orange-100 text-slate-600'}`}>
-                    <button onClick={() => loadScenario(s.id)} className="text-[10px] font-bold mr-1 whitespace-nowrap">
-                      {s.name}
-                    </button>
-                    <button onClick={(e) => deleteScenario(s.id, e)} className="p-0.5 text-orange-200 hover:text-rose-500 rounded hover:bg-rose-50 transition-colors"><Trash2 size={10} /></button>
-                  </div>
-                ))}
-                {scenarios.length === 0 && <span className="text-[10px] text-gray-400 italic">저장된 계획 없음</span>}
-               </div>
-                
-                {/* Current Draft Action Buttons */}
-                <div className="flex items-center gap-1 ml-2 border-l border-orange-200 pl-3">
-                   {/* Reset Button: Contextually placed with current draft actions */}
-                   <button 
-                      onClick={resetConfig}
-                      className="px-2 h-7 bg-slate-100 border border-slate-200 text-slate-500 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm hover:bg-slate-200 transition-all whitespace-nowrap"
-                      title="입력값 초기화 (현재 드래프트 리셋)"
-                    >
-                      <RotateCcw size={10} />
-                   </button>
-
-                   {activeScenarioId && (
-                    <button 
-                      onClick={updateCurrentScenario}
-                      className="px-2 h-7 bg-emerald-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm hover:bg-emerald-700 transition-all whitespace-nowrap"
-                      title="현재 계획 DB 업데이트"
-                    >
-                      <RefreshCw size={10}/>
-                    </button>
-                   )}
-                   <button 
-                    onClick={() => { const name = prompt("새로운 계획 이름을 입력하세요:"); if(name) saveCurrentScenario(name); }} 
-                    className="px-3 h-7 bg-[#5d4037] text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow-sm hover:bg-[#4e342e] transition-all transform hover:-translate-y-0.5 whitespace-nowrap"
-                   >
-                    <Plus size={12}/> {activeScenarioId ? '새로 저장' : 'DB 저장'}
-                   </button>
-                </div>
-            </div>
           </div>
         </div>
       </header>
+      
+      <nav className="flex flex-wrap gap-1 bg-orange-50/70 p-1 rounded-xl justify-center mx-4 sticky top-0 z-50 shadow-sm">
+        {[
+          { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={14} /> },
+          { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={14} /> },
+          { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={14} /> },
+          { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={14} /> },
+          { id: Tab.PLAN, label: '사업 계획', icon: <Presentation size={14} /> },
+          { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={14} /> },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as Tab)}
+            className={`flex items-center space-x-1 px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[#5d4037] text-white shadow-sm' : 'text-slate-500 hover:text-[#5d4037] hover:bg-white'}`}
+          >
+            {tab.icon}
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      <div className="bg-[#fff9f5] border-b border-orange-100 py-2.5">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col items-center justify-between gap-4">
+          
+          <div className="flex items-center gap-2 text-xs text-orange-800 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100 w-full md:w-auto">
+             <Database size={14} className="text-orange-500"/>
+             <span className="font-bold">Database:</span>
+             <span>Local IndexedDB Active</span>
+          </div>
+
+          {/* Right Side: Saved Plans & Draft Actions */}
+          <div className="flex flex-col md:flex-row items-center gap-3 w-full border-t md:border-t-0 pt-2.5 md:pt-0 border-orange-100">
+             <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest whitespace-nowrap flex items-center gap-1">
+               <Copy size={12}/> My Plans (DB):
+             </span>
+             
+             {/* Saved Scenarios List */}
+             <div className="flex gap-1.5 overflow-x-auto scrollbar-hide items-center w-full md:max-w-none">
+              {scenarios.map(s => (
+                <div key={s.id} className={`flex items-center bg-white border rounded-lg pl-2 pr-1 h-7 shadow-sm transition-all group ${activeScenarioId === s.id ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-orange-100 text-slate-600'}`}>
+                  <button onClick={() => loadScenario(s.id)} className="text-[10px] font-bold mr-1 whitespace-nowrap">
+                    {s.name}
+                  </button>
+                  <button onClick={(e) => deleteScenario(s.id, e)} className="p-0.5 text-orange-200 hover:text-rose-500 rounded hover:bg-rose-50 transition-colors"><Trash2 size={10} /></button>
+                </div>
+              ))}
+              {scenarios.length === 0 && <span className="text-[10px] text-gray-400 italic">저장된 계획 없음</span>}
+             </div>
+              
+              {/* Current Draft Action Buttons */}
+              <div className="flex items-center gap-1 md:ml-2 border-t md:border-t-0 md:border-l border-orange-200 pt-2.5 md:pt-0 md:pl-3 w-full md:w-auto justify-center">
+                 {/* Reset Button: Contextually placed with current draft actions */}
+                 <button 
+                    onClick={resetConfig}
+                    className="px-2 h-7 bg-slate-100 border border-slate-200 text-slate-500 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm hover:bg-slate-200 transition-all whitespace-nowrap"
+                    title="입력값 초기화 (현재 드래프트 리셋)"
+                  >
+                    <RotateCcw size={10} />
+                 </button>
+
+                 {activeScenarioId && (
+                  <button 
+                    onClick={updateCurrentScenario}
+                    className="px-2 h-7 bg-emerald-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm hover:bg-emerald-700 transition-all whitespace-nowrap"
+                    title="현재 계획 DB 업데이트"
+                  >
+                    <RefreshCw size={10}/>
+                  </button>
+                 )}
+                 <button 
+                  onClick={() => { const name = prompt("새로운 계획 이름을 입력하세요:"); if(name) saveCurrentScenario(name); }} 
+                  className="px-3 h-7 bg-[#5d4037] text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow-sm hover:bg-[#4e342e] transition-all transform hover:-translate-y-0.5 whitespace-nowrap"
+                 >
+                  <Plus size={12}/> {activeScenarioId ? '새로 저장' : 'DB 저장'}
+                 </button>
+              </div>
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 py-8 pb-16">
         {activeTab === Tab.DASHBOARD && (
