@@ -34,6 +34,7 @@ const INITIAL_CHECKLIST: ChecklistItem[] = [
 export const TodoTab: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [checklist, setChecklist] = useState<ChecklistItem[]>(INITIAL_CHECKLIST);
+  const [stage, setStage] = useState<'selection' | 'quotation'>('selection');
 
   const toggleItem = (id: string) => {
     const newSelected = new Set(selectedIds);
@@ -55,26 +56,42 @@ export const TodoTab: React.FC = () => {
     }));
   };
 
-  const totalAmount = useMemo(() => {
-    return checklist.reduce((sum, item) => {
-      if (selectedIds.has(item.id)) {
-        return sum + (item.price * item.quantity);
-      }
-      return sum;
-    }, 0);
+  const selectedItems = useMemo(() => {
+    return checklist.filter(item => selectedIds.has(item.id));
   }, [selectedIds, checklist]);
+
+  const totalAmount = useMemo(() => {
+    return selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [selectedItems]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-500 pb-24">
       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-bold text-gray-800">장비 체크리스트</h2>
+        <h2 className="text-2xl font-bold text-gray-800">
+          {stage === 'selection' ? '장비 선택 및 수량 조절' : '최종 견적서'}
+        </h2>
+        {stage === 'selection' ? (
+          <button 
+            onClick={() => setStage('quotation')}
+            className="px-6 py-2 bg-[#5d4037] text-white rounded-xl font-bold hover:bg-[#4e342e] transition-colors"
+          >
+            견적서 저장 및 보기
+          </button>
+        ) : (
+          <button 
+            onClick={() => setStage('selection')}
+            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition-colors"
+          >
+            수정하기
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-50 text-gray-700 font-bold border-b border-gray-200">
             <tr>
-              <th className="p-3 text-center">선택</th>
+              {stage === 'selection' && <th className="p-3 text-center">선택</th>}
               <th className="p-3">품명</th>
               <th className="p-3">모델</th>
               <th className="p-3 text-center">수량</th>
@@ -84,34 +101,40 @@ export const TodoTab: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {checklist.map((item) => (
+            {(stage === 'selection' ? checklist : selectedItems).map((item) => (
               <tr key={item.id} className={`hover:bg-orange-50/30 transition-colors ${selectedIds.has(item.id) ? 'bg-orange-50' : ''}`}>
-                <td className="p-3 text-center">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedIds.has(item.id)}
-                    onChange={() => toggleItem(item.id)}
-                    className="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                  />
-                </td>
+                {stage === 'selection' && (
+                  <td className="p-3 text-center">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedIds.has(item.id)}
+                      onChange={() => toggleItem(item.id)}
+                      className="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                    />
+                  </td>
+                )}
                 <td className="p-3 font-medium text-gray-800">{item.item}</td>
                 <td className="p-3 text-gray-600">{item.model}</td>
                 <td className="p-3 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <button 
-                      onClick={() => updateQuantity(item.id, -1)}
-                      className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 text-gray-600 font-bold"
-                    >
-                      -
-                    </button>
-                    <span className="w-6 text-center font-medium text-gray-800">{item.quantity}</span>
-                    <button 
-                      onClick={() => updateQuantity(item.id, 1)}
-                      className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 text-gray-600 font-bold"
-                    >
-                      +
-                    </button>
-                  </div>
+                  {stage === 'selection' ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <button 
+                        onClick={() => updateQuantity(item.id, -1)}
+                        className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 text-gray-600 font-bold"
+                      >
+                        -
+                      </button>
+                      <span className="w-6 text-center font-medium text-gray-800">{item.quantity}</span>
+                      <button 
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 text-gray-600 font-bold"
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="font-medium text-gray-800">{item.quantity}</span>
+                  )}
                 </td>
                 <td className="p-3 text-right text-gray-600">{item.price.toLocaleString()}</td>
                 <td className="p-3 text-right font-bold text-gray-800">{(item.price * item.quantity).toLocaleString()}</td>
