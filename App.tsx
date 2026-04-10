@@ -22,7 +22,6 @@ import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, Scenario } from './
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { TodoTab } from './components/TodoTab';
-import { ComparisonTab } from './components/ComparisonTab';
 import { BusinessPlanTab } from './components/BusinessPlanTab';
 import { InteriorCostTab } from './components/InteriorCostTab';
 import { dbService } from './db';
@@ -30,7 +29,6 @@ import { dbService } from './db';
 enum Tab {
   DASHBOARD = 'dashboard',
   PLANNER = 'planner',
-  COMPARISON = 'comparison',
   TODO = 'todo',
   PLAN = 'plan',
   INTERIOR = 'interior',
@@ -311,52 +309,6 @@ export default function App() {
     return match ? `M+${match.month}` : '측정 불가';
   }, [monthlyData]);
 
-  // Helper for Comparison Tab
-  const calculateFinancialsForScenario = (cfg: GlobalConfig) => {
-    // Re-calculate unit costs locally for the scenario
-    const tempUc = (() => {
-      const { beanPricePerKg, milkPricePerL, iceRatio, takeoutRatio } = cfg.cafe;
-      const s = cfg.cafeSupplies;
-      const bean = (beanPricePerKg / 1000) * s.beanGrams;
-      const milk = (milkPricePerL / 1000) * s.milkMl;
-      const water = s.water;
-      const ice = s.ice;
-      const syrup = s.syrup;
-      const getMenuCost = (menu: string, type: string, temp: string) => {
-        let ing = bean;
-        if (menu === 'am') ing += water; else if (menu === 'lt') ing += milk; else ing += milk + syrup;
-        if (temp === 'i') ing += ice;
-        let pkg = 0;
-        if (type === 'to') {
-            pkg = temp === 'h' ? (s.hotCup + s.hotLid + s.stick + s.holder + s.carrier + s.wipe + s.napkin) : (s.iceCup + s.iceLid + s.straw + s.holder + s.carrier + s.wipe + s.napkin);
-        } else {
-            pkg = s.wipe + s.napkin + s.dishwashing + (temp === 'h' ? s.stick : s.straw);
-        }
-        return ing + pkg;
-      };
-      
-      const calcWeighted = (m: 'am' | 'lt' | 'sl') => {
-          const toH = getMenuCost(m, 'to', 'h');
-          const toI = getMenuCost(m, 'to', 'i');
-          const stH = getMenuCost(m, 'st', 'h');
-          const stI = getMenuCost(m, 'st', 'i');
-          return (toI * iceRatio + toH * (1 - iceRatio)) * takeoutRatio + (stI * iceRatio + stH * (1 - iceRatio)) * (1 - takeoutRatio);
-      };
-      return {
-        finalCostAmericano: calcWeighted('am'),
-        finalCostLatte: calcWeighted('lt'),
-        finalCostSyrupLatte: calcWeighted('sl'),
-      };
-    })();
-
-    const fin = calculateFinancials(cfg, tempUc as any);
-    return {
-      totalRevenue: fin.totalRevenue,
-      netProfit: fin.netProfit,
-      totalInvestment: fin.totalInvestment
-    };
-  };
-
   return (
     <div className="min-h-screen bg-[#fdfcfb] font-sans text-[#3e2723]">
       <header className="bg-white border-b border-orange-100 shadow-sm backdrop-blur-md bg-white/90">
@@ -381,7 +333,6 @@ export default function App() {
         {[
           { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={14} /> },
           { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={14} /> },
-          { id: Tab.COMPARISON, label: '계획 비교', icon: <Copy size={14} /> },
           { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={14} /> },
           { id: Tab.PLAN, label: '사업 계획', icon: <Presentation size={14} /> },
           { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={14} /> },
@@ -478,21 +429,8 @@ export default function App() {
           />
         )}
 
-        {activeTab === Tab.COMPARISON && (
-          <ComparisonTab 
-            scenarios={scenarios} 
-            currentConfig={config}
-            calculateFinancials={calculateFinancialsForScenario} 
-          />
-        )}
-
         {activeTab === Tab.TODO && (
-          <TodoTab 
-            todos={todos} 
-            onToggle={(id) => setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))} 
-            onAdd={handleAddTodo}
-            onDelete={handleDeleteTodo}
-          />
+          <TodoTab />
         )}
         
         {activeTab === Tab.PLAN && (

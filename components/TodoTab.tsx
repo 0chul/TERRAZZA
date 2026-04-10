@@ -1,120 +1,144 @@
 
-import React, { useState } from 'react';
-import { CheckSquare, Plus, Trash2 } from 'lucide-react';
-import { TodoItem } from '../types';
+import React, { useState, useMemo } from 'react';
+import { CheckSquare } from 'lucide-react';
 
-interface TodoTabProps {
-  todos: TodoItem[];
-  onToggle: (id: string) => void;
-  onAdd: (category: string, task: string, note: string) => void;
-  onDelete: (id: string) => void;
+interface ChecklistItem {
+  id: string;
+  item: string;
+  model: string;
+  quantity: number;
+  price: number;
+  note: string;
 }
 
-export const TodoTab: React.FC<TodoTabProps> = ({ todos, onToggle, onAdd, onDelete }) => {
-  const [newCategory, setNewCategory] = useState('운영');
-  const [newTask, setNewTask] = useState('');
-  const [newNote, setNewNote] = useState('');
+const INITIAL_CHECKLIST: ChecklistItem[] = [
+  { id: '1', item: '1200테이블냉장고', model: '라셀르간냉식', quantity: 1, price: 700000, note: '중고' },
+  { id: '2', item: '50kg 제빙기', model: '브레마', quantity: 1, price: 750000, note: '중고,콤프신품' },
+  { id: '3', item: '식기세척기', model: '도어타입', quantity: 1, price: 800000, note: '중고,렉포함' },
+  { id: '4', item: '', model: '', quantity: 1, price: 1100000, note: '신품,렉포함' },
+  { id: '5', item: '세제,린스', model: '', quantity: 1, price: 50000, note: '' },
+  { id: '6', item: '900제과쇼케이스', model: '뒷문,사각', quantity: 1, price: 700000, note: '중고' },
+  { id: '7', item: '블렌더믹서', model: '바스토', quantity: 1, price: 450000, note: '중고,볼제외' },
+  { id: '8', item: '컨벡션오븐', model: '우녹스', quantity: 1, price: 1200000, note: '중고,선반별도' },
+  { id: '9', item: '', model: '소프트밀', quantity: 1, price: 1200000, note: '중고,선반별도' },
+  { id: '10', item: '전자동커피머신', model: 'WMF(독일)', quantity: 1, price: 12000000, note: '중고' },
+  { id: '11', item: '', model: '세코(이태리)', quantity: 1, price: 4200000, note: '중고' },
+  { id: '12', item: '', model: '닥터커피F15', quantity: 1, price: 1800000, note: '신품' },
+  { id: '13', item: '정수필터', model: 'FN6', quantity: 1, price: 150000, note: '신품,헤드포함' },
+  { id: '14', item: '', model: 'PF6', quantity: 1, price: 100000, note: '신품,헤드포함' },
+  { id: '15', item: '그라인더', model: '말코닉 EK43', quantity: 1, price: 2500000, note: '중고' },
+  { id: '16', item: '메져슈퍼졸리', model: '', quantity: 1, price: 600000, note: '중고' },
+  { id: '17', item: '현장설치비', model: '', quantity: 2, price: 250000, note: '기존 장비포함' },
+];
 
-  // Get unique categories for dropdown
-  const categories = Array.from(new Set(todos.map(t => t.category)));
+export const TodoTab: React.FC = () => {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [checklist, setChecklist] = useState<ChecklistItem[]>(INITIAL_CHECKLIST);
 
-  const handleAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTask.trim()) return;
-    onAdd(newCategory, newTask, newNote);
-    setNewTask('');
-    setNewNote('');
+  const toggleItem = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
   };
 
-  // Group by category
-  const groupedTodos = todos.reduce((acc, todo) => {
-    if (!acc[todo.category]) acc[todo.category] = [];
-    acc[todo.category].push(todo);
-    return acc;
-  }, {} as Record<string, TodoItem[]>);
+  const updateQuantity = (id: string, delta: number) => {
+    setChecklist(prev => prev.map(item => {
+      if (item.id === id) {
+        const newQuantity = Math.max(0, item.quantity + delta);
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    }));
+  };
+
+  const totalAmount = useMemo(() => {
+    return checklist.reduce((sum, item) => {
+      if (selectedIds.has(item.id)) {
+        return sum + (item.price * item.quantity);
+      }
+      return sum;
+    }, 0);
+  }, [selectedIds, checklist]);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <div className="flex justify-between items-end border-b border-gray-200 pb-4">
-          <h2 className="text-2xl font-bold text-gray-800">개업 준비 체크리스트</h2>
-          <div className="text-gray-500 text-sm">
-              진행률: {Math.round((todos.filter(t => t.completed).length / (todos.length || 1)) * 100)}%
-          </div>
+    <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-500 pb-24">
+      <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+        <h2 className="text-2xl font-bold text-gray-800">장비 체크리스트</h2>
       </div>
 
-      {/* Add New Item Form */}
-      <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
-        <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
-          <Plus size={16} className="text-orange-500" /> 새 항목 추가
-        </h3>
-        <form onSubmit={handleAdd} className="flex flex-col md:flex-row gap-3">
-          <select 
-            value={newCategory} 
-            onChange={(e) => setNewCategory(e.target.value)}
-            className="p-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-200"
-          >
-            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <div className="flex-1 flex flex-col gap-2">
-            <input 
-              type="text" 
-              placeholder="할 일 입력 (예: POS기 설치 문의)" 
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-              className="p-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-200"
-              required
-            />
-            <input 
-              type="text" 
-              placeholder="비고 (선택사항)" 
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              className="p-2 border border-gray-200 rounded-lg text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-200"
-            />
-          </div>
-          <button 
-            type="submit" 
-            className="px-4 py-2 bg-[#5d4037] text-white rounded-lg text-sm font-bold hover:bg-[#4e342e] transition-colors whitespace-nowrap self-start md:self-auto h-10"
-          >
-            추가하기
-          </button>
-        </form>
-      </div>
-
-      {Object.entries(groupedTodos).map(([category, items]) => (
-        <div key={category} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="bg-gray-50 px-6 py-3 font-semibold text-gray-700 border-b border-gray-200">
-            {category}
-          </div>
-          <div className="divide-y divide-gray-100">
-            {(items as TodoItem[]).map((item) => (
-              <div key={item.id} className="flex items-center p-4 hover:bg-orange-50/30 transition-colors group">
-                <div 
-                  className={`flex-1 flex items-center cursor-pointer`}
-                  onClick={() => onToggle(item.id)}
-                >
-                  <div className={`w-6 h-6 rounded border flex items-center justify-center mr-4 transition-all flex-shrink-0 ${item.completed ? 'bg-orange-500 border-orange-500' : 'border-gray-300 bg-white'}`}>
-                    {item.completed && <CheckSquare className="text-white w-4 h-4" />}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-gray-50 text-gray-700 font-bold border-b border-gray-200">
+            <tr>
+              <th className="p-3 text-center">선택</th>
+              <th className="p-3">품명</th>
+              <th className="p-3">모델</th>
+              <th className="p-3 text-center">수량</th>
+              <th className="p-3 text-right">단가</th>
+              <th className="p-3 text-right">금액</th>
+              <th className="p-3">비고</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {checklist.map((item) => (
+              <tr key={item.id} className={`hover:bg-orange-50/30 transition-colors ${selectedIds.has(item.id) ? 'bg-orange-50' : ''}`}>
+                <td className="p-3 text-center">
+                  <input 
+                    type="checkbox" 
+                    checked={selectedIds.has(item.id)}
+                    onChange={() => toggleItem(item.id)}
+                    className="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                  />
+                </td>
+                <td className="p-3 font-medium text-gray-800">{item.item}</td>
+                <td className="p-3 text-gray-600">{item.model}</td>
+                <td className="p-3 text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => updateQuantity(item.id, -1)}
+                      className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 text-gray-600 font-bold"
+                    >
+                      -
+                    </button>
+                    <span className="w-6 text-center font-medium text-gray-800">{item.quantity}</span>
+                    <button 
+                      onClick={() => updateQuantity(item.id, 1)}
+                      className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 text-gray-600 font-bold"
+                    >
+                      +
+                    </button>
                   </div>
-                  <div className="flex-1">
-                    <div className={`font-medium ${item.completed ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
-                      {item.task}
-                    </div>
-                    {item.note && <div className="text-xs text-gray-500 mt-0.5">{item.note}</div>}
-                  </div>
-                </div>
-                <button 
-                  onClick={() => onDelete(item.id)}
-                  className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                  title="삭제"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+                </td>
+                <td className="p-3 text-right text-gray-600">{item.price.toLocaleString()}</td>
+                <td className="p-3 text-right font-bold text-gray-800">{(item.price * item.quantity).toLocaleString()}</td>
+                <td className="p-3 text-gray-500 text-xs">{item.note}</td>
+              </tr>
             ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Fixed Bottom Total Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40">
+        <div className="max-w-5xl mx-auto flex flex-col gap-1">
+          <div className="flex justify-between items-center text-sm text-gray-600">
+            <span>공급가액</span>
+            <span>{totalAmount.toLocaleString()} 원</span>
+          </div>
+          <div className="flex justify-between items-center text-sm text-gray-600">
+            <span>부가세 (10%)</span>
+            <span>{Math.round(totalAmount * 0.1).toLocaleString()} 원</span>
+          </div>
+          <div className="flex justify-between items-center text-lg font-bold text-[#5d4037] border-t border-gray-100 pt-1 mt-1">
+            <span>합계</span>
+            <span className="text-2xl font-black">{Math.round(totalAmount * 1.1).toLocaleString()} 원</span>
           </div>
         </div>
-      ))}
+      </div>
     </div>
   );
 };
