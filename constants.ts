@@ -41,10 +41,16 @@ export const DEFAULT_CONFIG: GlobalConfig = {
   },
   cafeSupplies: DEFAULT_CAFE_SUPPLIES,
   space: {
-    hourlyRate: 40000,
-    hoursPerDay: 8,
-    operatingDays: 30,
-    utilizationRate: 0.2, // Lower utilization for space
+    partSAvgPrice: 250000,
+    partSCountPerMonth: 8,
+    partMAvgPrice: 550000,
+    partMCountPerMonth: 4,
+    fullHalfAvgPrice: 850000,
+    fullHalfCountPerMonth: 2,
+    fullFullAvgPrice: 1400000,
+    fullFullCountPerMonth: 1,
+    exhibitionAvgPrice: 2500000,
+    exhibitionCountPerMonth: 0,
   },
   wine: {
     avgTicketPrice: 70000,

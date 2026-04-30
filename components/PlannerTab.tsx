@@ -395,7 +395,6 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                         <NumberInput label="냅킨" value={config.cafeSupplies.napkin} onChange={(v) => onSupplyChange('napkin', v)} unit="원" />
                         <NumberInput label="물티슈" value={config.cafeSupplies.wipe} onChange={(v) => onSupplyChange('wipe', v)} unit="원" />
                         <NumberInput label="식기세척비 (매장)" value={config.cafeSupplies.dishwashing} onChange={(v) => onSupplyChange('dishwashing', v)} unit="원" />
-                        
                         <NumberInput label="물 (1잔)" value={config.cafeSupplies.water} onChange={(v) => onSupplyChange('water', v)} unit="원" />
                         <NumberInput label="얼음 (1잔)" value={config.cafeSupplies.ice} onChange={(v) => onSupplyChange('ice', v)} unit="원" />
                         <NumberInput label="시럽 (60g)" value={config.cafeSupplies.syrup} onChange={(v) => onSupplyChange('syrup', v)} unit="원" />
@@ -411,8 +410,13 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
     )
   }
 
-  // Recalculate explicitly for display in header
-  const spaceRev = config.space.hourlyRate * config.space.hoursPerDay * config.space.utilizationRate * config.space.operatingDays;
+  const spaceRev = 
+    (config.space.partSAvgPrice * config.space.partSCountPerMonth) + 
+    (config.space.partMAvgPrice * config.space.partMCountPerMonth) + 
+    (config.space.fullHalfAvgPrice * config.space.fullHalfCountPerMonth) + 
+    (config.space.fullFullAvgPrice * config.space.fullFullCountPerMonth) + 
+    (config.space.exhibitionAvgPrice * config.space.exhibitionCountPerMonth);
+
   const wineRev = config.wine.avgTicketPrice * config.wine.dailyTables * config.wine.operatingDays;
   const totalFixed = 
     calculatedLaborCost + 
@@ -439,17 +443,20 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
         summary={<span className="text-sm font-medium" style={{color: '#ffffff'}}>월 예상 매출: {formatSum(spaceRev)}</span>}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <NumberInput label="시간당 대여료" value={config.space.hourlyRate} onChange={(v) => onConfigChange('space', 'hourlyRate', v)} unit="원" />
-          <NumberInput label="일 가용 시간" value={config.space.hoursPerDay} onChange={(v) => onConfigChange('space', 'hoursPerDay', v)} unit="시간" />
-          <NumberInput label="월 영업일수" value={config.space.operatingDays} onChange={(v) => onConfigChange('space', 'operatingDays', v)} unit="일" />
-          <SliderInput 
-            label="가동률 (예약률)" 
-            value={config.space.utilizationRate} 
-            onChange={(v) => onConfigChange('space', 'utilizationRate', v)} 
-            step={0.05} 
-            min={0}
-            max={1}
-          />
+           <NumberInput label="부분대관 S (라운지/프라이빗) 월 예상건수" value={config.space.partSCountPerMonth} onChange={(v) => onConfigChange('space', 'partSCountPerMonth', v)} unit="건" />
+           <NumberInput label="부분대관 S 평균단가" value={config.space.partSAvgPrice} onChange={(v) => onConfigChange('space', 'partSAvgPrice', v)} step={10000} unit="원" />
+           
+           <NumberInput label="부분대관 M (세미나존) 월 예상건수" value={config.space.partMCountPerMonth} onChange={(v) => onConfigChange('space', 'partMCountPerMonth', v)} unit="건" />
+           <NumberInput label="부분대관 M 평균단가" value={config.space.partMAvgPrice} onChange={(v) => onConfigChange('space', 'partMAvgPrice', v)} step={10000} unit="원" />
+           
+           <NumberInput label="전관대관 Half 월 예상건수" value={config.space.fullHalfCountPerMonth} onChange={(v) => onConfigChange('space', 'fullHalfCountPerMonth', v)} unit="건" />
+           <NumberInput label="전관대관 Half 평균단가" value={config.space.fullHalfAvgPrice} onChange={(v) => onConfigChange('space', 'fullHalfAvgPrice', v)} step={10000} unit="원" />
+           
+           <NumberInput label="전관대관 Full 월 예상건수" value={config.space.fullFullCountPerMonth} onChange={(v) => onConfigChange('space', 'fullFullCountPerMonth', v)} unit="건" />
+           <NumberInput label="전관대관 Full 평균단가" value={config.space.fullFullAvgPrice} onChange={(v) => onConfigChange('space', 'fullFullAvgPrice', v)} step={10000} unit="원" />
+           
+           <NumberInput label="전시 패키지 월 예상건수" value={config.space.exhibitionCountPerMonth} onChange={(v) => onConfigChange('space', 'exhibitionCountPerMonth', v)} unit="건" />
+           <NumberInput label="전시 패키지 평균단가" value={config.space.exhibitionAvgPrice} onChange={(v) => onConfigChange('space', 'exhibitionAvgPrice', v)} step={100000} unit="원" />
         </div>
       </InputSection>
 

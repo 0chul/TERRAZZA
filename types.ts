@@ -37,10 +37,16 @@ export interface CafeSupplies {
 }
 
 export interface SpaceConfig {
-  hourlyRate: number;
-  hoursPerDay: number;
-  operatingDays: number;
-  utilizationRate: number; 
+  partSAvgPrice: number;
+  partSCountPerMonth: number;
+  partMAvgPrice: number;
+  partMCountPerMonth: number;
+  fullHalfAvgPrice: number;
+  fullHalfCountPerMonth: number;
+  fullFullAvgPrice: number;
+  fullFullCountPerMonth: number;
+  exhibitionAvgPrice: number;
+  exhibitionCountPerMonth: number;
 }
 
 export interface WineConfig {

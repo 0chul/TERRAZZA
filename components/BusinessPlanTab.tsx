@@ -231,58 +231,46 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
                 <tr>
                   <th>상품</th>
                   <th>구성</th>
-                  <th>평일 주간</th>
-                  <th>평일 저녁</th>
-                  <th>주말/공휴일</th>
-                  <th>비고</th>
+                  <th>예상 건수(월)</th>
+                  <th>평균 단가</th>
+                  <th>예상 월매출</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>부분대관 S</td>
-                  <td style={{fontSize:'0.8rem'}}>카페 일부, 8~12인, 2시간</td>
-                  <td className="price">18만원</td>
-                  <td className="price">22만원</td>
-                  <td className="price" style={{color:'var(--amber)'}}>25만원</td>
-                  <td style={{fontSize:'0.78rem'}}>소규모 회의·모임</td>
+                  <td style={{fontSize:'0.8rem'}}>라운지/프라이빗석, 4~8인, 4시간기준</td>
+                  <td className="price text-center">{config.space.partSCountPerMonth}건</td>
+                  <td className="price text-right">{config.space.partSAvgPrice.toLocaleString()}원</td>
+                  <td className="price text-right" style={{color:'var(--amber)'}}>{(config.space.partSAvgPrice * config.space.partSCountPerMonth).toLocaleString()}원</td>
                 </tr>
                 <tr>
                   <td>부분대관 M</td>
-                  <td style={{fontSize:'0.8rem'}}>클래스/세미나존, 15~20인, 4시간</td>
-                  <td className="price">45만원</td>
-                  <td className="price">55만원</td>
-                  <td className="price" style={{color:'var(--amber)'}}>60만원</td>
-                  <td style={{fontSize:'0.78rem'}}>빔·스피커 옵션</td>
+                  <td style={{fontSize:'0.8rem'}}>클래스/세미나존, 15~20인, 4시간기준</td>
+                  <td className="price text-center">{config.space.partMCountPerMonth}건</td>
+                  <td className="price text-right">{config.space.partMAvgPrice.toLocaleString()}원</td>
+                  <td className="price text-right" style={{color:'var(--amber)'}}>{(config.space.partMAvgPrice * config.space.partMCountPerMonth).toLocaleString()}원</td>
                 </tr>
                 <tr>
                   <td>전관대관 Half</td>
-                  <td style={{fontSize:'0.8rem'}}>4시간, 25~35인</td>
-                  <td className="price">65만원</td>
-                  <td className="price">85만원</td>
-                  <td className="price" style={{color:'var(--amber)'}}>95만원</td>
-                  <td style={{fontSize:'0.78rem'}}>행사·오프닝·촬영</td>
+                  <td style={{fontSize:'0.8rem'}}>4시간, 25~35인, 행사·오프닝</td>
+                  <td className="price text-center">{config.space.fullHalfCountPerMonth}건</td>
+                  <td className="price text-right">{config.space.fullHalfAvgPrice.toLocaleString()}원</td>
+                  <td className="price text-right" style={{color:'var(--amber)'}}>{(config.space.fullHalfAvgPrice * config.space.fullHalfCountPerMonth).toLocaleString()}원</td>
                 </tr>
                 <tr>
                   <td>전관대관 Full</td>
-                  <td style={{fontSize:'0.8rem'}}>8시간, 25~35인</td>
-                  <td className="price">110만원</td>
-                  <td className="price">140만원</td>
-                  <td className="price" style={{color:'var(--amber)'}}>160만원</td>
-                  <td style={{fontSize:'0.78rem'}}>종일 워크숍·전시</td>
+                  <td style={{fontSize:'0.8rem'}}>8시간, 25~35인, 종일 워크숍·전시</td>
+                  <td className="price text-center">{config.space.fullFullCountPerMonth}건</td>
+                  <td className="price text-right">{config.space.fullFullAvgPrice.toLocaleString()}원</td>
+                  <td className="price text-right" style={{color:'var(--amber)'}}>{(config.space.fullFullAvgPrice * config.space.fullFullCountPerMonth).toLocaleString()}원</td>
                 </tr>
                 <tr>
                   <td>전시 패키지</td>
                   <td style={{fontSize:'0.8rem'}}>7일, 벽면 사용, 오픈나이트 별도</td>
-                  <td className="price" colSpan={3} style={{textAlign:'center'}}>250만원</td>
-                  <td style={{fontSize:'0.78rem'}}>설치·철수 협의</td>
-                </tr>
-                <tr>
-                  <td>오버타임</td>
-                  <td style={{fontSize:'0.8rem'}}>1시간당 (30분 초과 시 1시간 적용)</td>
-                  <td className="price">10만원</td>
-                  <td className="price">12만원</td>
-                  <td className="price" style={{color:'var(--amber)'}}>12만원</td>
-                  <td style={{fontSize:'0.78rem'}}>—</td>
+                  <td className="price text-center">{config.space.exhibitionCountPerMonth}건</td>
+                  <td className="price text-right">{config.space.exhibitionAvgPrice.toLocaleString()}원</td>
+                  <td className="price text-right" style={{color:'var(--amber)'}}>{(config.space.exhibitionAvgPrice * config.space.exhibitionCountPerMonth).toLocaleString()}원</td>
                 </tr>
               </tbody>
             </table>

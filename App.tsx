@@ -54,6 +54,9 @@ export default function App() {
         if (parsed.initial && parsed.initial.interior === 60000000) {
           parsed.initial.interior = 12810950;
         }
+        if (parsed.space && parsed.space.hourlyRate !== undefined) {
+          parsed.space = DEFAULT_CONFIG.space; // overwrite old space config
+        }
         return parsed;
       }
     } catch (e) {
@@ -254,7 +257,7 @@ export default function App() {
 
   const calculateFinancials = (cfg: GlobalConfig, uc: CafeUnitCosts) => {
     const { seatCount, operatingHours, stayDuration, turnoverTarget, ratioAmericano, ratioLatte, ratioSyrupLatte, avgPriceAmericano, avgPriceLatte, avgPriceSyrupLatte, operatingDays: cafeDays } = cfg.cafe;
-    const { hourlyRate, hoursPerDay, operatingDays: spaceDays, utilizationRate } = cfg.space;
+    const { partSAvgPrice, partSCountPerMonth, partMAvgPrice, partMCountPerMonth, fullHalfAvgPrice, fullHalfCountPerMonth, fullFullAvgPrice, fullFullCountPerMonth, exhibitionAvgPrice, exhibitionCountPerMonth } = cfg.space;
     const { avgTicketPrice, dailyTables, operatingDays: wineDays, costOfGoodsSoldRate } = cfg.wine;
     const { weekdayStaff, weekendStaff, additionalLabor, utilities, internet, marketing, maintenance, misc } = cfg.fixed;
 
@@ -269,7 +272,7 @@ export default function App() {
 
     const cafeRevenue = weightedAvgPrice * salesCount * cafeDays;
     const cafeCOGS = weightedAvgCost * salesCount * cafeDays;
-    const spaceRevenue = hourlyRate * hoursPerDay * utilizationRate * spaceDays;
+    const spaceRevenue = (partSAvgPrice * partSCountPerMonth) + (partMAvgPrice * partMCountPerMonth) + (fullHalfAvgPrice * fullHalfCountPerMonth) + (fullFullAvgPrice * fullFullCountPerMonth) + (exhibitionAvgPrice * exhibitionCountPerMonth);
     const wineRevenue = avgTicketPrice * dailyTables * wineDays;
     const wineCOGS = wineRevenue * costOfGoodsSoldRate;
     
