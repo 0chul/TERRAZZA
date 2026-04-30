@@ -100,9 +100,19 @@ export const SliderInput: React.FC<SliderInputProps> = ({ label, value, onChange
     <div className="flex flex-col w-full">
       <div className="flex justify-between items-center mb-2">
         <label className="text-xs font-semibold uppercase tracking-wide" style={{color: 'var(--mist)'}}>{label}</label>
-        <span className="text-sm font-bold px-2 py-0.5 rounded border min-w-[3rem] text-center tabular-nums" style={{color: 'var(--amber)', background: 'rgba(201,150,58,0.1)', borderColor: 'rgba(201,150,58,0.3)'}}>
-          {value.toFixed(2)}
-        </span>
+        <input
+          type="number"
+          step={step}
+          className="text-sm font-bold w-16 p-1 rounded border text-center tabular-nums outline-none transition-all"
+          style={{
+            color: 'var(--amber)',
+            background: 'var(--bg-primary)',
+            borderColor: 'rgba(201,150,58,0.3)',
+            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)'
+          }}
+          value={value.toFixed(2)}
+          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        />
       </div>
       <input
         type="range"

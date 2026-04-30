@@ -220,10 +220,13 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                   <h4 className="font-semibold mb-2 flex items-center gap-2" style={{color: 'var(--cream)'}}>
                     <TrendingUp size={16}/> 판매 비중 설정
                   </h4>
-                  <div className={`p-2 rounded border mb-4 ${isRatioValid ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                  <div className="p-2 rounded border mb-4" style={{
+                    background: isRatioValid ? 'rgba(52, 211, 153, 0.05)' : 'rgba(248, 113, 113, 0.05)',
+                    borderColor: isRatioValid ? 'rgba(52, 211, 153, 0.2)' : 'rgba(248, 113, 113, 0.2)'
+                  }}>
                      <div className="text-xs text-[var(--stone)] mb-1">메뉴 비중 합계 (1.0 맞춰주세요)</div>
-                     <div className={`text-lg font-bold ${isRatioValid ? 'text-green-700' : 'text-red-600'}`}>
-                        {(totalRatio).toFixed(2)} / 1.00
+                     <div className="text-xl font-black" style={{ color: isRatioValid ? '#34d399' : '#f87171' }}>
+                        {(totalRatio).toFixed(2)} <span className="text-sm font-bold" style={{color: 'var(--stone)'}}>/ 1.00</span>
                      </div>
                   </div>
                   
@@ -423,9 +426,9 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="p-4 rounded-lg text-sm mb-6 flex items-start gap-2" style={{background: 'rgba(201, 150, 58, 0.05)', color: 'var(--charcoal)', border: '1px solid rgba(201, 150, 58, 0.1)'}}>
+      <div className="p-4 rounded-lg text-sm mb-6 flex items-start gap-2" style={{background: 'rgba(201, 150, 58, 0.05)', color: '#ffffff', border: '1px solid rgba(201, 150, 58, 0.1)'}}>
         <Calculator className="mt-0.5 flex-shrink-0" size={16} style={{color: 'var(--amber)'}}/>
-        <p>각 사업별 상세 설정을 입력하세요. 카페는 테이크아웃, 아이스 비율 등 상세 조건에 따라 원가가 정밀하게 계산됩니다.</p>
+        <p style={{color: '#ffffff'}}>각 사업별 상세 설정을 입력하세요. 카페는 테이크아웃, 아이스 비율 등 상세 조건에 따라 원가가 정밀하게 계산됩니다.</p>
       </div>
 
       {/* Render the specialized Cafe Submenu */}
@@ -433,7 +436,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
 
       <InputSection 
         title="🏠 공간대여 (Space Rental) 설정"
-        summary={<span className="text-sm font-medium" style={{color: 'var(--charcoal)'}}>월 예상 매출: {formatSum(spaceRev)}</span>}
+        summary={<span className="text-sm font-medium" style={{color: '#ffffff'}}>월 예상 매출: {formatSum(spaceRev)}</span>}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <NumberInput label="시간당 대여료" value={config.space.hourlyRate} onChange={(v) => onConfigChange('space', 'hourlyRate', v)} unit="원" />
@@ -452,7 +455,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
 
       <InputSection 
         title="🍷 와인바 (Wine Bar) 설정"
-        summary={<span className="text-sm font-medium" style={{color: 'var(--charcoal)'}}>월 예상 매출: {formatSum(wineRev)}</span>}
+        summary={<span className="text-sm font-medium" style={{color: '#ffffff'}}>월 예상 매출: {formatSum(wineRev)}</span>}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <NumberInput label="테이블당 평균 단가" value={config.wine.avgTicketPrice} onChange={(v) => onConfigChange('wine', 'avgTicketPrice', v)} unit="원" />
@@ -466,7 +469,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
         title="🏢 고정비 및 초기투자 (Fixed & Initial Cost)"
         summary={
           <div className="flex flex-col text-xs md:text-sm md:flex-row md:gap-4 text-right font-medium">
-             <span style={{color: 'var(--charcoal)'}}>초기 투자: {formatSum(totalInvestment)}</span>
+             <span style={{color: '#ffffff'}}>초기 투자: {formatSum(totalInvestment)}</span>
              <span className="hidden md:inline" style={{color: 'var(--stone)'}}>|</span>
              <span style={{color: 'var(--amber)'}}>월 고정비: {formatSum(totalFixed)}</span>
           </div>
@@ -483,7 +486,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                       <div className="p-4 rounded-lg border" style={{background: 'var(--bg-card)', borderColor: 'rgba(201, 150, 58, 0.1)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
                          <div className="flex justify-between items-start mb-2">
                             <span className="text-sm font-semibold" style={{color: 'var(--cream)'}}>주중 풀타임 근무자 (주 40시간)</span>
-                            <span className="text-xs px-2 py-0.5 rounded" style={{background: 'rgba(201, 150, 58, 0.05)', color: 'var(--charcoal)'}}>209시간 기준</span>
+                            <span className="text-xs px-2 py-0.5 rounded" style={{background: 'rgba(201, 150, 58, 0.05)', color: 'var(--mist)'}}>209시간 기준</span>
                          </div>
                          <div className="text-lg font-bold mb-3" style={{color: 'var(--cream)'}}>{WEEKDAY_RATE.toLocaleString()}원 <span className="text-xs font-normal" style={{color: 'var(--stone)'}}>/ 1인</span></div>
                          <NumberInput label="주중 인원수" value={config.fixed.weekdayStaff} onChange={(v) => onConfigChange('fixed', 'weekdayStaff', v)} unit="명" />
@@ -491,7 +494,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                       <div className="p-4 rounded-lg border" style={{background: 'var(--bg-card)', borderColor: 'rgba(201, 150, 58, 0.1)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
                          <div className="flex justify-between items-start mb-2">
                             <span className="text-sm font-semibold" style={{color: 'var(--cream)'}}>주말 근무자 (토/일 16시간)</span>
-                            <span className="text-xs px-2 py-0.5 rounded" style={{background: 'rgba(201, 150, 58, 0.05)', color: 'var(--charcoal)'}}>83.45시간 기준</span>
+                            <span className="text-xs px-2 py-0.5 rounded" style={{background: 'rgba(201, 150, 58, 0.05)', color: 'var(--mist)'}}>83.45시간 기준</span>
                          </div>
                          <div className="text-lg font-bold mb-3" style={{color: 'var(--cream)'}}>{WEEKEND_RATE.toLocaleString()}원 <span className="text-xs font-normal" style={{color: 'var(--stone)'}}>/ 1인</span></div>
                          <NumberInput label="주말 인원수" value={config.fixed.weekendStaff} onChange={(v) => onConfigChange('fixed', 'weekendStaff', v)} unit="명" />
@@ -531,12 +534,21 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
             </div>
 
             <h4 className="font-medium border-b pb-2 pt-4" style={{color: 'var(--cream)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>초기 투자 비용</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <NumberInput label="인테리어" value={config.initial.interior} onChange={(v) => onConfigChange('initial', 'interior', v)} unit="원" />
-                <NumberInput label="설비/집기" value={config.initial.equipment} onChange={(v) => onConfigChange('initial', 'equipment', v)} unit="원" />
-                <NumberInput label="디자인/브랜딩" value={config.initial.design} onChange={(v) => onConfigChange('initial', 'design', v)} unit="원" />
-                <NumberInput label="초도물품/기타" value={config.initial.supplies} onChange={(v) => onConfigChange('initial', 'supplies', v)} unit="원" />
+            <div className="p-4 rounded-xl border flex items-center justify-between" style={{background: 'rgba(201, 150, 58, 0.05)', borderColor: 'rgba(201, 150, 58, 0.2)'}}>
+               <div className="flex items-center gap-3">
+                 <div className="p-2 rounded-lg" style={{background: 'rgba(201, 150, 58, 0.1)'}}>
+                   <TrendingUp size={20} style={{color: 'var(--amber)'}}/>
+                 </div>
+                 <div>
+                   <div className="text-xs" style={{color: 'var(--stone)'}}>인테리어 지출 내역 합계</div>
+                   <div className="text-sm font-semibold" style={{color: 'var(--cream)'}}>총 초기 투자비</div>
+                 </div>
+               </div>
+               <div className="text-2xl font-black" style={{color: 'var(--amber)'}}>
+                 {totalInvestment.toLocaleString()}원
+               </div>
             </div>
+            <p className="text-[10px] mt-2" style={{color: 'var(--stone)'}}>* 상세 지출 내역은 '인테리어' 탭에서 관리할 수 있으며, 해당 합계가 자동으로 반영됩니다.</p>
         </div>
       </InputSection>
     </div>

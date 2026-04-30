@@ -28,7 +28,7 @@ export const DEFAULT_CONFIG: GlobalConfig = {
     avgPriceSyrupLatte: 5500,
     beanPricePerKg: 30000, 
     milkPricePerL: 2500,
-    seatCount: 60, // Increased for Cafe Focus
+    seatCount: 30, // Updated for Cafe Focus
     operatingHours: 9,
     stayDuration: 2,
     turnoverTarget: 1.2, // High turnover for Cafe Focus

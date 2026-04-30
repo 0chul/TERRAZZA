@@ -43,9 +43,9 @@ export const BusinessPlanTab: React.FC = () => {
         <div className="concept-inner">
           <div className="concept-left">
             <div className="section-label reveal">운영 개념</div>
-            <h2 className="section-title reveal reveal-delay-1">하나의 공간<br/><em>세 가지 수익원</em></h2>
+            <h2 className="section-title reveal reveal-delay-1">운영 모델<br/><em>수익 구조 분석</em></h2>
             <p className="section-body reveal reveal-delay-2">
-              Terrazza Lounge는 "예쁜 카페"가 아니라 시간대 전환이 가능한 수익 공간입니다. 60평 공간이 하루에 세 번 다른 얼굴로 바뀌며, 대관이 주 수익축으로 작동합니다. 카페 코어 10평이 바닥을 지키고, 가변홀 50평이 시간에 따라 전환됩니다.
+              Terrazza Lounge는 시간대별 수요 전환을 통해 수익을 극대화하는 멀티유즈 공간입니다. 카페 코어 10평과 가변홀 50평으로 구성되며, 주간 카페, 야간 라운지, 정기 대관의 세 가지 수익축을 기반으로 운영됩니다.
             </p>
             <div style={{marginTop:'36px', display:'flex', flexDirection:'column', gap:'14px'}} className="reveal reveal-delay-3">
               <div style={{display:'flex', gap:'20px', alignItems:'center'}}>
@@ -90,8 +90,8 @@ export const BusinessPlanTab: React.FC = () => {
       <section className="space" id="space">
         <div className="space-inner">
           <div className="section-label reveal">공간 운영 구조</div>
-          <h2 className="section-title reveal reveal-delay-1">60평의 가능성<br/><em>10분 전환 시스템</em></h2>
-          <p className="section-body reveal reveal-delay-2">카페 코어 10평 + 가변홀 50평. 폴딩 테이블·스태킹 체어 기반 10분 전환이 이 사업의 핵심 인프라입니다. 가구를 욕심내면 인건비가 따라옵니다.</p>
+          <h2 className="section-title reveal reveal-delay-1">공간 설계<br/><em>가변적 공간 구성</em></h2>
+          <p className="section-body reveal reveal-delay-2">카페 코어 10평과 가변형 홀 50평으로 구성됩니다. 가변 가구 도입을 통해 시공 시간과 인건비를 최소화하면서 다양한 운영 시나리오에 대응 가능한 인프라를 구축합니다.</p>
           <div className="space-grid">
             <div className="space-cell reveal">
               <div className="space-cell-number">01</div>
@@ -247,7 +247,7 @@ export const BusinessPlanTab: React.FC = () => {
           <div className="numbers-header">
             <div>
               <div className="section-label reveal">재무 시나리오</div>
-              <h2 className="section-title reveal reveal-delay-1">현실적인<br/><em>수익 모델</em></h2>
+              <h2 className="section-title reveal reveal-delay-1">재무 목표<br/><em>수익성 분석</em></h2>
             </div>
             <p className="section-body reveal reveal-delay-2">
               카페 바닥 매출로 고정비를 방어하고, 대관과 와인으로 이익을 창출합니다. 
@@ -339,58 +339,62 @@ export const BusinessPlanTab: React.FC = () => {
       {/* TEAM */}
       <section className="team" id="team">
         <div className="team-inner">
-          <div className="section-label reveal">인력 구조</div>
-          <h2 className="section-title reveal reveal-delay-1">초경량<br/><em>조직도</em></h2>
-          <p className="section-body reveal reveal-delay-2">오너 중심의 직영 구조와 탄력적인 파트타임 활용으로 고정 인건비를 월 400만원 이하로 통제합니다.</p>
+          <div className="section-label reveal">인력 운영 계획</div>
+          <h2 className="section-title reveal reveal-delay-1">매니저 중심<br/><em>경량 운영 체계</em></h2>
+          <p className="section-body reveal reveal-delay-2">외식업 평균 인건비 비율을 고려한 효율적 인력 설계. 책임 매니저 중심의 자율 운영 시스템을 지향합니다. 총 인건비 월 920만원 목표.</p>
           <div className="team-grid">
             <div className="team-card reveal">
-              <div className="team-role">Director</div>
-              <div className="team-name">오너 (본인)</div>
-              <div className="team-hours">주 6일 / 풀타임 상주</div>
-              <div className="team-salary">수익 배분</div>
-              <div className="team-salary-unit">순이익 100% 귀속</div>
+              <div className="team-role">General Manager</div>
+              <div className="team-name">책임 매니저</div>
+              <div className="team-hours">주 46~50시간</div>
+              <div className="team-salary">380</div>
+              <div className="team-salary-unit">만원 / 월</div>
               <div className="team-tasks">
-                <div className="team-task">총괄 운영 및 공간 관리</div>
-                <div className="team-task">대관 B2B 세일즈</div>
-                <div className="team-task">메인 바리스타/소믈리에</div>
+                <div className="team-task">총괄 운영 및 바 운영 주관</div>
+                <div className="team-task">대관 상담 및 견적 관리</div>
+                <div className="team-task">발주·재고 관리 및 정산</div>
+                <div className="team-task">SNS 및 브랜딩 콘텐츠 제작</div>
               </div>
             </div>
             <div className="team-card reveal reveal-delay-1">
-              <div className="team-role">Day Staff</div>
-              <div className="team-name">주간 매니저</div>
-              <div className="team-hours">평일 11:00 - 16:00</div>
-              <div className="team-salary">120</div>
-              <div className="team-salary-unit">만원 / 월 (예상)</div>
+              <div className="team-role">Part A — Daytime</div>
+              <div className="team-name">주간 파트</div>
+              <div className="team-hours">주 26~30시간</div>
+              <div className="team-salary">190</div>
+              <div className="team-salary-unit">만원 / 월</div>
               <div className="team-tasks">
-                <div className="team-task">오픈 세팅 및 청소</div>
-                <div className="team-task">주간 카페 음료 제조</div>
-                <div className="team-task">오너 휴게시간 보장</div>
+                <div className="team-task">주간 커피 바 운영 주관</div>
+                <div className="team-task">홀 서비스 및 청결 관리</div>
+                <div className="team-task">주간 대관 행사 지원</div>
               </div>
             </div>
             <div className="team-card reveal reveal-delay-2">
-              <div className="team-role">Night Staff</div>
-              <div className="team-name">야간 파트타임</div>
-              <div className="team-hours">금/토 18:00 - 23:00</div>
-              <div className="team-salary">80</div>
-              <div className="team-salary-unit">만원 / 월 (예상)</div>
+              <div className="team-role">Part B — Evening</div>
+              <div className="team-name">저녁 파트</div>
+              <div className="team-hours">주 18~22시간</div>
+              <div className="team-salary">150</div>
+              <div className="team-salary-unit">만원 / 월</div>
               <div className="team-tasks">
-                <div className="team-task">야간 와인 서빙</div>
-                <div className="team-task">스몰 플레이트 조리 보조</div>
-                <div className="team-task">마감 정리</div>
+                <div className="team-task">저녁 와인 서비스 주관</div>
+                <div className="team-task">영업 마감 및 보안 관리</div>
+                <div className="team-task">금·토 피크 타임 응대</div>
               </div>
             </div>
             <div className="team-card reveal reveal-delay-3">
-              <div className="team-role">Event Staff</div>
-              <div className="team-name">대관 전담 스태프</div>
-              <div className="team-hours">행사 발생 시 호출</div>
-              <div className="team-salary">시급</div>
-              <div className="team-salary-unit">15,000원 + 알파</div>
+              <div className="team-role">Part C — Spot</div>
+              <div className="team-name">예약형 스팟</div>
+              <div className="team-hours">월 30~40시간 (가변)</div>
+              <div className="team-salary">90</div>
+              <div className="team-salary-unit">만원 / 월</div>
               <div className="team-tasks">
-                <div className="team-task">행사 F&B 케이터링 보조</div>
-                <div className="team-task">가구 레이아웃 전환 세팅</div>
-                <div className="team-task">주차 및 동선 안내</div>
+                <div className="team-task">대관 세팅 및 철수 주관</div>
+                <div className="team-task">주말/행사 피크 보조</div>
+                <div className="team-task">특수 행사 시 현장 전담</div>
               </div>
             </div>
+          </div>
+          <div className="rental-note reveal reveal-delay-3" style={{marginTop: '40px', fontSize: '0.8rem', opacity: 0.8}}>
+            ⚠️ <strong>주 15시간 기준</strong> — 주 15시간 이상 근무자는 주휴수당 발생. 파트 B는 주휴수당 발생 구간 주의. 파트 C는 예약형 스팟으로 15시간 미만 설계. 법정비용·예비 항목 110만원 별도 적립.
           </div>
         </div>
       </section>
@@ -439,39 +443,39 @@ export const BusinessPlanTab: React.FC = () => {
       <section className="capex" id="capex">
         <div className="capex-inner">
           <div className="section-label reveal">투자금 및 회수</div>
-          <h2 className="section-title reveal reveal-delay-1">CAPEX<br/><em>4,500만원의 기적</em></h2>
+          <h2 className="section-title reveal reveal-delay-1">CAPEX<br/><em>초기 투자 지출</em></h2>
           <div className="capex-big">
             <div className="capex-visual reveal reveal-delay-2">
               <div className="capex-center-label">
                 <div className="capex-total">4,500</div>
-                <div className="capex-total-label">Total CAPEX (만원)</div>
+                <div className="capex-total-label">총 투자금 (만원)</div>
               </div>
               <div className="capex-breakdown">
                 <div className="capex-row">
-                  <div className="capex-bar-label">인테리어/시공</div>
+                  <div className="capex-bar-label">인테리어 공사</div>
                   <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '45%'}}></div></div>
                   <div className="capex-bar-value">2,000</div>
                 </div>
                 <div className="capex-row">
-                  <div className="capex-bar-label">가구/조명</div>
+                  <div className="capex-bar-label">가구 및 집기</div>
                   <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '25%', animationDelay: '0.2s'}}></div></div>
                   <div className="capex-bar-value">1,100</div>
                 </div>
                 <div className="capex-row">
-                  <div className="capex-bar-label">에스프레소 머신 등</div>
+                  <div className="capex-bar-label">주방/바 설비</div>
                   <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '20%', animationDelay: '0.4s'}}></div></div>
                   <div className="capex-bar-value">900</div>
                 </div>
                 <div className="capex-row">
-                  <div className="capex-bar-label">초기 마케팅/비품</div>
+                  <div className="capex-bar-label">운영 비품/기타</div>
                   <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '10%', animationDelay: '0.6s'}}></div></div>
                   <div className="capex-bar-value">500</div>
                 </div>
               </div>
             </div>
             <div className="capex-recovery reveal reveal-delay-3">
-              <div className="recovery-title">Payback Period</div>
-              <div className="recovery-sub">무권리/무보증 전제하에 압도적인 투자금 회수 속도를 달성합니다.</div>
+              <div className="recovery-title">Payback Simulation</div>
+              <div className="recovery-sub">무권리 및 무보증 전제 하의 시나리오별 예상 투자금 회수 기간 분석 결과입니다.</div>
               <div className="recovery-bars">
                 <div className="recovery-item">
                   <div className="recovery-scenario"><span className="rec-name">Conservative</span><span className="rec-month">12 Months</span></div>

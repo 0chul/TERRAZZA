@@ -56,19 +56,28 @@ export default function App() {
 
   // Load scenarios from Database
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [interiorCosts, setInteriorCosts] = useState<InteriorCost[]>([]);
 
   useEffect(() => {
     // Initial load from DB
-    const loadScenarios = async () => {
+    const loadData = async () => {
       try {
-        const loadedPlans = await dbService.getAllPlans();
+        const [loadedPlans, loadedCosts] = await Promise.all([
+          dbService.getAllPlans(),
+          dbService.getAllInteriorCosts()
+        ]);
         setScenarios(loadedPlans);
+        setInteriorCosts(loadedCosts);
       } catch (e) {
-        console.error("Failed to load plans from DB", e);
+        console.error("Failed to load data from DB", e);
       }
     };
-    loadScenarios();
-  }, []);
+    loadData();
+  }, [activeTab]); // Refresh when switching tabs as Interior tab modifies DB
+
+  const totalInteriorExpenses = useMemo(() => {
+    return interiorCosts.reduce((sum, c) => sum + c.cost, 0);
+  }, [interiorCosts]);
 
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
   const [projectionMonths, setProjectionMonths] = useState(12);
@@ -249,12 +258,12 @@ export default function App() {
     const totalCOGS = cafeCOGS + wineCOGS;
     const totalFixed = laborCost + utilities + internet + marketing + maintenance + misc;
     const netProfit = (totalRevenue - totalCOGS) - totalFixed;
-    const totalInvestment = Object.values(cfg.initial).reduce((a, b) => a + b, 0);
+    const totalInvestment = totalInteriorExpenses;
 
     return { totalRevenue, netProfit, totalInvestment, salesCount, cafeRevenue, spaceRevenue, wineRevenue, laborCost, totalFixed, cafeCOGS, wineCOGS, totalCOGS };
   };
 
-  const currentFinancials = useMemo(() => calculateFinancials(config, cafeUnitCosts), [config, cafeUnitCosts]);
+  const currentFinancials = useMemo(() => calculateFinancials(config, cafeUnitCosts), [config, cafeUnitCosts, totalInteriorExpenses]);
 
   const monthlyData: MonthlyData[] = useMemo(() => {
     const data: MonthlyData[] = [];
@@ -329,12 +338,6 @@ export default function App() {
       <div className="bg-[var(--dark)] border-b border-t border-[rgba(201,150,58,0.1)] py-2.5 mt-4">
         <div className="max-w-7xl mx-auto px-4 flex flex-col items-center justify-between gap-4">
           
-          <div className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg border w-full md:w-auto" style={{background: 'var(--charcoal)', color: 'var(--mist)', borderColor: 'rgba(201, 150, 58, 0.2)'}}>
-             <Database size={14} className="text-[var(--amber)]"/>
-             <span className="font-bold">Database:</span>
-             <span>Local IndexedDB Active</span>
-          </div>
-
           {/* Right Side: Saved Plans & Draft Actions */}
           <div className="flex flex-col md:flex-row items-center gap-3 w-full border-t md:border-t-0 pt-2.5 md:pt-0 border-[rgba(201,150,58,0.1)]">
              <span className="text-[10px] font-black text-[var(--amber)] uppercase tracking-widest whitespace-nowrap flex items-center gap-1">

@@ -25,7 +25,7 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, children, isO
         className="w-full px-6 py-4 flex items-center justify-between transition-colors"
         style={{ background: 'rgba(201, 150, 58, 0.05)' }}
       >
-        <span className="font-semibold flex-shrink-0" style={{color: 'var(--cream)'}}>{title}</span>
+        <span className="font-semibold flex-shrink-0 text-white">{title}</span>
         <div className="flex items-center gap-4">
           {summary && (
             <div className="text-right hidden sm:block">
