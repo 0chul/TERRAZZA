@@ -142,54 +142,53 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
           <h2 className="text-lg font-bold" style={{color: 'var(--cream)'}}>수익 추이 및 BEP 분석 (12개월 전망)</h2>
         </div>
         
-        <div className="chart-wrap reveal reveal-delay-2" style={{ height: '350px', marginTop: '20px' }}>
-          <div className="chart-bars">
-            {monthlyData.map((d, i) => {
-              const denom = maxRevenue * 1.1 || 1;
-              const revHeight = (d.totalRevenue / denom) * 100;
-              
-              return (
-                <div key={i} className="chart-col">
-                  <div className="bar-revenue" style={{height: `${revHeight}%`}}>
-                    {d.netProfit > 0 && d.totalRevenue > 0 && (
-                      <div className="bar-profit" style={{height: `${Math.min(100, (d.netProfit / d.totalRevenue) * 100)}%`}}></div>
-                    )}
-                  </div>
-                  <div className="chart-tooltip">
-                    <div className="font-bold text-[var(--amber)] mb-1">Month {d.month}</div>
-                    <div className="flex justify-between gap-4">
-                      <span className="text-[var(--stone)]">매출:</span>
-                      <span>{Math.round(d.totalRevenue / 10000).toLocaleString()}만</span>
-                    </div>
-                    <div className="flex justify-between gap-4">
-                      <span className="text-[var(--stone)]">순익:</span>
-                      <span style={{color: d.netProfit > 0 ? 'var(--amber)' : '#f87171'}}>
-                        {Math.round(d.netProfit / 10000).toLocaleString()}만
-                      </span>
-                    </div>
-                    <div className="flex justify-between gap-4 border-t border-[rgba(255,255,255,0.1)] mt-1 pt-1">
-                      <span className="text-[var(--stone)]">누적:</span>
-                      <span style={{color: d.cumulativeProfit > 0 ? 'var(--amber)' : '#f87171'}}>
-                        {Math.round(d.cumulativeProfit / 10000).toLocaleString()}만
-                      </span>
-                    </div>
-                  </div>
-                  <div className="month-label">M+{d.month}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="chart-legend reveal reveal-delay-3" style={{marginTop: '40px'}}>
-          <div className="legend-item">
-            <div className="legend-dot" style={{background: 'linear-gradient(to top, rgba(107,39,55,0.8), rgba(139,58,74,0.4))'}}></div>
-            예상 총 매출
-          </div>
-          <div className="legend-item">
-            <div className="legend-dot" style={{background: 'linear-gradient(to top, var(--amber), rgba(201,150,58,0.3))'}}></div>
-            월 예상 순수익
-          </div>
+        <div className="reveal reveal-delay-2" style={{ height: '350px', marginTop: '20px', width: '100%' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis 
+                dataKey="month" 
+                stroke="var(--stone)" 
+                tickFormatter={(val) => `M+${val}`}
+                axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                tickLine={false}
+              />
+              <YAxis 
+                stroke="var(--stone)" 
+                tickFormatter={(val) => `${Math.round(val / 10000).toLocaleString()}`}
+                axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                tickLine={false}
+              />
+              <Tooltip 
+                formatter={(value: number) => [`₩${Math.round(value / 10000).toLocaleString()}만`]}
+                labelFormatter={(label) => `Month ${label}`}
+                contentStyle={{ background: 'var(--charcoal)', border: '1px solid rgba(201,150,58,0.3)', borderRadius: '8px', color: 'var(--cream)' }}
+              />
+              <Legend wrapperStyle={{ paddingTop: '20px', color: 'var(--stone)' }} />
+              <Bar 
+                dataKey="totalRevenue" 
+                name="예상 총 매출" 
+                fill="url(#revenueGrad)" 
+                radius={[4, 4, 0, 0]} 
+                barSize={30}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="netProfit" 
+                name="월 예상 순수익" 
+                stroke="var(--amber)" 
+                strokeWidth={3}
+                dot={{ r: 4, fill: 'var(--black)', stroke: 'var(--amber)', strokeWidth: 2 }}
+                activeDot={{ r: 6, fill: 'var(--amber)' }}
+              />
+              <defs>
+                <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(139,58,74,0.8)" />
+                  <stop offset="100%" stopColor="rgba(107,39,55,0.4)" />
+                </linearGradient>
+              </defs>
+            </ComposedChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
