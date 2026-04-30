@@ -336,17 +336,17 @@ export default function App() {
         </div>
       </header>
       
-      <nav className="flex flex-wrap gap-1 border p-1.5 rounded-xl justify-center mx-4 sticky top-0 z-50 shadow-sm backdrop-blur-md mt-4" style={{background: 'rgba(42, 36, 32, 0.6)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+      <nav className="flex flex-wrap gap-2 border p-2 rounded-xl justify-center mx-4 sticky top-0 z-50 shadow-sm backdrop-blur-md mt-4" style={{background: 'rgba(42, 36, 32, 0.6)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
         {[
-          { id: Tab.PLAN, label: '사업계획', icon: <Presentation size={14} /> },
-          { id: Tab.DASHBOARD, label: '재무계획', icon: <TrendingUp size={14} /> },
-          { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={14} /> },
-          { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={14} /> },
+          { id: Tab.PLAN, label: '사업계획', icon: <Presentation size={18} /> },
+          { id: Tab.DASHBOARD, label: '재무계획', icon: <TrendingUp size={18} /> },
+          { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={18} /> },
+          { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={18} /> },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as Tab)}
-            className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[var(--amber)] text-[var(--black)] shadow-sm' : 'text-[var(--mist)] hover:text-[var(--amber)] hover:bg-[rgba(201,150,58,0.1)]'}`}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[var(--amber)] text-[var(--black)] shadow-sm' : 'text-[var(--mist)] hover:text-[var(--amber)] hover:bg-[rgba(201,150,58,0.1)]'}`}
           >
             {tab.icon}
             <span>{tab.label}</span>
