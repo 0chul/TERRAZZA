@@ -102,5 +102,15 @@ export const dbService = {
       console.error('Failed to delete interior cost from DB:', error);
       throw error;
     }
+  },
+
+  async clearInteriorCosts(): Promise<void> {
+    try {
+      const db = await initDB();
+      await db.clear(INTERIOR_STORE);
+    } catch (error) {
+      console.error('Failed to clear interior costs from DB:', error);
+      throw error;
+    }
   }
 };

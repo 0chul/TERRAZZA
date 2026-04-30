@@ -63,7 +63,7 @@ export const DEFAULT_CONFIG: GlobalConfig = {
     misc: 100000,
   },
   initial: {
-    interior: 60000000,
+    interior: 12810950,
     equipment: 20000000,
     design: 3000000,
     supplies: 5000000,

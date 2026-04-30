@@ -18,7 +18,8 @@ import {
 } from 'lucide-react';
 
 import { DEFAULT_CONFIG, INITIAL_TODOS } from './constants';
-import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, Scenario } from './types';
+import { DEFAULT_INTERIOR_COSTS } from './defaultInteriorCosts';
+import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, Scenario, InteriorCost } from './types';
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { BusinessPlanTab } from './components/BusinessPlanTab';
@@ -46,7 +47,14 @@ export default function App() {
     try {
       const savedDraft = localStorage.getItem('terrazza_current_draft');
       if (savedDraft) {
-        return JSON.parse(savedDraft);
+        const parsed = JSON.parse(savedDraft);
+        if (parsed.cafe && parsed.cafe.seatCount === 60) {
+          parsed.cafe.seatCount = 30; // Apply new default for existing drafts
+        }
+        if (parsed.initial && parsed.initial.interior === 60000000) {
+          parsed.initial.interior = 12810950;
+        }
+        return parsed;
       }
     } catch (e) {
       console.error("Failed to load draft", e);
@@ -67,7 +75,18 @@ export default function App() {
           dbService.getAllInteriorCosts()
         ]);
         setScenarios(loadedPlans);
-        setInteriorCosts(loadedCosts);
+        
+        const oldSum = loadedCosts.reduce((acc, curr) => acc + curr.cost, 0);
+        
+        if (loadedCosts.length === 0 || oldSum === 13768520) {
+          await dbService.clearInteriorCosts();
+          for (const item of DEFAULT_INTERIOR_COSTS) {
+            await dbService.saveInteriorCost(item as InteriorCost);
+          }
+          setInteriorCosts(DEFAULT_INTERIOR_COSTS as InteriorCost[]);
+        } else {
+          setInteriorCosts(loadedCosts);
+        }
       } catch (e) {
         console.error("Failed to load data from DB", e);
       }
@@ -396,7 +415,7 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 py-8 pb-16">
         {activeTab === Tab.PLAN && (
-          <BusinessPlanTab />
+          <BusinessPlanTab totalInteriorExpenses={totalInteriorExpenses} config={config} cafeUnitCosts={cafeUnitCosts} />
         )}
 
         {activeTab === Tab.DASHBOARD && (

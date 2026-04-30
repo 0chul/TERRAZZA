@@ -147,14 +147,14 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
             {monthlyData.map((d, i) => {
               const denom = maxRevenue * 1.1 || 1;
               const revHeight = (d.totalRevenue / denom) * 100;
-              const profHeight = Math.max(0, (d.netProfit / denom) * 100);
               
               return (
                 <div key={i} className="chart-col">
-                  <div className="bar-revenue" style={{height: `${revHeight}%`}}></div>
-                  {profHeight > 0 && (
-                    <div className="bar-profit" style={{height: `${profHeight}%`}}></div>
-                  )}
+                  <div className="bar-revenue" style={{height: `${revHeight}%`}}>
+                    {d.netProfit > 0 && d.totalRevenue > 0 && (
+                      <div className="bar-profit" style={{height: `${Math.min(100, (d.netProfit / d.totalRevenue) * 100)}%`}}></div>
+                    )}
+                  </div>
                   <div className="chart-tooltip">
                     <div className="font-bold text-[var(--amber)] mb-1">Month {d.month}</div>
                     <div className="flex justify-between gap-4">

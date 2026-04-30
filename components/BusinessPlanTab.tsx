@@ -1,7 +1,26 @@
 
 import React, { useEffect } from 'react';
+import { GlobalConfig, CafeUnitCosts } from '../types';
 
-export const BusinessPlanTab: React.FC = () => {
+export interface BusinessPlanTabProps {
+  totalInteriorExpenses: number;
+  config: GlobalConfig;
+  cafeUnitCosts: CafeUnitCosts;
+}
+
+export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorExpenses, config, cafeUnitCosts }) => {
+  const interiorAmount = totalInteriorExpenses;
+  const equipmentAmount = config.initial.equipment;
+  const designAmount = config.initial.design;
+  const suppliesAmount = config.initial.supplies;
+  
+  const totalAmount = interiorAmount + equipmentAmount + designAmount + suppliesAmount;
+  
+  const getWidth = (amount: number) => {
+    if (totalAmount === 0) return '0%';
+    return `${Math.round((amount / totalAmount) * 100)}%`;
+  };
+
   useEffect(() => {
     const reveals = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver(entries => {
@@ -135,12 +154,45 @@ export const BusinessPlanTab: React.FC = () => {
               <div className="menu-card-cat">Coffee</div>
               <div className="menu-card-title">커피</div>
               <div className="menu-items">
-                <div className="menu-item"><span>에스프레소 / 아메리카노</span><span className="menu-price">4,500~5,500</span></div>
-                <div className="menu-item"><span>라떼 / 플랫화이트</span><span className="menu-price">5,800~6,800</span></div>
-                <div className="menu-item"><span>배치브루</span><span className="menu-price">5,000~5,800</span></div>
+                <div className="menu-item" style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+                    <span>아메리카노</span>
+                    <span className="menu-price">{config.cafe.avgPriceAmericano.toLocaleString()}</span>
+                  </div>
+                  <div style={{fontSize: '0.75rem', color: 'var(--stone)', marginTop: '4px', fontWeight: 'normal'}}>
+                    원가 {Math.round(cafeUnitCosts.finalCostAmericano).toLocaleString()}원 ({Math.round((cafeUnitCosts.finalCostAmericano / config.cafe.avgPriceAmericano) * 100)}%)
+                  </div>
+                </div>
+                <div className="menu-item" style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+                    <span>카페라떼</span>
+                    <span className="menu-price">{config.cafe.avgPriceLatte.toLocaleString()}</span>
+                  </div>
+                  <div style={{fontSize: '0.75rem', color: 'var(--stone)', marginTop: '4px', fontWeight: 'normal'}}>
+                    원가 {Math.round(cafeUnitCosts.finalCostLatte).toLocaleString()}원 ({Math.round((cafeUnitCosts.finalCostLatte / config.cafe.avgPriceLatte) * 100)}%)
+                  </div>
+                </div>
+                <div className="menu-item" style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+                    <span>시럽라떼</span>
+                    <span className="menu-price">{config.cafe.avgPriceSyrupLatte.toLocaleString()}</span>
+                  </div>
+                  <div style={{fontSize: '0.75rem', color: 'var(--stone)', marginTop: '4px', fontWeight: 'normal'}}>
+                    원가 {Math.round(cafeUnitCosts.finalCostSyrupLatte).toLocaleString()}원 ({Math.round((cafeUnitCosts.finalCostSyrupLatte / config.cafe.avgPriceSyrupLatte) * 100)}%)
+                  </div>
+                </div>
               </div>
-              <div className="menu-rate">목표 원가율 <span>22~27%</span></div>
-              <div style={{marginTop:'14px',fontSize:'0.75rem',color:'var(--stone)',lineHeight:1.7}}>2인 운영 가능 레시피. 한국소비자원 프리미엄 카페 평균가와 동등 또는 소폭 높은 수준.</div>
+              <div className="menu-rate">예상 원가율 <span>
+                {Math.round(
+                  ((cafeUnitCosts.finalCostAmericano * config.cafe.ratioAmericano +
+                    cafeUnitCosts.finalCostLatte * config.cafe.ratioLatte +
+                    cafeUnitCosts.finalCostSyrupLatte * config.cafe.ratioSyrupLatte) /
+                  (config.cafe.avgPriceAmericano * config.cafe.ratioAmericano +
+                    config.cafe.avgPriceLatte * config.cafe.ratioLatte +
+                    config.cafe.avgPriceSyrupLatte * config.cafe.ratioSyrupLatte)) * 100
+                )}%
+              </span></div>
+              <div style={{marginTop:'14px',fontSize:'0.75rem',color:'var(--stone)',lineHeight:1.7}}>상세설정의 판매가 및 재료비 연동. 테이크아웃/매장/아이스 비율이 반영된 가중평균 원가입니다.</div>
             </div>
             <div className="menu-card reveal reveal-delay-1">
               <div className="menu-card-cat">Non-Coffee &amp; Wine</div>
@@ -320,8 +372,9 @@ export const BusinessPlanTab: React.FC = () => {
                 const prof = rev * (0.15 + (m * 0.015));
                 return (
                   <div key={m} className="chart-col">
-                    <div className="bar-revenue" style={{height: `${(rev/4000)*100}%`}}></div>
-                    <div className="bar-profit" style={{height: `${(prof/rev)*100}%`}}></div>
+                    <div className="bar-revenue" style={{height: `${(rev/4000)*100}%`}}>
+                      <div className="bar-profit" style={{height: `${(prof/rev)*100}%`}}></div>
+                    </div>
                     <div className="chart-tooltip">매출: {Math.round(rev)}만<br/>이익: {Math.round(prof)}만</div>
                     <div className="month-label">Month {m}</div>
                   </div>
@@ -447,29 +500,29 @@ export const BusinessPlanTab: React.FC = () => {
           <div className="capex-big">
             <div className="capex-visual reveal reveal-delay-2">
               <div className="capex-center-label">
-                <div className="capex-total">4,500</div>
+                <div className="capex-total">{(totalAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                 <div className="capex-total-label">총 투자금 (만원)</div>
               </div>
               <div className="capex-breakdown">
                 <div className="capex-row">
                   <div className="capex-bar-label">인테리어 공사</div>
-                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '45%'}}></div></div>
-                  <div className="capex-bar-value">2,000</div>
+                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(interiorAmount)}}></div></div>
+                  <div className="capex-bar-value">{(interiorAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                 </div>
                 <div className="capex-row">
                   <div className="capex-bar-label">가구 및 집기</div>
-                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '25%', animationDelay: '0.2s'}}></div></div>
-                  <div className="capex-bar-value">1,100</div>
+                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(equipmentAmount), animationDelay: '0.2s'}}></div></div>
+                  <div className="capex-bar-value">{(equipmentAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                 </div>
                 <div className="capex-row">
-                  <div className="capex-bar-label">주방/바 설비</div>
-                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '20%', animationDelay: '0.4s'}}></div></div>
-                  <div className="capex-bar-value">900</div>
+                  <div className="capex-bar-label">주방/바 설비 (디자인 포함)</div>
+                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(designAmount), animationDelay: '0.4s'}}></div></div>
+                  <div className="capex-bar-value">{(designAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                 </div>
                 <div className="capex-row">
                   <div className="capex-bar-label">운영 비품/기타</div>
-                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '10%', animationDelay: '0.6s'}}></div></div>
-                  <div className="capex-bar-value">500</div>
+                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(suppliesAmount), animationDelay: '0.6s'}}></div></div>
+                  <div className="capex-bar-value">{(suppliesAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                 </div>
               </div>
             </div>
