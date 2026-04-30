@@ -55,6 +55,20 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
     }));
   }, [monthlyData]);
 
+  React.useEffect(() => {
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, [monthlyData]);
+
+  const maxRevenue = useMemo(() => {
+    const vals = monthlyData.map(m => m.totalRevenue);
+    return vals.length > 0 ? Math.max(...vals) : 10000000;
+  }, [monthlyData]);
+
   const pieChartData = useMemo(() => {
     const current = monthlyData[0];
     if (!current) return { revenue: [], cost: [] };
@@ -124,27 +138,58 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
       </div>
 
       <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(201, 150, 58, 0.15)', marginTop: '24px' }}>
-        <div className="flex justify-between items-center mb-6"><h2 className="text-lg font-bold" style={{color: 'var(--cream)'}}>수익 추이 및 BEP 분석 (12개월 전망)</h2></div>
-        <div className="h-[450px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={mainChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }} barGap={2}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(201, 150, 58, 0.1)" />
-              <XAxis dataKey="month" tickFormatter={(val) => `M+${val}`} stroke="var(--mist)" />
-              <YAxis yAxisId="left" stroke="var(--mist)" tickFormatter={(val) => `${val / 10000}만`} />
-              <Tooltip formatter={(value: number, name: string) => name === '누적 손익' ? [`₩${Math.round(value).toLocaleString()}`, name] : [`₩${Math.abs(Math.round(value)).toLocaleString()}`, name]} />
-              <Legend verticalAlign="bottom" height={36} content={() => (<div className="flex justify-center gap-6 mt-4 text-[11px] font-bold" style={{color: 'var(--mist)'}}><div className="flex items-center gap-2"><div className="w-3 h-3" style={{backgroundColor: 'var(--amber)'}}></div><span>매출원</span></div><div className="flex items-center gap-2"><div className="w-3 h-3" style={{backgroundColor: 'var(--stone)'}}></div><span>지출원</span></div><div className="flex items-center gap-2"><div className="w-4 h-0.5" style={{backgroundColor: 'var(--amber)'}}></div><span>누적 자산 추이</span></div></div>)} />
-              <ReferenceLine yAxisId="left" y={0} stroke="var(--mist)" strokeDasharray="3 3" />
-              <Bar yAxisId="left" dataKey="cafeRevenue" name="카페 매출" stackId="revenue" fill={CHART_COLORS.revenue.cafe} barSize={20} />
-              <Bar yAxisId="left" dataKey="spaceRevenue" name="공간대여 매출" stackId="revenue" fill={CHART_COLORS.revenue.space} barSize={20} />
-              <Bar yAxisId="left" dataKey="wineRevenue" name="와인바 매출" stackId="revenue" fill={CHART_COLORS.revenue.wine} barSize={20} radius={[4, 4, 0, 0]} />
-              <Bar yAxisId="left" dataKey="laborCost" name="인건비" stackId="cost" fill={CHART_COLORS.cost.labor} barSize={20} />
-              <Bar yAxisId="left" dataKey="cafeCOGS" name="카페 재료비" stackId="cost" fill={CHART_COLORS.cost.cafe} barSize={20} />
-              <Bar yAxisId="left" dataKey="wineCOGS" name="와인바 원가" stackId="cost" fill={CHART_COLORS.cost.wine} barSize={20} />
-              <Bar yAxisId="left" dataKey="utilityCost" name="공과금" stackId="cost" fill={CHART_COLORS.cost.utility} barSize={20} />
-              <Bar yAxisId="left" dataKey="otherFixedCost" name="기타 고정비" stackId="cost" fill={CHART_COLORS.cost.fixed} barSize={20} radius={[0, 0, 4, 4]} />
-              <Line yAxisId="left" type="monotone" dataKey="cumulativeProfit" name="누적 손익" stroke={'var(--amber)'} strokeWidth={3} dot={{ r: 3, fill: 'var(--amber)' }} />
-            </ComposedChart>
-          </ResponsiveContainer>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-bold" style={{color: 'var(--cream)'}}>수익 추이 및 BEP 분석 (12개월 전망)</h2>
+        </div>
+        
+        <div className="chart-wrap reveal reveal-delay-2" style={{ height: '350px', marginTop: '20px' }}>
+          <div className="chart-bars">
+            {monthlyData.map((d, i) => {
+              const denom = maxRevenue * 1.1 || 1;
+              const revHeight = (d.totalRevenue / denom) * 100;
+              const profHeight = Math.max(0, (d.netProfit / denom) * 100);
+              
+              return (
+                <div key={i} className="chart-col">
+                  <div className="bar-revenue" style={{height: `${revHeight}%`}}></div>
+                  {profHeight > 0 && (
+                    <div className="bar-profit" style={{height: `${profHeight}%`}}></div>
+                  )}
+                  <div className="chart-tooltip">
+                    <div className="font-bold text-[var(--amber)] mb-1">Month {d.month}</div>
+                    <div className="flex justify-between gap-4">
+                      <span className="text-[var(--stone)]">매출:</span>
+                      <span>{Math.round(d.totalRevenue / 10000).toLocaleString()}만</span>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <span className="text-[var(--stone)]">순익:</span>
+                      <span style={{color: d.netProfit > 0 ? 'var(--amber)' : '#f87171'}}>
+                        {Math.round(d.netProfit / 10000).toLocaleString()}만
+                      </span>
+                    </div>
+                    <div className="flex justify-between gap-4 border-t border-[rgba(255,255,255,0.1)] mt-1 pt-1">
+                      <span className="text-[var(--stone)]">누적:</span>
+                      <span style={{color: d.cumulativeProfit > 0 ? 'var(--amber)' : '#f87171'}}>
+                        {Math.round(d.cumulativeProfit / 10000).toLocaleString()}만
+                      </span>
+                    </div>
+                  </div>
+                  <div className="month-label">M+{d.month}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="chart-legend reveal reveal-delay-3" style={{marginTop: '40px'}}>
+          <div className="legend-item">
+            <div className="legend-dot" style={{background: 'linear-gradient(to top, rgba(107,39,55,0.8), rgba(139,58,74,0.4))'}}></div>
+            예상 총 매출
+          </div>
+          <div className="legend-item">
+            <div className="legend-dot" style={{background: 'linear-gradient(to top, var(--amber), rgba(201,150,58,0.3))'}}></div>
+            월 예상 순수익
+          </div>
         </div>
       </div>
 
