@@ -150,52 +150,52 @@ export const InteriorCostTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white md:p-2 md:rounded-2xl md:shadow-sm md:border md:border-orange-100">
+      <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(201, 150, 58, 0.15)' }}>
         <div className="flex justify-between items-center mb-4 px-2">
-          <h2 className="text-xl font-bold text-[#5d4037] flex items-center gap-2">
-            <DollarSign className="text-orange-500" /> 인테리어 공사 비용 계산
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{color: 'var(--cream)'}}>
+            <DollarSign style={{color: 'var(--amber)'}} /> 인테리어 공사 비용 계산
           </h2>
         </div>
 
         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
-          <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex flex-col justify-center">
+          <div style={{background: 'rgba(201, 150, 58, 0.05)', borderColor: 'rgba(201, 150, 58, 0.1)'}} className="p-4 rounded-xl border flex flex-col justify-center">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-bold text-gray-500">총 예산 (입금액)</span>
-              <button onClick={() => setShowDepositForm(!showDepositForm)} className="text-xs bg-white border border-orange-200 px-2 py-1 rounded text-orange-600 hover:bg-orange-100 font-bold transition-colors">
+              <span className="text-sm font-bold" style={{color: 'var(--mist)'}}>총 예산 (입금액)</span>
+              <button onClick={() => setShowDepositForm(!showDepositForm)} style={{ borderColor: 'var(--amber)', color: 'var(--amber)' }} className="text-xs bg-transparent border px-2 py-1 rounded hover:bg-orange-50 font-bold transition-colors">
                 {showDepositForm ? '내역 닫기' : '내역 보기 / 추가'}
               </button>
             </div>
             <div className="flex items-center justify-end gap-1">
-              <span className="text-2xl font-black text-[#5d4037]">{totalBudget.toLocaleString()}</span>
-              <span className="text-[#5d4037] font-bold">원</span>
+              <span className="text-2xl font-black" style={{color: 'var(--cream)'}}>{totalBudget.toLocaleString()}</span>
+              <span className="font-bold" style={{color: 'var(--cream)'}}>원</span>
             </div>
           </div>
-          <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex flex-col justify-center items-end">
-            <span className="text-sm font-bold text-gray-500 mb-1">총 지출 (현재+예상)</span>
+          <div style={{background: 'rgba(201, 150, 58, 0.05)', borderColor: 'rgba(201, 150, 58, 0.1)'}} className="p-4 rounded-xl border flex flex-col justify-center items-end">
+            <span className="text-sm font-bold mb-1" style={{color: 'var(--mist)'}}>총 지출 (현재+예상)</span>
             <span className="text-xl font-bold text-rose-500">{(totalActual + totalEstimated).toLocaleString()} 원</span>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs mt-1" style={{color: 'var(--stone)'}}>
               현재: {totalActual.toLocaleString()} / 예상: {totalEstimated.toLocaleString()}
             </div>
           </div>
-          <div className={`p-4 rounded-xl border flex flex-col justify-center items-end ${totalBudget - (totalActual + totalEstimated) >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
-            <span className="text-sm font-bold text-gray-500 mb-1">현재 잔액</span>
-            <span className={`text-2xl font-black ${totalBudget - (totalActual + totalEstimated) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+          <div className={`p-4 rounded-xl border flex flex-col justify-center items-end`} style={{background: totalBudget - (totalActual + totalEstimated) >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(244, 63, 94, 0.05)', borderColor: totalBudget - (totalActual + totalEstimated) >= 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)'}}>
+            <span className="text-sm font-bold mb-1" style={{color: 'var(--mist)'}}>현재 잔액</span>
+            <span className={`text-2xl font-black ${totalBudget - (totalActual + totalEstimated) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
               {(totalBudget - (totalActual + totalEstimated)).toLocaleString()} 원
             </span>
           </div>
         </div>
 
         {showDepositForm && (
-          <div className="mb-6 bg-white p-4 rounded-xl border border-emerald-200 shadow-sm mx-2">
-            <h3 className="font-bold text-emerald-700 mb-3 flex items-center gap-2">
-              <DollarSign size={16} /> 예산 입금 내역
+          <div className="mb-6 p-4 rounded-xl border shadow-sm mx-2" style={{background: 'rgba(16, 185, 129, 0.03)', borderColor: 'rgba(16, 185, 129, 0.2)'}}>
+            <h3 className="font-bold mb-3 flex items-center gap-2" style={{color: 'var(--cream)'}}>
+              <DollarSign size={16} className="text-emerald-400" /> 예산 입금 내역
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-4">
-              <input type="date" value={depositDate} onChange={e => setDepositDate(e.target.value)} className="p-2 border rounded-lg text-sm" />
-              <input type="text" placeholder="적요 (예: 1차 대출금)" value={depositNote} onChange={e => setDepositNote(e.target.value)} className="p-2 border rounded-lg text-sm md:col-span-1" />
-              <input type="number" placeholder="금액 (원)" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} className="p-2 border rounded-lg text-sm" />
-              <button onClick={addDeposit} className="bg-emerald-600 text-white p-2 rounded-lg font-bold hover:bg-emerald-700 text-sm flex items-center justify-center gap-1">
-                <Plus size={14} /> 입금 추가
+              <input type="date" value={depositDate} onChange={e => setDepositDate(e.target.value)} className="p-2 rounded-lg text-sm" style={{background: 'var(--bg-primary)', border: '1px solid rgba(16, 185, 129, 0.2)', color: 'var(--cream)'}} />
+              <input type="text" placeholder="적요 (예: 1차 대출금)" value={depositNote} onChange={e => setDepositNote(e.target.value)} className="p-2 rounded-lg text-sm md:col-span-1" style={{background: 'var(--bg-primary)', border: '1px solid rgba(16, 185, 129, 0.2)', color: 'var(--cream)'}} />
+              <input type="number" placeholder="금액 (원)" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} className="p-2 rounded-lg text-sm" style={{background: 'var(--bg-primary)', border: '1px solid rgba(16, 185, 129, 0.2)', color: 'var(--cream)'}} />
+              <button onClick={addDeposit} className="p-2 rounded-lg font-bold text-sm flex items-center justify-center gap-1 transition" style={{background: 'rgba(16, 185, 129, 0.1)', color: '#34d399'}}>
+                <Plus size={14} className="text-emerald-400" /> <span className="text-emerald-400">입금 추가</span>
               </button>
             </div>
             
@@ -203,7 +203,7 @@ export const InteriorCostTab: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-emerald-100 text-emerald-800">
+                    <tr className="border-b" style={{borderColor: 'rgba(16, 185, 129, 0.2)', color: '#34d399'}}>
                       <th className="p-2 font-semibold">날짜</th>
                       <th className="p-2 font-semibold">적요</th>
                       <th className="p-2 text-right font-semibold">금액</th>
@@ -212,12 +212,12 @@ export const InteriorCostTab: React.FC = () => {
                   </thead>
                   <tbody>
                     {[...deposits].sort((a,b) => b.date.localeCompare(a.date)).map(d => (
-                      <tr key={d.id} className="border-b border-gray-50 hover:bg-emerald-50/30">
-                        <td className="p-2 text-gray-600">{d.date}</td>
-                        <td className="p-2 text-gray-800">{d.note}</td>
-                        <td className="p-2 text-right font-bold text-emerald-600">+{d.amount.toLocaleString()} 원</td>
+                      <tr key={d.id} className="border-b transition" style={{borderColor: 'rgba(255,255,255,0.05)', color: 'var(--mist)'}}>
+                        <td className="p-2">{d.date}</td>
+                        <td className="p-2" style={{color: 'var(--cream)'}}>{d.note}</td>
+                        <td className="p-2 text-right font-bold text-emerald-400">+{d.amount.toLocaleString()} 원</td>
                         <td className="p-2 text-center">
-                          <button onClick={() => deleteDeposit(d.id)} className="text-rose-400 hover:text-rose-600 p-1"><Trash2 size={14}/></button>
+                          <button onClick={() => deleteDeposit(d.id)} className="text-rose-400 hover:text-rose-300 p-1 transition"><Trash2 size={14}/></button>
                         </td>
                       </tr>
                     ))}
@@ -225,57 +225,57 @@ export const InteriorCostTab: React.FC = () => {
                 </table>
               </div>
             ) : (
-              <div className="text-center py-4 text-sm text-gray-400">입금 내역이 없습니다.</div>
+              <div className="text-center py-4 text-sm" style={{color: 'var(--stone)'}}>입금 내역이 없습니다.</div>
             )}
           </div>
         )}
 
-        <div className="mb-6 md:bg-orange-50 md:p-4 md:rounded-xl">
-          <h3 className="font-bold text-[#5d4037] mb-4 px-2">카테고리별 요약</h3>
+        <div className="mb-6 md:p-4 md:rounded-xl" style={{background: 'rgba(201, 150, 58, 0.05)'}}>
+          <h3 className="font-bold mb-4 px-2" style={{color: 'var(--cream)'}}>카테고리별 요약</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
             <div>
-              <h4 className="font-bold text-gray-600 mb-2">현재까지</h4>
+              <h4 className="font-bold mb-2" style={{color: 'var(--mist)'}}>현재까지</h4>
               {Object.entries(categoryTotals).map(([cat, totals]) => (
-                totals.actual > 0 && <div key={cat} className="flex justify-between text-sm py-1 border-b border-orange-100"><span>{cat}</span><span>{totals.actual.toLocaleString()}</span></div>
+                totals.actual > 0 && <div key={cat} className="flex justify-between text-sm py-1 border-b" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}><span>{cat}</span><span>{totals.actual.toLocaleString()}</span></div>
               ))}
             </div>
             <div>
-              <h4 className="font-bold text-orange-500 mb-2">예상</h4>
+              <h4 className="font-bold mb-2" style={{color: 'var(--amber)'}}>예상</h4>
               {Object.entries(categoryTotals).map(([cat, totals]) => (
-                totals.estimated > 0 && <div key={cat} className="flex justify-between text-sm py-1 border-b border-orange-100"><span>{cat}</span><span>{totals.estimated.toLocaleString()}</span></div>
+                totals.estimated > 0 && <div key={cat} className="flex justify-between text-sm py-1 border-b" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}><span>{cat}</span><span>{totals.estimated.toLocaleString()}</span></div>
               ))}
             </div>
             <div>
-              <h4 className="font-bold text-[#5d4037] mb-2">합계 (현재+예상)</h4>
+              <h4 className="font-bold mb-2" style={{color: 'var(--cream)'}}>합계 (현재+예상)</h4>
               {Object.entries(categoryTotals).map(([cat, totals]) => (
-                <div key={cat} className="flex justify-between text-sm py-1 border-b border-orange-100"><span>{cat}</span><span>{(totals.actual + totals.estimated).toLocaleString()}</span></div>
+                <div key={cat} className="flex justify-between text-sm py-1 border-b" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}><span>{cat}</span><span>{(totals.actual + totals.estimated).toLocaleString()}</span></div>
               ))}
             </div>
           </div>
         </div>
         
         <div className="grid grid-cols-1 gap-2 mb-6">
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-2 border rounded-lg w-full" />
+          <input style={{background: 'var(--bg-primary)', border: '1px solid rgba(201, 150, 58, 0.2)', color: 'var(--cream)'}} type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-2 rounded-lg w-full" />
           <div className="grid grid-cols-2 gap-2">
-            <input type="text" placeholder="카테고리" value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 border rounded-lg w-full" />
-            <input type="text" placeholder="항목" value={item} onChange={(e) => setItem(e.target.value)} className="p-2 border rounded-lg w-full" />
+            <input style={{background: 'var(--bg-primary)', border: '1px solid rgba(201, 150, 58, 0.2)', color: 'var(--cream)'}} type="text" placeholder="카테고리" value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 rounded-lg w-full" />
+            <input style={{background: 'var(--bg-primary)', border: '1px solid rgba(201, 150, 58, 0.2)', color: 'var(--cream)'}} type="text" placeholder="항목" value={item} onChange={(e) => setItem(e.target.value)} className="p-2 rounded-lg w-full" />
           </div>
-          <input type="number" placeholder="비용 (원)" value={cost} onChange={(e) => setCost(e.target.value)} className="p-2 border rounded-lg w-full" />
-          <button onClick={addCost} className="bg-[#5d4037] text-white p-2 rounded-lg flex items-center justify-center gap-2 hover:bg-[#4e342e] w-full">
+          <input style={{background: 'var(--bg-primary)', border: '1px solid rgba(201, 150, 58, 0.2)', color: 'var(--cream)'}} type="number" placeholder="비용 (원)" value={cost} onChange={(e) => setCost(e.target.value)} className="p-2 rounded-lg w-full" />
+          <button onClick={addCost} className="p-2 rounded-lg flex items-center justify-center gap-2 w-full transition font-bold" style={{background: 'rgba(201, 150, 58, 0.15)', color: 'var(--amber)'}}>
             <Plus size={16} /> 추가
           </button>
         </div>
 
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-orange-100 text-xs">
-              <th className="p-1 cursor-pointer hover:text-orange-600 whitespace-nowrap" onClick={() => handleSort('date')}>
+            <tr className="border-b text-xs" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+              <th className="p-1 cursor-pointer whitespace-nowrap" style={{color: 'var(--amber)'}} onClick={() => handleSort('date')}>
                 날짜 {getSortIcon('date')}
               </th>
-              <th className="p-1 cursor-pointer hover:text-orange-600 whitespace-nowrap" onClick={() => handleSort('category')}>
+              <th className="p-1 cursor-pointer whitespace-nowrap" style={{color: 'var(--amber)'}} onClick={() => handleSort('category')}>
                 카테고리 {getSortIcon('category')}
               </th>
-              <th className="p-1 cursor-pointer hover:text-orange-600 whitespace-nowrap" onClick={() => handleSort('item')}>
+              <th className="p-1 cursor-pointer whitespace-nowrap" style={{color: 'var(--amber)'}} onClick={() => handleSort('item')}>
                 항목 {getSortIcon('item')}
               </th>
               <th className="p-1 text-right whitespace-nowrap">비용</th>
@@ -284,27 +284,27 @@ export const InteriorCostTab: React.FC = () => {
           </thead>
           <tbody>
             {sortedCosts.map(c => (
-              <tr key={c.id} className={`border-b border-orange-50 ${c.date > today ? 'text-orange-600' : ''}`}>
+              <tr key={c.id} className={`border-b transition`} style={{borderColor: 'rgba(201, 150, 58, 0.1)', color: c.date > today ? 'var(--amber)' : 'var(--cream)'}}>
                 {editingId === c.id ? (
                   <>
-                    <td className="p-2"><input type="date" value={editForm.date} onChange={(e) => setEditForm({...editForm, date: e.target.value})} className="p-1 border rounded w-full" /></td>
-                    <td className="p-2"><input type="text" value={editForm.category} onChange={(e) => setEditForm({...editForm, category: e.target.value})} className="p-1 border rounded w-full" /></td>
-                    <td className="p-2"><input type="text" value={editForm.item} onChange={(e) => setEditForm({...editForm, item: e.target.value})} className="p-1 border rounded w-full" /></td>
-                    <td className="p-2"><input type="number" value={editForm.cost} onChange={(e) => setEditForm({...editForm, cost: Number(e.target.value)})} className="p-1 border rounded w-full" /></td>
+                    <td className="p-2"><input type="date" value={editForm.date} onChange={(e) => setEditForm({...editForm, date: e.target.value})} className="p-1 rounded w-full" style={{background: 'var(--bg-primary)', border: '1px solid rgba(201,150,58,0.2)', color: 'var(--cream)'}} /></td>
+                    <td className="p-2"><input type="text" value={editForm.category} onChange={(e) => setEditForm({...editForm, category: e.target.value})} className="p-1 rounded w-full" style={{background: 'var(--bg-primary)', border: '1px solid rgba(201,150,58,0.2)', color: 'var(--cream)'}} /></td>
+                    <td className="p-2"><input type="text" value={editForm.item} onChange={(e) => setEditForm({...editForm, item: e.target.value})} className="p-1 rounded w-full" style={{background: 'var(--bg-primary)', border: '1px solid rgba(201,150,58,0.2)', color: 'var(--cream)'}} /></td>
+                    <td className="p-2"><input type="number" value={editForm.cost} onChange={(e) => setEditForm({...editForm, cost: Number(e.target.value)})} className="p-1 rounded w-full" style={{background: 'var(--bg-primary)', border: '1px solid rgba(201,150,58,0.2)', color: 'var(--cream)'}} /></td>
                     <td className="p-2 text-center flex gap-2">
-                      <button onClick={saveEdit} className="text-emerald-600"><Check size={16} /></button>
-                      <button onClick={() => setEditingId(null)} className="text-slate-500"><X size={16} /></button>
+                      <button onClick={saveEdit} className="text-emerald-400 hover:text-emerald-300 transition"><Check size={16} /></button>
+                      <button onClick={() => setEditingId(null)} className="text-rose-400 hover:text-rose-300 transition"><X size={16} /></button>
                     </td>
                   </>
                 ) : (
                   <>
-                    <td className="p-1 text-xs whitespace-nowrap">{c.date.substring(5)} {c.date > today && <span className="text-[10px] font-bold bg-orange-100 px-1 rounded">예측</span>}</td>
-                    <td className="p-1 text-xs whitespace-nowrap">{c.category}</td>
+                    <td className="p-1 text-xs whitespace-nowrap">{c.date.substring(5)} {c.date > today && <span className="text-[10px] font-bold px-1 rounded ml-1" style={{background: 'rgba(201, 150, 58, 0.2)', color: 'var(--amber)'}}>예측</span>}</td>
+                    <td className="p-1 text-xs whitespace-nowrap" style={{color: 'var(--mist)'}}>{c.category}</td>
                     <td className="p-1 text-xs whitespace-nowrap">{c.item}</td>
                     <td className="p-1 text-xs text-right whitespace-nowrap">{c.cost.toLocaleString()} 원</td>
                     <td className="p-1 text-center flex gap-1 justify-center">
-                      <button onClick={() => startEdit(c)} className="text-blue-500 hover:text-blue-700"><Edit2 size={14} /></button>
-                      <button onClick={() => deleteCost(c.id)} className="text-rose-500 hover:text-rose-700"><Trash2 size={14} /></button>
+                      <button onClick={() => startEdit(c)} className="text-blue-400 hover:text-blue-300 transition"><Edit2 size={14} /></button>
+                      <button onClick={() => deleteCost(c.id)} className="text-rose-400 hover:text-rose-300 transition"><Trash2 size={14} /></button>
                     </td>
                   </>
                 )}

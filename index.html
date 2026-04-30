@@ -5,8 +5,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Terrazza Business Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+      :root {
+        --black: #0e0c0b;
+        --dark: #1a1614;
+        --charcoal: #2a2420;
+        --amber: #C9963A;
+        --amber-light: #E8B84B;
+        --gold: #D4AF37;
+        --wine: #6B2737;
+        --wine-light: #8B3A4A;
+        --cream: #F5EDD8;
+        --cream-dim: #D9CFBC;
+        --stone: #8A8070;
+        --mist: #C4BAA8;
+        
+        --bg-primary: #12100e;
+        --bg-card: #181512;
+      }
+
+      body {
+        background: var(--black);
+        color: var(--cream);
+        font-family: 'Noto Serif KR', serif;
+        overflow-x: hidden;
+      }
+
+      /* GRAIN OVERLAY */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9000;
+        opacity: 0.4;
+      }
+
       /* Custom scrollbar for tables */
       .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -18,6 +55,213 @@
       /* Ensure root takes full height */
       #root {
         min-height: 100vh;
+      }
+
+      /* CUSTOM CURSOR */
+      .cursor {
+        position: fixed;
+        width: 8px; height: 8px;
+        background: var(--amber);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transition: transform 0.1s ease;
+        mix-blend-mode: difference;
+      }
+      .cursor-ring {
+        position: fixed;
+        width: 36px; height: 36px;
+        border: 1px solid rgba(201,150,58,0.5);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        transition: all 0.18s ease;
+      }
+
+      /* REST OF USER CSS */
+      .hero { position: relative; height: 100vh; min-height: 700px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 30% 60%, rgba(107,39,55,0.35) 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 75% 40%, rgba(201,150,58,0.15) 0%, transparent 55%), radial-gradient(ellipse 80% 80% at 50% 50%, rgba(26,22,20,0.8) 30%, var(--black) 100%); }
+      .orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; animation: orbFloat 12s ease-in-out infinite; }
+      .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(107,39,55,0.5) 0%, transparent 70%); top: -100px; left: -100px; animation-delay: 0s; }
+      .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(201,150,58,0.3) 0%, transparent 70%); bottom: -50px; right: 100px; animation-delay: -4s; }
+      .orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(107,39,55,0.25) 0%, transparent 70%); top: 40%; right: -80px; animation-delay: -8s; }
+      @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -40px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.97); } }
+      .hero-lines { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+      .hero-line { position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(201,150,58,0.2), transparent); animation: linePulse 6s ease-in-out infinite; }
+      .hero-line:nth-child(1) { top: 25%; animation-delay: 0s; }
+      .hero-line:nth-child(2) { top: 75%; animation-delay: -3s; }
+      @keyframes linePulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+      .hero-content { position: relative; text-align: center; z-index: 2; padding: 0 20px; }
+      .hero-eyebrow { font-family: 'Cormorant Garamond', serif; font-size: 0.75rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--amber); margin-bottom: 30px; opacity: 0; animation: fadeUp 1s ease 0.3s forwards; }
+      .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(4rem, 9vw, 9rem); font-weight: 300; line-height: 0.9; letter-spacing: -0.02em; color: var(--cream); opacity: 0; animation: fadeUp 1.2s ease 0.5s forwards; }
+      .hero-title em { font-style: italic; color: var(--amber); }
+      .hero-subtitle { margin-top: 30px; font-size: 0.85rem; letter-spacing: 0.25em; color: var(--mist); text-transform: uppercase; opacity: 0; animation: fadeUp 1s ease 0.9s forwards; }
+      .hero-divider { width: 1px; height: 80px; background: linear-gradient(to bottom, var(--amber), transparent); margin: 50px auto 0; opacity: 0; animation: fadeUp 1s ease 1.2s forwards; }
+      .hero-tagline { margin-top: 24px; font-size: 1rem; font-weight: 300; color: var(--cream-dim); opacity: 0; animation: fadeUp 1s ease 1.4s forwards; line-height: 1.8; }
+      .hero-scroll { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0; animation: fadeIn 1s ease 2s forwards; }
+      .hero-scroll span { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--stone); }
+      .scroll-line { width: 1px; height: 60px; background: linear-gradient(to bottom, var(--amber), transparent); animation: scrollAnim 2s ease-in-out infinite; }
+      @keyframes scrollAnim { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 50.01% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+      @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .section-label { font-family: 'Cormorant Garamond', serif; font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--amber); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+      .section-label::before { content: ''; display: inline-block; width: 40px; height: 1px; background: var(--amber); }
+      .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem, 4vw, 4rem); font-weight: 300; line-height: 1.1; color: var(--cream); margin-bottom: 24px; }
+      .section-title em { font-style: italic; color: var(--amber); }
+      .section-body { font-size: 0.92rem; line-height: 2; color: var(--mist); max-width: 600px; }
+      .concept { padding: 140px 60px; background: var(--dark); }
+      .concept-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
+      .concept-visual { position: relative; height: 560px; }
+      .time-card { position: absolute; border: 1px solid rgba(201,150,58,0.2); padding: 32px 28px; background: rgba(26,22,20,0.8); backdrop-filter: blur(10px); transition: all 0.4s ease; }
+      .time-card:hover { border-color: var(--amber); transform: translateY(-6px); background: rgba(42,36,32,0.95); }
+      .time-card-1 { top: 0; left: 0; width: 260px; }
+      .time-card-2 { top: 140px; right: 0; width: 260px; }
+      .time-card-3 { bottom: 0; left: 60px; width: 280px; }
+      .time-card-icon { font-size: 2rem; margin-bottom: 14px; }
+      .time-card-time { font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--amber); margin-bottom: 8px; }
+      .time-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--cream); margin-bottom: 10px; }
+      .time-card-desc { font-size: 0.8rem; line-height: 1.7; color: var(--stone); }
+      .concept-connector { position: absolute; width: 1px; background: linear-gradient(to bottom, var(--amber), transparent); }
+      .cc-1 { left: 130px; top: 88px; height: 120px; }
+      .cc-2 { right: 130px; top: 228px; height: 130px; }
+      .numbers { padding: 120px 60px; background: var(--black); }
+      .numbers-inner { max-width: 1200px; margin: 0 auto; }
+      .numbers-header { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; margin-bottom: 80px; align-items: end; }
+      .scenario-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(201,150,58,0.15); border: 1px solid rgba(201,150,58,0.15); margin-bottom: 50px; }
+      .scenario-card { background: var(--black); padding: 40px 36px; position: relative; overflow: hidden; transition: background 0.3s; }
+      .scenario-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--amber); transform: scaleX(0); transition: transform 0.4s ease; }
+      .scenario-card:hover { background: rgba(26,22,20,0.8); }
+      .scenario-card:hover::before { transform: scaleX(1); }
+      .scenario-card.featured { background: rgba(201,150,58,0.06); }
+      .scenario-card.featured::before { transform: scaleX(1); }
+      .scenario-name { font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--stone); margin-bottom: 20px; }
+      .scenario-name.highlight { color: var(--amber); }
+      .scenario-revenue { font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 300; color: var(--cream); line-height: 1; margin-bottom: 6px; }
+      .scenario-unit { font-size: 0.8rem; color: var(--stone); margin-bottom: 24px; }
+      .scenario-stats { display: flex; flex-direction: column; gap: 10px; }
+      .stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      .stat-label { color: var(--stone); }
+      .stat-value { color: var(--cream); font-weight: 400; }
+      .stat-value.gold { color: var(--amber); }
+      .chart-section { padding: 100px 60px; background: var(--dark); }
+      .chart-inner { max-width: 1200px; margin: 0 auto; }
+      .chart-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; }
+      .chart-wrap { position: relative; height: 320px; border-left: 1px solid rgba(201,150,58,0.2); border-bottom: 1px solid rgba(201,150,58,0.2); padding: 20px 0 0 0; }
+      .chart-bars { display: flex; align-items: flex-end; height: 100%; gap: 3px; padding: 0 10px; }
+      .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; position: relative; height: 100%; }
+      .bar-revenue { width: 100%; background: linear-gradient(to top, rgba(107,39,55,0.8), rgba(139,58,74,0.4)); border-top: 1px solid rgba(139,58,74,0.6); border-radius: 2px 2px 0 0; transition: all 0.3s; position: relative; animation: barGrow 1.5s ease forwards; transform-origin: bottom; }
+      .bar-profit { width: 70%; position: absolute; bottom: 0; left: 15%; background: linear-gradient(to top, var(--amber), rgba(201,150,58,0.3)); border-top: 1px solid var(--amber); border-radius: 2px 2px 0 0; animation: barGrow 1.5s ease 0.3s forwards; transform-origin: bottom; transform: scaleY(0); }
+      @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+      .chart-col:hover .bar-revenue { opacity: 0.85; }
+      .chart-tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--charcoal); border: 1px solid rgba(201,150,58,0.3); padding: 8px 12px; font-size: 0.65rem; white-space: nowrap; color: var(--cream); z-index: 10; margin-bottom: 8px; }
+      .chart-col:hover .chart-tooltip { display: block; }
+      .month-label { font-size: 0.55rem; color: var(--stone); letter-spacing: 0.05em; margin-top: 6px; text-align: center; transform: rotate(-45deg); transform-origin: top center; white-space: nowrap; }
+      .chart-legend { display: flex; gap: 32px; margin-top: 32px; }
+      .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: var(--stone); }
+      .legend-dot { width: 12px; height: 12px; border-radius: 2px; }
+      .space { padding: 120px 60px; background: var(--black); }
+      .space-inner { max-width: 1200px; margin: 0 auto; }
+      .space-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: rgba(201,150,58,0.1); margin-top: 70px; border: 1px solid rgba(201,150,58,0.1); }
+      .space-cell { background: var(--black); padding: 48px 44px; position: relative; overflow: hidden; transition: background 0.4s; }
+      .space-cell::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(201,150,58,0.05) 0%, transparent 70%); opacity: 0; transition: opacity 0.4s; }
+      .space-cell:hover { background: rgba(26,22,20,0.9); }
+      .space-cell:hover::after { opacity: 1; }
+      .space-cell-number { font-family: 'Cormorant Garamond', serif; font-size: 5rem; font-weight: 300; color: rgba(201,150,58,0.1); position: absolute; top: 20px; right: 28px; line-height: 1; }
+      .space-cell-icon { font-size: 2rem; margin-bottom: 20px; }
+      .space-cell-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--cream); margin-bottom: 12px; }
+      .space-cell-sub { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber); margin-bottom: 16px; }
+      .space-cell-desc { font-size: 0.85rem; line-height: 1.9; color: var(--stone); }
+      .menu { padding: 120px 60px; background: var(--dark); position: relative; }
+      .menu::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 80% 50%, rgba(107,39,55,0.2) 0%, transparent 60%); pointer-events: none; }
+      .menu-inner { max-width: 1200px; margin: 0 auto; }
+      .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 70px; }
+      .menu-card { border: 1px solid rgba(201,150,58,0.15); padding: 36px 30px; position: relative; transition: all 0.4s; background: rgba(14,12,11,0.5); }
+      .menu-card:hover { border-color: rgba(201,150,58,0.4); transform: translateY(-8px); background: rgba(26,22,20,0.9); }
+      .menu-card-cat { font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--amber); margin-bottom: 16px; }
+      .menu-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--cream); margin-bottom: 20px; }
+      .menu-items { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+      .menu-item { font-size: 0.82rem; color: var(--mist); padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; }
+      .menu-price { color: var(--stone); }
+      .menu-rate { font-size: 0.7rem; color: var(--stone); border-top: 1px solid rgba(201,150,58,0.15); padding-top: 16px; display: flex; justify-content: space-between; }
+      .menu-rate span { color: var(--amber); }
+      .rental { padding: 120px 60px; background: var(--black); }
+      .rental-inner { max-width: 1200px; margin: 0 auto; }
+      .rental-table-wrap { margin-top: 70px; overflow-x: auto; }
+      .rental-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+      .rental-table th { font-family: 'Cormorant Garamond', serif; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber); padding: 16px 20px; border-bottom: 1px solid rgba(201,150,58,0.3); white-space: nowrap; }
+      .rental-table tr { border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s; }
+      .rental-table tr:hover { background: rgba(201,150,58,0.04); }
+      .rental-table td { padding: 20px; color: var(--mist); vertical-align: top; }
+      .rental-table td:first-child { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--cream); }
+      .rental-table td.price { color: var(--cream); font-weight: 400; white-space: nowrap; }
+      .rental-note { margin-top: 30px; padding: 24px 28px; border: 1px solid rgba(201,150,58,0.2); background: rgba(201,150,58,0.04); font-size: 0.82rem; color: var(--stone); line-height: 1.8; }
+      .rental-note strong { color: var(--amber); }
+      .team { padding: 120px 60px; background: var(--dark); }
+      .team-inner { max-width: 1200px; margin: 0 auto; }
+      .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(201,150,58,0.1); border: 1px solid rgba(201,150,58,0.1); margin-top: 70px; }
+      .team-card { background: var(--dark); padding: 36px 28px; transition: background 0.3s; }
+      .team-card:hover { background: rgba(42,36,32,0.95); }
+      .team-role { font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--amber); margin-bottom: 12px; }
+      .team-name { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--cream); margin-bottom: 16px; }
+      .team-hours { font-size: 0.78rem; color: var(--stone); margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+      .team-salary { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--cream); margin-bottom: 4px; }
+      .team-salary-unit { font-size: 0.7rem; color: var(--stone); }
+      .team-tasks { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+      .team-task { font-size: 0.75rem; color: var(--stone); padding-left: 12px; position: relative; }
+      .team-task::before { content: '—'; position: absolute; left: 0; color: rgba(201,150,58,0.4); }
+      .risk { padding: 100px 60px; background: var(--black); }
+      .risk-inner { max-width: 1200px; margin: 0 auto; }
+      .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 70px; }
+      .risk-card { padding: 32px 28px; border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s; position: relative; overflow: hidden; }
+      .risk-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--wine); }
+      .risk-card:hover { border-color: rgba(107,39,55,0.3); transform: translateX(4px); }
+      .risk-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--cream); margin-bottom: 10px; }
+      .risk-trigger { font-size: 0.75rem; color: var(--stone); margin-bottom: 14px; line-height: 1.6; }
+      .risk-response { font-size: 0.8rem; color: var(--mist); line-height: 1.7; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); }
+      .capex { padding: 120px 60px; background: var(--dark); position: relative; }
+      .capex::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 20% 50%, rgba(201,150,58,0.07) 0%, transparent 60%); pointer-events: none; }
+      .capex-inner { max-width: 1200px; margin: 0 auto; }
+      .capex-big { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 70px; }
+      .capex-visual { position: relative; padding: 48px 40px; border: 1px solid rgba(201,150,58,0.2); }
+      .capex-center-label { text-align: center; margin-bottom: 40px; }
+      .capex-total { font-family: 'Cormorant Garamond', serif; text-align: center; font-size: 4.5rem; font-weight: 300; color: var(--amber); line-height: 1; }
+      .capex-total-label { font-size: 0.7rem; text-align: center; letter-spacing: 0.3em; color: var(--stone); text-transform: uppercase; margin-top: 8px; }
+      .capex-breakdown { display: flex; flex-direction: column; gap: 16px; }
+      .capex-row { display: flex; align-items: center; gap: 16px; }
+      .capex-bar-label { font-size: 0.78rem; color: var(--mist); width: 120px; flex-shrink: 0; }
+      .capex-bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+      .capex-bar-fill { height: 100%; background: linear-gradient(to right, var(--amber), var(--amber-light)); animation: barFill 1.5s ease forwards; transform-origin: left; transform: scaleX(0); }
+      @keyframes barFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+      .capex-bar-value { font-size: 0.78rem; color: var(--amber); width: 60px; text-align: right; flex-shrink: 0; }
+      .capex-recovery { padding: 40px; }
+      .recovery-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--cream); margin-bottom: 8px; }
+      .recovery-sub { font-size: 0.8rem; color: var(--stone); margin-bottom: 36px; }
+      .recovery-bars { display: flex; flex-direction: column; gap: 24px; }
+      .recovery-item { position: relative; }
+      .recovery-scenario { display: flex; justify-content: space-between; margin-bottom: 8px; }
+      .rec-name { font-size: 0.75rem; color: var(--mist); }
+      .rec-month { font-size: 0.75rem; color: var(--amber); }
+      .recovery-track { height: 8px; background: rgba(255,255,255,0.06); position: relative; }
+      .recovery-fill { height: 100%; animation: barFill 1.8s ease forwards; transform-origin: left; transform: scaleX(0); }
+      .rf-conservative { background: linear-gradient(to right, var(--stone), var(--mist)); width: 62%; }
+      .rf-base { background: linear-gradient(to right, var(--amber), var(--amber-light)); width: 71%; }
+      .rf-optimistic { background: linear-gradient(to right, var(--wine-light), var(--amber)); width: 79%; }
+
+      /* SCROLL REVEAL */
+      .reveal { opacity: 0; transform: translateY(40px); transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+      .reveal.visible { opacity: 1; transform: translateY(0); }
+      .reveal-delay-1 { transition-delay: 0.1s; }
+      .reveal-delay-2 { transition-delay: 0.2s; }
+      .reveal-delay-3 { transition-delay: 0.3s; }
+      .reveal-delay-4 { transition-delay: 0.4s; }
+
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
+        .concept-inner, .numbers-header, .capex-big { grid-template-columns: 1fr; gap: 50px; }
+        .concept-visual { height: 350px; }
+        .scenario-cards, .menu-grid, .team-grid, .risk-grid { grid-template-columns: 1fr; }
+        .space-grid { grid-template-columns: 1fr; }
+        section { padding-left: 28px !important; padding-right: 28px !important; }
       }
     </style>
     <script type="importmap">
@@ -38,7 +282,7 @@
 }
 </script>
   </head>
-  <body class="bg-[#fdfcfb] text-[#3e2723]">
+  <body>
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
   </body>

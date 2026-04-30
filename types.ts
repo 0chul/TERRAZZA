@@ -102,14 +102,6 @@ export interface Scenario {
   timestamp: number;
 }
 
-export interface TodoItem {
-  id: string;
-  category: string;
-  task: string;
-  note?: string;
-  completed: boolean;
-}
-
 export interface InteriorCost {
   id: string;
   category: string;

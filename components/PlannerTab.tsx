@@ -51,21 +51,21 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
 
   // Fix: Explicitly type CostDetailItem as React.FC to allow magic React props like 'key' in mapping
   const CostDetailItem: React.FC<{ label: string, value: number }> = ({ label, value }) => (
-    <div className="flex justify-between text-xs text-gray-600 mb-1">
+    <div className="flex justify-between text-xs mb-1" style={{color: 'var(--mist)'}}>
       <span>{label}</span>
       <span>{Math.round(value)}원</span>
     </div>
   );
 
   const CostDetailCard = ({ title, items, total }: { title: string, items: {label: string, value: number}[], total: number }) => (
-    <div className="bg-white p-3 rounded border border-gray-200 shadow-sm h-full">
-      <div className="text-xs font-bold text-gray-800 mb-2 border-b pb-1">{title}</div>
+    <div className="p-3 rounded border h-full" style={{background: 'var(--bg-card)', borderColor: 'rgba(201, 150, 58, 0.15)'}}>
+      <div className="text-xs font-bold mb-2 border-b pb-1" style={{color: 'var(--cream)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>{title}</div>
       <div className="space-y-1 mb-2">
         {items.map((item, idx) => (
           <CostDetailItem key={idx} label={item.label} value={item.value} />
         ))}
       </div>
-      <div className="border-t pt-1 flex justify-between font-bold text-xs text-blue-700">
+      <div className="border-t pt-1 flex justify-between font-bold text-xs" style={{borderColor: 'rgba(201, 150, 58, 0.1)', color: 'var(--amber)'}}>
         <span>합계</span>
         <span>{Math.round(total).toLocaleString()}원</span>
       </div>
@@ -110,7 +110,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
       };
 
       return (
-          <div className="grid grid-cols-4 gap-2 p-3 bg-gray-50 border-t border-gray-200">
+          <div className="grid grid-cols-4 gap-2 p-3 border-t" style={{background: 'rgba(201, 150, 58, 0.02)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
                <CostDetailCard title="Takeout (Hot)" items={getItems('takeoutHot')} total={cafeUnitCosts.products.takeout.hot[menu]} />
                <CostDetailCard title="Takeout (Ice)" items={getItems('takeoutIce')} total={cafeUnitCosts.products.takeout.ice[menu]} />
                <CostDetailCard title="매장 (Hot)" items={getItems('storeHot')} total={cafeUnitCosts.products.store.hot[menu]} />
@@ -127,45 +127,46 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
     const currentCafeRevenue = monthlyData[0]?.cafeRevenue || 0;
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+      <div className="bg-white rounded-lg overflow-hidden mb-6" style={{background: 'var(--bg-card)', border: '1px solid rgba(201, 150, 58, 0.15)'}}>
         <button
           onClick={() => setCafeDetailsOpen(!cafeDetailsOpen)}
-          className="w-full px-6 py-4 flex items-center justify-between bg-amber-50 hover:bg-amber-100 transition-colors border-l-4 border-amber-500"
+          className="w-full px-6 py-4 flex items-center justify-between transition-colors border-l-4"
+          style={{background: 'rgba(201, 150, 58, 0.05)', borderLeftColor: 'var(--amber)'}}
         >
           <div className="flex items-center gap-3">
-             <Coffee className="text-amber-700" size={24}/>
+             <Coffee style={{color: 'var(--amber)'}} size={24}/>
              <div className="text-left">
-                <span className="block font-bold text-lg text-gray-800">카페 (Cafe) 상세 설정</span>
-                <span className="text-xs text-gray-500">테이크아웃/매장/HOT/ICE 및 좌석 회전율 기반 매출 예측</span>
+                <span className="block font-bold text-lg" style={{color: 'var(--cream)'}}>카페 (Cafe) 상세 설정</span>
+                <span className="text-xs" style={{color: 'var(--stone)'}}>테이크아웃/매장/HOT/ICE 및 좌석 회전율 기반 매출 예측</span>
              </div>
           </div>
           <div className="flex items-center gap-4">
              <div className="text-right hidden sm:block">
-                <span className="text-sm text-blue-600 font-bold">
-                    월 예상 매출: ₩{Math.round(currentCafeRevenue).toLocaleString()}
+                <span className="text-sm font-bold" style={{color: 'var(--cream)'}}>
+                    월 예상 매출: <span style={{color: 'var(--amber)'}}>₩{Math.round(currentCafeRevenue).toLocaleString()}</span>
                 </span>
              </div>
-             {cafeDetailsOpen ? <ChevronDown size={24} className="text-amber-700" /> : <ChevronRight size={24} className="text-gray-400" />}
+             {cafeDetailsOpen ? <ChevronDown size={24} style={{color: 'var(--amber)'}} /> : <ChevronRight size={24} style={{color: 'var(--mist)'}} />}
           </div>
         </button>
         
         {cafeDetailsOpen && (
-          <div className="p-6 border-t border-gray-200 space-y-8">
+          <div className="p-6 border-t space-y-8" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}>
             {/* 1. Inputs Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                
                {/* Column 1: Capacity & Turnover (New) */}
-               <div className="space-y-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
-                  <h4 className="font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+               <div className="space-y-4 p-4 rounded-lg border" style={{background: 'rgba(201, 150, 58, 0.03)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2" style={{color: 'var(--cream)'}}>
                     <Users size={16}/> 매출/회전율 예측
                   </h4>
                   
-                  <div className="bg-white p-3 rounded border border-indigo-100 shadow-sm mb-4">
-                     <div className="flex justify-between text-sm text-gray-600 mb-1">
+                  <div className="bg-white p-3 rounded border shadow-sm mb-4" style={{background: 'var(--bg-card)', borderColor: 'rgba(201, 150, 58, 0.15)'}}>
+                     <div className="flex justify-between text-sm mb-1" style={{color: 'var(--mist)'}}>
                         <span>일 최대 회전 좌석</span>
-                        <span className="font-bold">{maxCapacity}석</span>
+                        <span className="font-bold" style={{color: 'var(--cream)'}}>{maxCapacity}석</span>
                      </div>
-                     <div className="flex justify-between text-lg text-indigo-700 font-bold items-center border-t border-indigo-50 pt-1 mt-1">
+                     <div className="flex justify-between text-lg font-bold items-center border-t pt-1 mt-1" style={{borderColor: 'rgba(201, 150, 58, 0.1)', color: 'var(--amber)'}}>
                         <span>일일 판매량</span>
                         <span>{dailySalesCount} 잔/팀</span>
                      </div>
@@ -175,8 +176,8 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                   
                   {/* Operating Days Selector */}
                   <div className="flex flex-col">
-                     <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">운영 일수 (월 평균)</label>
-                     <div className="grid grid-cols-3 gap-1 bg-white p-1 rounded-md border border-gray-300 shadow-sm">
+                     <label className="text-xs font-semibold text-[var(--stone)] uppercase tracking-wide mb-1">운영 일수 (월 평균)</label>
+                     <div className="grid grid-cols-3 gap-1 bg-[var(--bg-primary)] p-1 rounded-md border border-[rgba(201,150,58,0.2)] shadow-sm">
                         {[
                            { label: '주 5일', val: 21.7 },
                            { label: '주 6일', val: 26.1 },
@@ -187,15 +188,15 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                               onClick={() => onConfigChange('cafe', 'operatingDays', opt.val)}
                               className={`text-xs py-2 rounded font-bold transition-all ${
                                  Math.abs(config.cafe.operatingDays - opt.val) < 0.5
-                                 ? 'bg-indigo-600 text-white shadow-sm'
-                                 : 'text-gray-500 hover:bg-gray-100 hover:text-indigo-600'
+                                 ? 'bg-[var(--amber)] text-[var(--bg-primary)] shadow-sm'
+                                 : 'text-[var(--stone)] hover:bg-[rgba(201,150,58,0.1)] hover:text-[var(--amber)]'
                               }`}
                            >
                               {opt.label}
                            </button>
                         ))}
                      </div>
-                     <div className="text-right text-[10px] text-indigo-400 mt-1 font-medium">
+                     <div className="text-right text-[10px] mt-1 font-medium" style={{color: 'var(--mist)'}}>
                         * 월 평균 {config.cafe.operatingDays.toFixed(1)}일 영업
                      </div>
                   </div>
@@ -203,7 +204,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                   <NumberInput label="일 영업 시간" value={config.cafe.operatingHours} onChange={(v) => onConfigChange('cafe', 'operatingHours', v)} unit="시간" />
                   <NumberInput label="고객 평균 점유시간" value={config.cafe.stayDuration} onChange={(v) => onConfigChange('cafe', 'stayDuration', v)} unit="시간" step={0.5} />
                   
-                  <div className="mt-4 pt-4 border-t border-indigo-200">
+                  <div className="mt-4 pt-4 border-t" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}>
                      <SliderInput 
                         label="좌석 회전율 (목표)" 
                         value={config.cafe.turnoverTarget} 
@@ -215,12 +216,12 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                </div>
 
                {/* Column 2: Ratios */}
-               <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
-                  <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+               <div className="space-y-4 p-4 rounded-lg border" style={{background: 'rgba(201, 150, 58, 0.03)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2" style={{color: 'var(--cream)'}}>
                     <TrendingUp size={16}/> 판매 비중 설정
                   </h4>
                   <div className={`p-2 rounded border mb-4 ${isRatioValid ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-                     <div className="text-xs text-gray-500 mb-1">메뉴 비중 합계 (1.0 맞춰주세요)</div>
+                     <div className="text-xs text-[var(--stone)] mb-1">메뉴 비중 합계 (1.0 맞춰주세요)</div>
                      <div className={`text-lg font-bold ${isRatioValid ? 'text-green-700' : 'text-red-600'}`}>
                         {(totalRatio).toFixed(2)} / 1.00
                      </div>
@@ -230,7 +231,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                   <SliderInput label="카페라떼 비중" value={config.cafe.ratioLatte} onChange={(v) => onConfigChange('cafe', 'ratioLatte', v)} step={0.05} />
                   <SliderInput label="시럽라떼 비중" value={config.cafe.ratioSyrupLatte} onChange={(v) => onConfigChange('cafe', 'ratioSyrupLatte', v)} step={0.05} />
                   
-                  <div className="my-4 border-t border-gray-200"></div>
+                  <div className="my-4 border-t border-[rgba(201,150,58,0.1)]"></div>
                   
                   <SliderInput label="테이크아웃 비율" value={config.cafe.takeoutRatio} onChange={(v) => onConfigChange('cafe', 'takeoutRatio', v)} step={0.05} />
                   <SliderInput label="아이스 음료 비율" value={config.cafe.iceRatio} onChange={(v) => onConfigChange('cafe', 'iceRatio', v)} step={0.05} />
@@ -239,8 +240,8 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                {/* Column 3: Costs & Prices */}
                <div className="space-y-6">
                   {/* Prices */}
-                   <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
-                      <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                   <div className="space-y-4 p-4 rounded-lg border" style={{background: 'rgba(201, 150, 58, 0.03)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2" style={{color: 'var(--cream)'}}>
                         <DollarSign size={16}/> 판매가 설정
                       </h4>
                       <NumberInput label="아메리카노" value={config.cafe.avgPriceAmericano} onChange={(v) => onConfigChange('cafe', 'avgPriceAmericano', v)} unit="원" />
@@ -249,24 +250,24 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                    </div>
 
                    {/* Materials */}
-                   <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
-                      <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                   <div className="space-y-4 p-4 rounded-lg border" style={{background: 'rgba(201, 150, 58, 0.03)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2" style={{color: 'var(--cream)'}}>
                         <Calculator size={16}/> 재료비 설정
                       </h4>
                       <NumberInput label="원두 가격 (1kg)" value={config.cafe.beanPricePerKg} onChange={(v) => onConfigChange('cafe', 'beanPricePerKg', v)} unit="원" />
                       <NumberInput label="우유 가격 (1L)" value={config.cafe.milkPricePerL} onChange={(v) => onConfigChange('cafe', 'milkPricePerL', v)} unit="원" />
-                      <div className="pt-2 text-xs text-gray-500 space-y-1">
+                      <div className="pt-2 text-xs space-y-1" style={{color: 'var(--stone)'}}>
                         <div className="flex justify-between">
                             <span>원두 1잔({config.cafeSupplies.beanGrams}g)</span>
-                            <span className="font-bold">{Math.round(cafeUnitCosts.unitCosts.bean)}원</span>
+                            <span className="font-bold" style={{color: 'var(--cream)'}}>{Math.round(cafeUnitCosts.unitCosts.bean)}원</span>
                         </div>
                         <div className="flex justify-between">
                             <span>우유 1잔({config.cafeSupplies.milkMl}ml)</span>
-                            <span className="font-bold">{Math.round(cafeUnitCosts.unitCosts.milk)}원</span>
+                            <span className="font-bold" style={{color: 'var(--cream)'}}>{Math.round(cafeUnitCosts.unitCosts.milk)}원</span>
                         </div>
                          <div className="flex justify-between">
                             <span>시럽 1회(30ml)</span>
-                            <span className="font-bold text-amber-600">+{Math.round(cafeUnitCosts.unitCosts.syrup)}원</span>
+                            <span className="font-bold text-amber-600" style={{color: 'var(--amber)'}}>+{Math.round(cafeUnitCosts.unitCosts.syrup)}원</span>
                         </div>
                       </div>
                    </div>
@@ -275,34 +276,34 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
 
             {/* 2. Detailed Cost Breakdown Matrix */}
             <div>
-              <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide flex justify-between items-end">
+              <h4 className="font-bold mb-3 text-sm uppercase tracking-wide flex justify-between items-end" style={{color: 'var(--cream)'}}>
                   <span>상황별 1잔 원가 분석표 (Cost Matrix)</span>
-                  <span className="text-xs normal-case text-gray-500 font-normal">비중: Takeout {config.cafe.takeoutRatio*100}% | Ice {config.cafe.iceRatio*100}%</span>
+                  <span className="text-xs normal-case font-normal" style={{color: 'var(--stone)'}}>비중: Takeout {config.cafe.takeoutRatio*100}% | Ice {config.cafe.iceRatio*100}%</span>
               </h4>
-              <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+              <div className="overflow-x-auto border rounded-lg shadow-sm" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}>
                 <table className="w-full text-sm text-right">
-                    <thead className="bg-gray-100 text-gray-700 border-b border-gray-200">
+                    <thead className="border-b" style={{background: 'rgba(201, 150, 58, 0.05)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
                         <tr>
-                            <th className="px-4 py-3 text-left w-32 font-bold">구분</th>
-                            <th className="px-4 py-3 bg-blue-50 text-blue-900">Takeout (Hot)</th>
-                            <th className="px-4 py-3 bg-blue-100 text-blue-900">Takeout (Ice)</th>
-                            <th className="px-4 py-3 bg-green-50 text-green-900">매장 (Hot)</th>
-                            <th className="px-4 py-3 bg-green-100 text-green-900">매장 (Ice)</th>
-                            <th className="px-4 py-3 bg-gray-800 text-white font-bold">최종 가중평균</th>
+                            <th className="px-4 py-3 text-left w-32 font-bold" style={{color: 'var(--cream)'}}>구분</th>
+                            <th className="px-4 py-3" style={{color: 'var(--mist)'}}>Takeout (Hot)</th>
+                            <th className="px-4 py-3" style={{color: 'var(--mist)'}}>Takeout (Ice)</th>
+                            <th className="px-4 py-3" style={{color: 'var(--mist)'}}>매장 (Hot)</th>
+                            <th className="px-4 py-3" style={{color: 'var(--mist)'}}>매장 (Ice)</th>
+                            <th className="px-4 py-3 font-bold" style={{background: 'var(--bg-card)', color: 'var(--amber)'}}>최종 가중평균</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-[rgba(201,150,58,0.1)]">
                         {/* Americano Row */}
-                        <tr onClick={() => toggleCostRow('americano')} className="hover:bg-gray-50 cursor-pointer transition-colors group">
-                            <td className="px-4 py-3 text-left font-semibold text-gray-800 flex items-center gap-2">
-                                {expandedCostRows.has('americano') ? <ChevronUp size={14} /> : <ChevronDown size={14} className="text-gray-400 group-hover:text-gray-600"/>}
+                        <tr onClick={() => toggleCostRow('americano')} className="cursor-pointer transition-colors group" style={{background: expandedCostRows.has('americano') ? 'rgba(201,150,58,0.05)' : 'transparent'}} onMouseEnter={(e) => e.currentTarget.style.background='rgba(201, 150, 58, 0.05)'} onMouseLeave={(e) => e.currentTarget.style.background=expandedCostRows.has('americano') ? 'rgba(201,150,58,0.05)' : 'transparent'}>
+                            <td className="px-4 py-3 text-left font-semibold text-[var(--cream)] flex items-center gap-2">
+                                {expandedCostRows.has('americano') ? <ChevronUp size={14} /> : <ChevronDown size={14} className="text-[var(--stone)] group-hover:text-[var(--mist)]"/>}
                                 아메리카노
                             </td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.takeout.hot.americano).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.takeout.ice.americano).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.store.hot.americano).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.store.ice.americano).toLocaleString()}원</td>
-                            <td className="px-4 py-3 font-bold bg-amber-50 text-amber-900 border-l border-amber-100">
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.takeout.hot.americano).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.takeout.ice.americano).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.store.hot.americano).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.store.ice.americano).toLocaleString()}원</td>
+                            <td className="px-4 py-3 font-bold bg-[rgba(201,150,58,0.1)] text-[var(--amber)] border-l border-[rgba(201,150,58,0.2)]">
                                 {Math.round(cafeUnitCosts.finalCostAmericano).toLocaleString()}원
                             </td>
                         </tr>
@@ -317,16 +318,16 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                         )}
 
                         {/* Latte Row */}
-                        <tr onClick={() => toggleCostRow('latte')} className="hover:bg-gray-50 cursor-pointer transition-colors group">
-                            <td className="px-4 py-3 text-left font-semibold text-gray-800 flex items-center gap-2">
-                                {expandedCostRows.has('latte') ? <ChevronUp size={14} /> : <ChevronDown size={14} className="text-gray-400 group-hover:text-gray-600"/>}
+                        <tr onClick={() => toggleCostRow('latte')} className="hover:bg-[rgba(201,150,58,0.05)] cursor-pointer transition-colors group">
+                            <td className="px-4 py-3 text-left font-semibold text-[var(--cream)] flex items-center gap-2">
+                                {expandedCostRows.has('latte') ? <ChevronUp size={14} /> : <ChevronDown size={14} className="text-[var(--stone)] group-hover:text-[var(--mist)]"/>}
                                 카페라떼
                             </td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.takeout.hot.latte).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.takeout.ice.latte).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.store.hot.latte).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.store.ice.latte).toLocaleString()}원</td>
-                            <td className="px-4 py-3 font-bold bg-amber-50 text-amber-900 border-l border-amber-100">
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.takeout.hot.latte).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.takeout.ice.latte).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.store.hot.latte).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.store.ice.latte).toLocaleString()}원</td>
+                            <td className="px-4 py-3 font-bold bg-[rgba(201,150,58,0.1)] text-[var(--amber)] border-l border-[rgba(201,150,58,0.2)]">
                                 {Math.round(cafeUnitCosts.finalCostLatte).toLocaleString()}원
                             </td>
                         </tr>
@@ -341,16 +342,16 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                         )}
 
                         {/* Syrup Latte Row */}
-                        <tr onClick={() => toggleCostRow('syrupLatte')} className="hover:bg-gray-50 cursor-pointer transition-colors group bg-amber-50/30">
-                            <td className="px-4 py-3 text-left font-semibold text-gray-800 flex items-center gap-2">
-                                {expandedCostRows.has('syrupLatte') ? <ChevronUp size={14} /> : <ChevronDown size={14} className="text-gray-400 group-hover:text-gray-600"/>}
+                        <tr onClick={() => toggleCostRow('syrupLatte')} className="hover:bg-[rgba(201,150,58,0.05)] cursor-pointer transition-colors group bg-[rgba(201,150,58,0.03)]">
+                            <td className="px-4 py-3 text-left font-semibold text-[var(--cream)] flex items-center gap-2">
+                                {expandedCostRows.has('syrupLatte') ? <ChevronUp size={14} /> : <ChevronDown size={14} className="text-[var(--stone)] group-hover:text-[var(--mist)]"/>}
                                 시럽 라떼
                             </td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.takeout.hot.syrupLatte).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.takeout.ice.syrupLatte).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.store.hot.syrupLatte).toLocaleString()}원</td>
-                            <td className="px-4 py-3 text-gray-600">{Math.round(cafeUnitCosts.products.store.ice.syrupLatte).toLocaleString()}원</td>
-                            <td className="px-4 py-3 font-bold bg-amber-50 text-amber-900 border-l border-amber-100">
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.takeout.hot.syrupLatte).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.takeout.ice.syrupLatte).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.store.hot.syrupLatte).toLocaleString()}원</td>
+                            <td className="px-4 py-3 text-[var(--mist)]">{Math.round(cafeUnitCosts.products.store.ice.syrupLatte).toLocaleString()}원</td>
+                            <td className="px-4 py-3 font-bold bg-[rgba(201,150,58,0.1)] text-[var(--amber)] border-l border-[rgba(201,150,58,0.2)]">
                                 {Math.round(cafeUnitCosts.finalCostSyrupLatte).toLocaleString()}원
                             </td>
                         </tr>
@@ -367,7 +368,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                     </tbody>
                 </table>
               </div>
-              <p className="mt-2 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-[var(--stone)]">
                 * 메뉴명을 클릭하면 상세 재료비 및 포장재 원가를 확인할 수 있습니다.<br/>
                 * Takeout: 컵/뚜껑/홀더/캐리어/물티슈 포함 (Ice는 빨대 포함, Hot은 스틱 포함)<br/>
                 * 매장: 설거지비용(수도/인건)/물티슈 포함 (일회용컵 제외)
@@ -422,8 +423,8 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="bg-blue-50 p-4 rounded-lg text-blue-800 text-sm mb-6 flex items-start gap-2">
-        <Calculator className="mt-0.5 flex-shrink-0" size={16}/>
+      <div className="p-4 rounded-lg text-sm mb-6 flex items-start gap-2" style={{background: 'rgba(201, 150, 58, 0.05)', color: 'var(--charcoal)', border: '1px solid rgba(201, 150, 58, 0.1)'}}>
+        <Calculator className="mt-0.5 flex-shrink-0" size={16} style={{color: 'var(--amber)'}}/>
         <p>각 사업별 상세 설정을 입력하세요. 카페는 테이크아웃, 아이스 비율 등 상세 조건에 따라 원가가 정밀하게 계산됩니다.</p>
       </div>
 
@@ -432,7 +433,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
 
       <InputSection 
         title="🏠 공간대여 (Space Rental) 설정"
-        summary={<span className="text-sm text-blue-600 font-medium">월 예상 매출: {formatSum(spaceRev)}</span>}
+        summary={<span className="text-sm font-medium" style={{color: 'var(--charcoal)'}}>월 예상 매출: {formatSum(spaceRev)}</span>}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <NumberInput label="시간당 대여료" value={config.space.hourlyRate} onChange={(v) => onConfigChange('space', 'hourlyRate', v)} unit="원" />
@@ -451,7 +452,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
 
       <InputSection 
         title="🍷 와인바 (Wine Bar) 설정"
-        summary={<span className="text-sm text-blue-600 font-medium">월 예상 매출: {formatSum(wineRev)}</span>}
+        summary={<span className="text-sm font-medium" style={{color: 'var(--charcoal)'}}>월 예상 매출: {formatSum(wineRev)}</span>}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <NumberInput label="테이블당 평균 단가" value={config.wine.avgTicketPrice} onChange={(v) => onConfigChange('wine', 'avgTicketPrice', v)} unit="원" />
@@ -465,48 +466,48 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
         title="🏢 고정비 및 초기투자 (Fixed & Initial Cost)"
         summary={
           <div className="flex flex-col text-xs md:text-sm md:flex-row md:gap-4 text-right font-medium">
-             <span className="text-indigo-600">초기 투자: {formatSum(totalInvestment)}</span>
-             <span className="hidden md:inline text-gray-300">|</span>
-             <span className="text-blue-600">월 고정비: {formatSum(totalFixed)}</span>
+             <span style={{color: 'var(--charcoal)'}}>초기 투자: {formatSum(totalInvestment)}</span>
+             <span className="hidden md:inline" style={{color: 'var(--stone)'}}>|</span>
+             <span style={{color: 'var(--amber)'}}>월 고정비: {formatSum(totalFixed)}</span>
           </div>
         }
       >
         <div className="space-y-6">
             {/* Improved Labor Calculator Section */}
-            <div className="bg-blue-50/50 rounded-xl p-5 border border-blue-100">
-               <h4 className="font-bold text-blue-900 flex items-center gap-2 mb-4">
-                  <Briefcase size={18}/> 2026년 기준 인건비 계산기 (시급 10,320원)
+            <div className="rounded-xl p-5 border" style={{background: 'rgba(201, 150, 58, 0.03)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+               <h4 className="font-bold flex items-center gap-2 mb-4" style={{color: 'var(--cream)'}}>
+                  <Briefcase size={18} style={{color: 'var(--amber)'}}/> 2026년 기준 인건비 계산기 (시급 10,320원)
                </h4>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                      <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
+                      <div className="p-4 rounded-lg border" style={{background: 'var(--bg-card)', borderColor: 'rgba(201, 150, 58, 0.1)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
                          <div className="flex justify-between items-start mb-2">
-                            <span className="text-sm font-semibold text-gray-700">주중 풀타임 근무자 (주 40시간)</span>
-                            <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">209시간 기준</span>
+                            <span className="text-sm font-semibold" style={{color: 'var(--cream)'}}>주중 풀타임 근무자 (주 40시간)</span>
+                            <span className="text-xs px-2 py-0.5 rounded" style={{background: 'rgba(201, 150, 58, 0.05)', color: 'var(--charcoal)'}}>209시간 기준</span>
                          </div>
-                         <div className="text-lg font-bold text-gray-900 mb-3">{WEEKDAY_RATE.toLocaleString()}원 <span className="text-xs font-normal text-gray-500">/ 1인</span></div>
+                         <div className="text-lg font-bold mb-3" style={{color: 'var(--cream)'}}>{WEEKDAY_RATE.toLocaleString()}원 <span className="text-xs font-normal" style={{color: 'var(--stone)'}}>/ 1인</span></div>
                          <NumberInput label="주중 인원수" value={config.fixed.weekdayStaff} onChange={(v) => onConfigChange('fixed', 'weekdayStaff', v)} unit="명" />
                       </div>
-                      <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
+                      <div className="p-4 rounded-lg border" style={{background: 'var(--bg-card)', borderColor: 'rgba(201, 150, 58, 0.1)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
                          <div className="flex justify-between items-start mb-2">
-                            <span className="text-sm font-semibold text-gray-700">주말 근무자 (토/일 16시간)</span>
-                            <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">83.45시간 기준</span>
+                            <span className="text-sm font-semibold" style={{color: 'var(--cream)'}}>주말 근무자 (토/일 16시간)</span>
+                            <span className="text-xs px-2 py-0.5 rounded" style={{background: 'rgba(201, 150, 58, 0.05)', color: 'var(--charcoal)'}}>83.45시간 기준</span>
                          </div>
-                         <div className="text-lg font-bold text-gray-900 mb-3">{WEEKEND_RATE.toLocaleString()}원 <span className="text-xs font-normal text-gray-500">/ 1인</span></div>
+                         <div className="text-lg font-bold mb-3" style={{color: 'var(--cream)'}}>{WEEKEND_RATE.toLocaleString()}원 <span className="text-xs font-normal" style={{color: 'var(--stone)'}}>/ 1인</span></div>
                          <NumberInput label="주말 인원수" value={config.fixed.weekendStaff} onChange={(v) => onConfigChange('fixed', 'weekendStaff', v)} unit="명" />
                       </div>
                   </div>
                   <div className="flex flex-col justify-between">
-                      <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-50 flex-1 flex flex-col justify-center">
+                      <div className="p-4 rounded-lg flex-1 flex flex-col justify-center border" style={{background: 'var(--bg-card)', borderColor: 'rgba(201, 150, 58, 0.1)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
                          <div className="text-center">
-                            <div className="text-sm text-gray-500 mb-1">총 인건비 합계</div>
-                            <div className="text-3xl font-black text-blue-700">{Math.round(calculatedLaborCost).toLocaleString()}원</div>
-                            <div className="mt-4 pt-4 border-t border-gray-50 space-y-2">
-                               <div className="flex justify-between text-xs text-gray-500">
+                            <div className="text-sm mb-1" style={{color: 'var(--mist)'}}>총 인건비 합계</div>
+                            <div className="text-3xl font-black" style={{color: 'var(--amber)'}}>{Math.round(calculatedLaborCost).toLocaleString()}원</div>
+                            <div className="mt-4 pt-4 border-t space-y-2" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+                               <div className="flex justify-between text-xs" style={{color: 'var(--stone)'}}>
                                   <span>주중 ({config.fixed.weekdayStaff}명)</span>
                                   <span>{(config.fixed.weekdayStaff * WEEKDAY_RATE).toLocaleString()}원</span>
                                </div>
-                               <div className="flex justify-between text-xs text-gray-500">
+                               <div className="flex justify-between text-xs" style={{color: 'var(--stone)'}}>
                                   <span>주말 ({config.fixed.weekendStaff}명)</span>
                                   <span>{(config.fixed.weekendStaff * WEEKEND_RATE).toLocaleString()}원</span>
                                </div>
@@ -520,7 +521,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                </div>
             </div>
 
-            <h4 className="font-medium text-gray-700 border-b pb-2 pt-4">기타 월 고정 비용</h4>
+            <h4 className="font-medium border-b pb-2 pt-4" style={{color: 'var(--cream)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>기타 월 고정 비용</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <NumberInput label="공과금 (수도/전기)" value={config.fixed.utilities} onChange={(v) => onConfigChange('fixed', 'utilities', v)} unit="원" />
                 <NumberInput label="마케팅비" value={config.fixed.marketing} onChange={(v) => onConfigChange('fixed', 'marketing', v)} unit="원" />
@@ -529,7 +530,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                 <NumberInput label="인터넷/통신" value={config.fixed.internet} onChange={(v) => onConfigChange('fixed', 'internet', v)} unit="원" />
             </div>
 
-            <h4 className="font-medium text-gray-700 border-b pb-2 pt-4">초기 투자 비용</h4>
+            <h4 className="font-medium border-b pb-2 pt-4" style={{color: 'var(--cream)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>초기 투자 비용</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <NumberInput label="인테리어" value={config.initial.interior} onChange={(v) => onConfigChange('initial', 'interior', v)} unit="원" />
                 <NumberInput label="설비/집기" value={config.initial.equipment} onChange={(v) => onConfigChange('initial', 'equipment', v)} unit="원" />

@@ -1,336 +1,497 @@
 
-import React from 'react';
-import { 
-  Target, 
-  Users, 
-  Smartphone, 
-  MapPin, 
-  Share2, 
-  Calendar, 
-  Heart, 
-  Briefcase,
-  Megaphone,
-  Repeat,
-  TrendingUp,
-  Layout
-} from 'lucide-react';
+import React, { useEffect } from 'react';
 
 export const BusinessPlanTab: React.FC = () => {
+  useEffect(() => {
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="max-w-5xl mx-auto space-y-16 pb-20 animate-in fade-in duration-700">
+    <div className="terrazza-template">
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-bg"></div>
+        <div className="orb orb-1"></div>
+        <div className="orb orb-2"></div>
+        <div className="orb orb-3"></div>
+        <div className="hero-lines">
+          <div className="hero-line"></div>
+          <div className="hero-line"></div>
+        </div>
+        <div className="hero-content">
+          <p className="hero-eyebrow">서울 서초구 방배동 807-17</p>
+          <h1 className="hero-title">Terrazza<br/><em>Lounge</em></h1>
+          <p className="hero-subtitle">낮의 카페 &nbsp;·&nbsp; 저녁의 와인 라운지 &nbsp;·&nbsp; 시간대 전환형 공간</p>
+          <div className="hero-divider"></div>
+          <p className="hero-tagline">
+            카페가 바닥 매출을 깔고<br/>와인이 객단가를 올리고<br/>대관이 이익을 만든다
+          </p>
+        </div>
+        <div className="hero-scroll">
+          <span>Scroll</span>
+          <div className="scroll-line"></div>
+        </div>
+      </section>
+
+      {/* CONCEPT SECTION */}
+      <section className="concept" id="concept">
+        <div className="concept-inner">
+          <div className="concept-left">
+            <div className="section-label reveal">운영 개념</div>
+            <h2 className="section-title reveal reveal-delay-1">하나의 공간<br/><em>세 가지 수익원</em></h2>
+            <p className="section-body reveal reveal-delay-2">
+              Terrazza Lounge는 "예쁜 카페"가 아니라 시간대 전환이 가능한 수익 공간입니다. 60평 공간이 하루에 세 번 다른 얼굴로 바뀌며, 대관이 주 수익축으로 작동합니다. 카페 코어 10평이 바닥을 지키고, 가변홀 50평이 시간에 따라 전환됩니다.
+            </p>
+            <div style={{marginTop:'36px', display:'flex', flexDirection:'column', gap:'14px'}} className="reveal reveal-delay-3">
+              <div style={{display:'flex', gap:'20px', alignItems:'center'}}>
+                <div style={{width:'36px',height:'1px',background:'var(--amber)',flexShrink:0}}></div>
+                <span style={{fontSize:'0.8rem',color:'var(--mist)'}}>일반음식점 신고 전제 — 와인 서비스 합법 운영</span>
+              </div>
+              <div style={{display:'flex', gap:'20px', alignItems:'center'}}>
+                <div style={{width:'36px',height:'1px',background:'var(--amber)',flexShrink:0}}></div>
+                <span style={{fontSize:'0.8rem',color:'var(--mist)'}}>CAPEX 4,000~5,000만원 내 고정 — 재건축 전 24개월 임시 운영</span>
+              </div>
+              <div style={{display:'flex', gap:'20px', alignItems:'center'}}>
+                <div style={{width:'36px',height:'1px',background:'var(--amber)',flexShrink:0}}></div>
+                <span style={{fontSize:'0.8rem',color:'var(--mist)'}}>무임차 전제 — 업계 평균 대비 고수익률 구조 설계</span>
+              </div>
+            </div>
+          </div>
+          <div className="concept-visual reveal reveal-delay-2">
+            <div className="time-card time-card-1">
+              <div className="time-card-icon">☕</div>
+              <div className="time-card-time">12:00 — 17:00</div>
+              <div className="time-card-title">주간 카페</div>
+              <div className="time-card-desc">자연채광과 식물, 테라스 감성의 라운지형 카페. 커피·논커피 중심 운영. 좌석 체류 품질 우선.</div>
+            </div>
+            <div className="concept-connector cc-1"></div>
+            <div className="time-card time-card-2">
+              <div className="time-card-icon">🍷</div>
+              <div className="time-card-time">18:30 — 23:00</div>
+              <div className="time-card-title">와인 라운지</div>
+              <div className="time-card-desc">조도를 낮춘 저녁 와인 라운지. 글라스 4~6종, 스몰 플레이트. 조용한 모임 공간으로 전환.</div>
+            </div>
+            <div className="concept-connector cc-2"></div>
+            <div className="time-card time-card-3">
+              <div className="time-card-icon">🏛</div>
+              <div className="time-card-time">예약 기반 운영</div>
+              <div className="time-card-title">대관 &amp; 클래스</div>
+              <div className="time-card-desc">세미나·워크숍·프라이빗 파티·전시. 10분 전환 기준. 전관대관 최대 35인.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space" id="space">
+        <div className="space-inner">
+          <div className="section-label reveal">공간 운영 구조</div>
+          <h2 className="section-title reveal reveal-delay-1">60평의 가능성<br/><em>10분 전환 시스템</em></h2>
+          <p className="section-body reveal reveal-delay-2">카페 코어 10평 + 가변홀 50평. 폴딩 테이블·스태킹 체어 기반 10분 전환이 이 사업의 핵심 인프라입니다. 가구를 욕심내면 인건비가 따라옵니다.</p>
+          <div className="space-grid">
+            <div className="space-cell reveal">
+              <div className="space-cell-number">01</div>
+              <div className="space-cell-icon">🏪</div>
+              <div className="space-cell-sub">오더 바 · 커피 스테이션</div>
+              <div className="space-cell-title">카페 코어</div>
+              <div className="space-cell-desc">카페·와인 공용 바. 동선 최단화. 대관 시에도 축소 유지하여 바닥 매출을 지킵니다. 상시 오픈 가능한 최소 운영 거점.</div>
+            </div>
+            <div className="space-cell reveal reveal-delay-1">
+              <div className="space-cell-number">02</div>
+              <div className="space-cell-icon">🎪</div>
+              <div className="space-cell-sub">가변홀 · 50평</div>
+              <div className="space-cell-title">다목적 전환홀</div>
+              <div className="space-cell-desc">세미나·클래스·파티·전시·와인 라운지. 폴딩 테이블과 스태킹 체어로 10분 전환. 빔·스피커·마이크는 수납형 고정.</div>
+            </div>
+            <div className="space-cell reveal reveal-delay-2">
+              <div className="space-cell-number">03</div>
+              <div className="space-cell-icon">🖼</div>
+              <div className="space-cell-sub">갤러리 월</div>
+              <div className="space-cell-title">전시 공간</div>
+              <div className="space-cell-desc">상시 전시 가능. 대관과 병행 운영. 7일 전시 패키지 250만원. 오픈나이트 별도 협의로 추가 수익 창출.</div>
+            </div>
+            <div className="space-cell reveal reveal-delay-3">
+              <div className="space-cell-number">04</div>
+              <div className="space-cell-icon">🌿</div>
+              <div className="space-cell-sub">테라스 무드존</div>
+              <div className="space-cell-title">입구 &amp; 테라스</div>
+              <div className="space-cell-desc">첫인상을 만드는 공간. 식물·자연채광·향·조도. SNS 콘텐츠 촬영 거점. 고객 동선의 시작점이자 브랜드 이미지 형성 공간.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="menu" id="menu">
+        <div className="menu-inner">
+          <div className="section-label reveal">메뉴 전략</div>
+          <h2 className="section-title reveal reveal-delay-1">공간을 방해하지 않는<br/><em>메뉴 설계</em></h2>
+          <p className="section-body reveal reveal-delay-2">조리 복잡도는 낮게 유지합니다. 커피·논커피·와인·스몰 플레이트 네 카테고리로만 재고와 공정을 단순화합니다.</p>
+          <div className="menu-grid">
+            <div className="menu-card reveal">
+              <div className="menu-card-cat">Coffee</div>
+              <div className="menu-card-title">커피</div>
+              <div className="menu-items">
+                <div className="menu-item"><span>에스프레소 / 아메리카노</span><span className="menu-price">4,500~5,500</span></div>
+                <div className="menu-item"><span>라떼 / 플랫화이트</span><span className="menu-price">5,800~6,800</span></div>
+                <div className="menu-item"><span>배치브루</span><span className="menu-price">5,000~5,800</span></div>
+              </div>
+              <div className="menu-rate">목표 원가율 <span>22~27%</span></div>
+              <div style={{marginTop:'14px',fontSize:'0.75rem',color:'var(--stone)',lineHeight:1.7}}>2인 운영 가능 레시피. 한국소비자원 프리미엄 카페 평균가와 동등 또는 소폭 높은 수준.</div>
+            </div>
+            <div className="menu-card reveal reveal-delay-1">
+              <div className="menu-card-cat">Non-Coffee &amp; Wine</div>
+              <div className="menu-card-title">음료 &amp; 와인</div>
+              <div className="menu-items">
+                <div className="menu-item"><span>티 / 허브 에이드</span><span className="menu-price">5,800~7,500</span></div>
+                <div className="menu-item"><span>글라스 와인 (4~6종)</span><span className="menu-price">11,000~13,000</span></div>
+                <div className="menu-item"><span>와인 보틀 (8~12종)</span><span className="menu-price">52,000~98,000</span></div>
+              </div>
+              <div className="menu-rate">와인 목표 원가율 <span>30~42%</span></div>
+              <div style={{marginTop:'14px',fontSize:'0.75rem',color:'var(--stone)',lineHeight:1.7}}>오픈병 회전 우선. SKU 좁게 유지. 화이트·레드·스파클링·오렌지/로제 라인업.</div>
+            </div>
+            <div className="menu-card reveal reveal-delay-2">
+              <div className="menu-card-cat">Small Plates</div>
+              <div className="menu-card-title">스몰 플레이트</div>
+              <div className="menu-items">
+                <div className="menu-item"><span>올리브 &amp; 너트</span><span className="menu-price">9,000~12,000</span></div>
+                <div className="menu-item"><span>치즈 플레이트</span><span className="menu-price">16,000~22,000</span></div>
+                <div className="menu-item"><span>콜드컷 / 브레드</span><span className="menu-price">12,000~18,000</span></div>
+              </div>
+              <div className="menu-rate">목표 원가율 <span>28~35%</span></div>
+              <div style={{marginTop:'14px',fontSize:'0.75rem',color:'var(--stone)',lineHeight:1.7}}>조리보다 플레이팅 중심. 최소한의 키친 투자. 와인 야간 객단가 연동 설계.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="rental" id="rental">
+        <div className="rental-inner">
+          <div className="section-label reveal">대관 가격표</div>
+          <h2 className="section-title reveal reveal-delay-1">공간 대관<br/><em>이익의 레버리지</em></h2>
+          <p className="section-body reveal reveal-delay-2">VAT 별도 가안. 대관 가동률이 이익률을 결정합니다. 전관대관 저녁·주말에는 F&amp;B 최소주문을 함께 설정해야 저수익 예약을 방어할 수 있습니다.</p>
+          <div className="rental-table-wrap reveal reveal-delay-2">
+            <table className="rental-table">
+              <thead>
+                <tr>
+                  <th>상품</th>
+                  <th>구성</th>
+                  <th>평일 주간</th>
+                  <th>평일 저녁</th>
+                  <th>주말/공휴일</th>
+                  <th>비고</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>부분대관 S</td>
+                  <td style={{fontSize:'0.8rem'}}>카페 일부, 8~12인, 2시간</td>
+                  <td className="price">18만원</td>
+                  <td className="price">22만원</td>
+                  <td className="price" style={{color:'var(--amber)'}}>25만원</td>
+                  <td style={{fontSize:'0.78rem'}}>소규모 회의·모임</td>
+                </tr>
+                <tr>
+                  <td>부분대관 M</td>
+                  <td style={{fontSize:'0.8rem'}}>클래스/세미나존, 15~20인, 4시간</td>
+                  <td className="price">45만원</td>
+                  <td className="price">55만원</td>
+                  <td className="price" style={{color:'var(--amber)'}}>60만원</td>
+                  <td style={{fontSize:'0.78rem'}}>빔·스피커 옵션</td>
+                </tr>
+                <tr>
+                  <td>전관대관 Half</td>
+                  <td style={{fontSize:'0.8rem'}}>4시간, 25~35인</td>
+                  <td className="price">65만원</td>
+                  <td className="price">85만원</td>
+                  <td className="price" style={{color:'var(--amber)'}}>95만원</td>
+                  <td style={{fontSize:'0.78rem'}}>행사·오프닝·촬영</td>
+                </tr>
+                <tr>
+                  <td>전관대관 Full</td>
+                  <td style={{fontSize:'0.8rem'}}>8시간, 25~35인</td>
+                  <td className="price">110만원</td>
+                  <td className="price">140만원</td>
+                  <td className="price" style={{color:'var(--amber)'}}>160만원</td>
+                  <td style={{fontSize:'0.78rem'}}>종일 워크숍·전시</td>
+                </tr>
+                <tr>
+                  <td>전시 패키지</td>
+                  <td style={{fontSize:'0.8rem'}}>7일, 벽면 사용, 오픈나이트 별도</td>
+                  <td className="price" colSpan={3} style={{textAlign:'center'}}>250만원</td>
+                  <td style={{fontSize:'0.78rem'}}>설치·철수 협의</td>
+                </tr>
+                <tr>
+                  <td>오버타임</td>
+                  <td style={{fontSize:'0.8rem'}}>1시간당 (30분 초과 시 1시간 적용)</td>
+                  <td className="price">10만원</td>
+                  <td className="price">12만원</td>
+                  <td className="price" style={{color:'var(--amber)'}}>12만원</td>
+                  <td style={{fontSize:'0.78rem'}}>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="rental-note reveal reveal-delay-3">
+            <strong>F&amp;B Minimum Spend 정책</strong>: 전관대관 저녁 30만원, 주말 50만원 최소 주문 필수 적용. 이 조항 없이 운영 시 "공간만 쓰고 음료는 거의 안 사는" 저수익 예약이 지속됩니다. 예약 확정은 계약금 20% 입금 시점. 외부 주류 반입 금지, 협의 시 corkage 별도 부과.
+          </div>
+        </div>
+      </section>
+
+      {/* NUMBERS */}
+      <section className="numbers" id="numbers">
+        <div className="numbers-inner">
+          <div className="numbers-header">
+            <div>
+              <div className="section-label reveal">재무 시나리오</div>
+              <h2 className="section-title reveal reveal-delay-1">현실적인<br/><em>수익 모델</em></h2>
+            </div>
+            <p className="section-body reveal reveal-delay-2">
+              카페 바닥 매출로 고정비를 방어하고, 대관과 와인으로 이익을 창출합니다. 
+              객단가가 높은 야간 시간대와 대관 비중이 높아질수록 영업이익률이 급증하는 구조입니다.
+            </p>
+          </div>
+          <div className="scenario-cards reveal reveal-delay-3">
+            <div className="scenario-card">
+              <div className="scenario-name">Conservative</div>
+              <div className="scenario-revenue">1,800</div>
+              <div className="scenario-unit">만원 / 월 매출</div>
+              <div className="scenario-stats">
+                <div className="stat-row">
+                  <span className="stat-label">예상 영업이익</span>
+                  <span className="stat-value">350 만원</span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">대관 가동률</span>
+                  <span className="stat-value">주 2회</span>
+                </div>
+              </div>
+            </div>
+            <div className="scenario-card featured">
+              <div className="scenario-name highlight">Base Target</div>
+              <div className="scenario-revenue">2,500</div>
+              <div className="scenario-unit">만원 / 월 매출</div>
+              <div className="scenario-stats">
+                <div className="stat-row">
+                  <span className="stat-label">예상 영업이익</span>
+                  <span className="stat-value gold">800 만원 (32%)</span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">대관 가동률</span>
+                  <span className="stat-value">주 4회</span>
+                </div>
+              </div>
+            </div>
+            <div className="scenario-card">
+              <div className="scenario-name">Optimistic</div>
+              <div className="scenario-revenue">3,200</div>
+              <div className="scenario-unit">만원 / 월 매출</div>
+              <div className="scenario-stats">
+                <div className="stat-row">
+                  <span className="stat-label">예상 영업이익</span>
+                  <span className="stat-value">1,350 만원</span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">대관 가동률</span>
+                  <span className="stat-value">주 6회</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CHART */}
+      <section className="chart-section" id="chart-section">
+        <div className="chart-inner">
+          <div className="chart-header">
+            <div>
+              <div className="section-label reveal">시뮬레이션</div>
+              <h2 className="section-title reveal reveal-delay-1">12개월<br/><em>성장 곡선</em></h2>
+            </div>
+          </div>
+          <div className="chart-wrap reveal reveal-delay-2">
+            <div className="chart-bars">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => {
+                const rev = 1200 + (m * 150) + (Math.random()*200);
+                const prof = rev * (0.15 + (m * 0.015));
+                return (
+                  <div key={m} className="chart-col">
+                    <div className="bar-revenue" style={{height: `${(rev/4000)*100}%`}}></div>
+                    <div className="bar-profit" style={{height: `${(prof/rev)*100}%`}}></div>
+                    <div className="chart-tooltip">매출: {Math.round(rev)}만<br/>이익: {Math.round(prof)}만</div>
+                    <div className="month-label">Month {m}</div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+          <div className="chart-legend reveal reveal-delay-3">
+            <div className="legend-item"><div className="legend-dot" style={{background: 'linear-gradient(to top, rgba(107,39,55,0.8), rgba(139,58,74,0.4))'}}></div>예상 매출</div>
+            <div className="legend-item"><div className="legend-dot" style={{background: 'linear-gradient(to top, var(--amber), rgba(201,150,58,0.3))'}}></div>예상 이익</div>
+          </div>
+        </div>
+      </section>
+
+      {/* TEAM */}
+      <section className="team" id="team">
+        <div className="team-inner">
+          <div className="section-label reveal">인력 구조</div>
+          <h2 className="section-title reveal reveal-delay-1">초경량<br/><em>조직도</em></h2>
+          <p className="section-body reveal reveal-delay-2">오너 중심의 직영 구조와 탄력적인 파트타임 활용으로 고정 인건비를 월 400만원 이하로 통제합니다.</p>
+          <div className="team-grid">
+            <div className="team-card reveal">
+              <div className="team-role">Director</div>
+              <div className="team-name">오너 (본인)</div>
+              <div className="team-hours">주 6일 / 풀타임 상주</div>
+              <div className="team-salary">수익 배분</div>
+              <div className="team-salary-unit">순이익 100% 귀속</div>
+              <div className="team-tasks">
+                <div className="team-task">총괄 운영 및 공간 관리</div>
+                <div className="team-task">대관 B2B 세일즈</div>
+                <div className="team-task">메인 바리스타/소믈리에</div>
+              </div>
+            </div>
+            <div className="team-card reveal reveal-delay-1">
+              <div className="team-role">Day Staff</div>
+              <div className="team-name">주간 매니저</div>
+              <div className="team-hours">평일 11:00 - 16:00</div>
+              <div className="team-salary">120</div>
+              <div className="team-salary-unit">만원 / 월 (예상)</div>
+              <div className="team-tasks">
+                <div className="team-task">오픈 세팅 및 청소</div>
+                <div className="team-task">주간 카페 음료 제조</div>
+                <div className="team-task">오너 휴게시간 보장</div>
+              </div>
+            </div>
+            <div className="team-card reveal reveal-delay-2">
+              <div className="team-role">Night Staff</div>
+              <div className="team-name">야간 파트타임</div>
+              <div className="team-hours">금/토 18:00 - 23:00</div>
+              <div className="team-salary">80</div>
+              <div className="team-salary-unit">만원 / 월 (예상)</div>
+              <div className="team-tasks">
+                <div className="team-task">야간 와인 서빙</div>
+                <div className="team-task">스몰 플레이트 조리 보조</div>
+                <div className="team-task">마감 정리</div>
+              </div>
+            </div>
+            <div className="team-card reveal reveal-delay-3">
+              <div className="team-role">Event Staff</div>
+              <div className="team-name">대관 전담 스태프</div>
+              <div className="team-hours">행사 발생 시 호출</div>
+              <div className="team-salary">시급</div>
+              <div className="team-salary-unit">15,000원 + 알파</div>
+              <div className="team-tasks">
+                <div className="team-task">행사 F&B 케이터링 보조</div>
+                <div className="team-task">가구 레이아웃 전환 세팅</div>
+                <div className="team-task">주차 및 동선 안내</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* RISK */}
+      <section className="risk">
+        <div className="risk-inner">
+          <div className="section-label reveal">리스크 대응</div>
+          <h2 className="section-title reveal reveal-delay-1">예상 리스크 &amp;<br/><em>대응 계획</em></h2>
+          <div className="risk-grid">
+            <div className="risk-card reveal">
+              <div className="risk-title">대관 미달</div>
+              <div className="risk-trigger">📊 징후: 월 대관 6건 미만, 주말 공실 지속</div>
+              <div className="risk-response">가격표 재조정, 부분대관 S 상품 확대. B2B 아웃바운드 강화. 인근 오피스·크리에이터 커뮤니티 타겟 직접 영업.</div>
+            </div>
+            <div className="risk-card reveal reveal-delay-1">
+              <div className="risk-title">카페 매출 저조</div>
+              <div className="risk-trigger">📊 징후: 평일 낮 테이블 점유율 저하</div>
+              <div className="risk-response">Quiet Work Session, 워크패스 프로그램 도입. 인근 오피스·프리랜서 대상 월정액 카드. 주간 고정 고객 확보 우선.</div>
+            </div>
+            <div className="risk-card reveal reveal-delay-2">
+              <div className="risk-title">와인 서비스 피로</div>
+              <div className="risk-trigger">📊 징후: 저녁 민원·소음·과음 사고</div>
+              <div className="risk-response">와인 SKU 축소, 라스트오더 22:00 엄격화. 21시 이후 BGM 다운, 팀 간 간섭 통제. "조용한 와인 라운지" 선 유지.</div>
+            </div>
+            <div className="risk-card reveal">
+              <div className="risk-title">인건비 과다</div>
+              <div className="risk-trigger">📊 징후: 오너 제외 인건비 700만원 초과</div>
+              <div className="risk-response">월요일 휴무 고정 준수. 예약형 스팟만 호출하는 원칙 유지. 파트 확충보다 영업일 축소 우선 검토.</div>
+            </div>
+            <div className="risk-card reveal reveal-delay-1">
+              <div className="risk-title">인허가·민원</div>
+              <div className="risk-trigger">📊 징후: 소음, 주류 관련 민원, 청소년 이슈</div>
+              <div className="risk-response">일반음식점 준수 사항 고정. CCTV 바 앞 각도 유지. "90년대생처럼 보이지 않으면 무조건 신분증 확인" 실무 기준 적용.</div>
+            </div>
+            <div className="risk-card reveal reveal-delay-2">
+              <div className="risk-title">재건축 일정 변동</div>
+              <div className="risk-trigger">📊 징후: 종료 시점 불확실</div>
+              <div className="risk-response">3개월 전 신규 장기예약 제한. 장비 매각 리스트 사전 작성. 에스프레소 머신·AV·폴딩가구 중고 회수 계획 선수립.</div>
+            </div>
+          </div>
+        </div>
+      </section>
       
-      {/* Hero Section */}
-      <section className="text-center space-y-6 py-12 bg-[#5d4037] rounded-3xl text-white shadow-xl relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative z-10 px-4">
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">Terrazza</h1>
-          <p className="text-xl md:text-2xl font-light text-orange-100 max-w-2xl mx-auto">
-            성공적인 론칭을 위한 광고 운영 및 행사 실행 전략
-          </p>
-          <div className="mt-8 w-24 h-1 bg-orange-400 mx-auto rounded-full"></div>
-        </div>
-      </section>
-
-      {/* Vision & Mission */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-orange-100">
-          <div className="flex items-center gap-3 mb-4 text-[#5d4037]">
-            <Target size={28} />
-            <h2 className="text-2xl font-bold">우리의 비전</h2>
-          </div>
-          <p className="text-gray-600 leading-relaxed text-lg">
-            Terrazza는 단순한 대여 공간이 아닌, 사람들이 모여 <span className="font-bold text-[#5d4037]">새로운 관계</span>를 맺고, 
-            영감을 나누며 잊지 못할 경험을 만들어가는 <span className="font-bold text-[#5d4037]">강남의 새로운 문화 거점</span>이 되는 것을 목표로 합니다.
-          </p>
-        </div>
-        <div className="bg-orange-50 p-8 rounded-2xl border border-orange-100">
-          <div className="flex items-center gap-3 mb-4 text-orange-800">
-            <Briefcase size={28} />
-            <h2 className="text-2xl font-bold">현실적인 과제</h2>
-          </div>
-          <ul className="space-y-4">
-            <li className="flex items-start gap-3 text-gray-700">
-              <span className="bg-orange-200 text-orange-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
-              <span>수많은 경쟁 공간 속에서 Terrazza의 존재를 어떻게 각인시킬 것인가?</span>
-            </li>
-            <li className="flex items-start gap-3 text-gray-700">
-              <span className="bg-orange-200 text-orange-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
-              <span>단발성 방문객을 어떻게 충성도 높은 커뮤니티 멤버로 전환할 것인가?</span>
-            </li>
-            <li className="flex items-start gap-3 text-gray-700">
-              <span className="bg-orange-200 text-orange-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
-              <span>초기 인지도를 성공적으로 확보하고 안정적인 운영 기반을 마련할 것인가?</span>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      {/* Two Core Strategies */}
-      <section>
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-[#3e2723] mb-2">하나의 목표를 위한 두 개의 핵심 전략</h2>
-          <p className="text-gray-500">Digital Reach & Community Building</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-          {/* Connector Line (Desktop) */}
-          <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 bg-white border border-gray-200 p-2 rounded-full shadow-md">
-             <span className="font-bold text-[#5d4037] px-2">Terrazza</span>
-          </div>
-
-          {/* Strategy 1 */}
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-8 rounded-3xl shadow-lg relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Smartphone size={120} />
-            </div>
-            <h3 className="text-xl font-bold text-blue-200 mb-2 uppercase tracking-widest">Strategy 01</h3>
-            <h4 className="text-2xl font-bold mb-4">압도적인 디지털 리치<br/>(Digital Reach)</h4>
-            <p className="text-slate-300 mb-6 leading-relaxed">
-              잠재 고객이 있는 모든 디지털 채널에 Terrazza를 노출시켜, 인지도를 극대화하고 결정적 순간에 선택받는 전략입니다.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-slate-700 rounded-full text-xs">#타겟광고</span>
-              <span className="px-3 py-1 bg-slate-700 rounded-full text-xs">#검색최적화</span>
-              <span className="px-3 py-1 bg-slate-700 rounded-full text-xs">#플랫폼입점</span>
-            </div>
-          </div>
-
-          {/* Strategy 2 */}
-          <div className="bg-gradient-to-br from-[#5d4037] to-[#3e2723] text-white p-8 rounded-3xl shadow-lg relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Users size={120} />
-            </div>
-            <h3 className="text-xl font-bold text-orange-200 mb-2 uppercase tracking-widest">Strategy 02</h3>
-            <h4 className="text-2xl font-bold mb-4">강력한 커뮤니티 구축<br/>(Community Building)</h4>
-            <p className="text-orange-100/80 mb-6 leading-relaxed">
-              오프라인 경험을 통해 방문객을 팬으로 만들고, 지속적인 관계를 형성하여 자발적인 바이럴을 유도하는 전략입니다.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-[#4e342e] border border-orange-900/50 rounded-full text-xs">#오프닝이벤트</span>
-              <span className="px-3 py-1 bg-[#4e342e] border border-orange-900/50 rounded-full text-xs">#시그니처프로그램</span>
-              <span className="px-3 py-1 bg-[#4e342e] border border-orange-900/50 rounded-full text-xs">#B2B네트워킹</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Digital Channel Detail */}
-      <section>
-        <h3 className="text-2xl font-bold text-[#3e2723] mb-8 border-l-4 border-orange-500 pl-4">
-          전략 1: 디지털 채널 포트폴리오
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-400 transition-colors shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-bold text-lg">META (IG/FB)</h4>
-              <Smartphone className="text-blue-600" />
-            </div>
-            <p className="text-sm text-gray-600 mb-4 min-h-[40px]">
-              단순 노출을 넘어 행동을 유도하는 퀄리티 리치 전략
-            </p>
-            <div className="space-y-2 text-xs bg-gray-50 p-3 rounded">
-              <div className="flex gap-2">
-                <span className="font-bold text-blue-800">M3</span>
-                <span>단기간 타겟 40~60% 도달</span>
+      {/* CAPEX */}
+      <section className="capex" id="capex">
+        <div className="capex-inner">
+          <div className="section-label reveal">투자금 및 회수</div>
+          <h2 className="section-title reveal reveal-delay-1">CAPEX<br/><em>4,500만원의 기적</em></h2>
+          <div className="capex-big">
+            <div className="capex-visual reveal reveal-delay-2">
+              <div className="capex-center-label">
+                <div className="capex-total">4,500</div>
+                <div className="capex-total-label">Total CAPEX (만원)</div>
               </div>
-              <div className="flex gap-2">
-                <span className="font-bold text-blue-800">Story</span>
-                <span>브랜드 메시지 깊이 각인</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl border border-gray-200 hover:border-green-400 transition-colors shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-bold text-lg">NAVER Place</h4>
-              <MapPin className="text-green-600" />
-            </div>
-            <p className="text-sm text-gray-600 mb-4 min-h-[40px]">
-              '강남 파티룸' 등 명확한 목적을 가진 고객의 최종 결정 단계 선점
-            </p>
-            <div className="space-y-2 text-xs bg-gray-50 p-3 rounded">
-              <div>✅ 지도 검색 광고 집행</div>
-              <div>✅ 플레이스 상위 노출 최적화</div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl border border-gray-200 hover:border-orange-400 transition-colors shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-bold text-lg">당근마켓</h4>
-              <MapPin className="text-orange-600" />
-            </div>
-            <p className="text-sm text-gray-600 mb-4 min-h-[40px]">
-              반포, 서초 등 핵심 상권 내 지역 주민 대상 정밀 타겟팅
-            </p>
-            <div className="space-y-2 text-xs bg-gray-50 p-3 rounded">
-              <div>🎯 서초구 내곡동, 반포1~5동 타겟</div>
-              <div>👥 예상 타겟 약 41만명 도달</div>
-            </div>
-          </div>
-          
-           <div className="bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-400 transition-colors shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-bold text-lg">플랫폼 (SpaceCloud)</h4>
-              <Layout className="text-purple-600" />
-            </div>
-            <p className="text-sm text-gray-600 mb-4 min-h-[40px]">
-              대관 목적 고객에게 직접 노출하는 핵심 판매 채널
-            </p>
-            <div className="space-y-2 text-xs bg-gray-50 p-3 rounded">
-              <div>⭐ '강남 대형 파티룸' 키워드 선점</div>
-              <div>📸 매력적인 대표 사진 세팅</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Offline Strategy Roadmap */}
-      <section>
-        <h3 className="text-2xl font-bold text-[#3e2723] mb-8 border-l-4 border-orange-500 pl-4">
-          전략 2: 오프라인 경험 로드맵
-        </h3>
-        
-        <div className="relative border-l-2 border-orange-200 ml-4 md:ml-6 space-y-12 pb-8">
-          {/* Phase 1 */}
-          <div className="relative pl-8 md:pl-12">
-            <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-orange-500 ring-4 ring-orange-100"></div>
-            <h4 className="text-lg font-bold text-orange-800 mb-1">Phase 1: 론칭 이벤트 (첫인상)</h4>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-orange-100 mt-3">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h5 className="font-bold mb-2 flex items-center gap-2"><Calendar size={16}/> Soft Opening Week</h5>
-                  <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
-                    <li>운영 프로세스 최종 점검 및 리허설</li>
-                    <li>초기 리뷰, 사진 등 온라인 확산용 콘텐츠 확보</li>
-                    <li>100% 예약제 (타임 슬롯 운영)</li>
-                  </ul>
+              <div className="capex-breakdown">
+                <div className="capex-row">
+                  <div className="capex-bar-label">인테리어/시공</div>
+                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '45%'}}></div></div>
+                  <div className="capex-bar-value">2,000</div>
                 </div>
-                <div>
-                  <h5 className="font-bold mb-2 flex items-center gap-2"><Heart size={16}/> Terrazza Open Table</h5>
-                  <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
-                    <li>저녁 와인 라운지로서의 정체성 강화</li>
-                    <li>동네 주민 및 직장인 대상 고정 고객 확보</li>
-                    <li>웰컴 와인 1잔 및 스몰 플레이트 제공</li>
-                  </ul>
+                <div className="capex-row">
+                  <div className="capex-bar-label">가구/조명</div>
+                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '25%', animationDelay: '0.2s'}}></div></div>
+                  <div className="capex-bar-value">1,100</div>
+                </div>
+                <div className="capex-row">
+                  <div className="capex-bar-label">에스프레소 머신 등</div>
+                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '20%', animationDelay: '0.4s'}}></div></div>
+                  <div className="capex-bar-value">900</div>
+                </div>
+                <div className="capex-row">
+                  <div className="capex-bar-label">초기 마케팅/비품</div>
+                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: '10%', animationDelay: '0.6s'}}></div></div>
+                  <div className="capex-bar-value">500</div>
+                </div>
+              </div>
+            </div>
+            <div className="capex-recovery reveal reveal-delay-3">
+              <div className="recovery-title">Payback Period</div>
+              <div className="recovery-sub">무권리/무보증 전제하에 압도적인 투자금 회수 속도를 달성합니다.</div>
+              <div className="recovery-bars">
+                <div className="recovery-item">
+                  <div className="recovery-scenario"><span className="rec-name">Conservative</span><span className="rec-month">12 Months</span></div>
+                  <div className="recovery-track"><div className="recovery-fill rf-conservative"></div></div>
+                </div>
+                <div className="recovery-item">
+                  <div className="recovery-scenario"><span className="rec-name">Base Target</span><span className="rec-month">6 Months</span></div>
+                  <div className="recovery-track"><div className="recovery-fill rf-base" style={{animationDelay: '0.2s'}}></div></div>
+                </div>
+                <div className="recovery-item">
+                  <div className="recovery-scenario"><span className="rec-name">Optimistic</span><span className="rec-month">3.5 Months</span></div>
+                  <div className="recovery-track"><div className="recovery-fill rf-optimistic" style={{animationDelay: '0.4s'}}></div></div>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Phase 2 */}
-          <div className="relative pl-8 md:pl-12">
-            <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-orange-400 ring-4 ring-orange-100"></div>
-            <h4 className="text-lg font-bold text-orange-800 mb-1">Phase 2: 팬덤 형성 (시그니처)</h4>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mt-3">
-              <p className="text-sm text-gray-600 mb-3">
-                '오픈 테이블'과 같은 정기적인 이벤트를 통해 고정 고객을 만들고 Terrazza만의 문화를 구축합니다.
-              </p>
-            </div>
-          </div>
-
-          {/* Phase 3 */}
-          <div className="relative pl-8 md:pl-12">
-             <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#5d4037] ring-4 ring-orange-100"></div>
-            <h4 className="text-lg font-bold text-[#5d4037] mb-1">Phase 3: 비즈니스 확장 (B2B)</h4>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mt-3">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h5 className="font-bold mb-2 text-sm text-gray-800">Daytime: 원데이 클래스</h5>
-                  <p className="text-sm text-gray-600">클래스 수강생들에게 공간을 자연스럽게 알리고, 잠재적인 대관 고객으로 전환</p>
-                </div>
-                <div>
-                  <h5 className="font-bold mb-2 text-sm text-gray-800">Evening: 미니 세미나</h5>
-                  <p className="text-sm text-gray-600">기업 행사 담당자 초청, 공간 시설과 케이터링 직접 경험 유도</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Growth Cycle */}
-      <section className="bg-[#fff3e0] rounded-3xl p-8 text-center">
-        <div className="flex flex-col items-center mb-8">
-           <Repeat className="text-orange-600 mb-4" size={48} />
-           <h3 className="text-2xl font-bold text-[#5d4037]">선순환 성장 모델 (Flywheel)</h3>
-           <p className="text-orange-800/70 mt-2">디지털과 오프라인이 만나 만드는 강력한 시너지</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-           {[
-             { title: "1. 디지털 광고", desc: "인지도 상승 & 신규 유입" },
-             { title: "2. 행사 참여", desc: "오프라인 경험 & 만족도" },
-             { title: "3. 자발적 공유", desc: "리뷰 및 UGC 생성" },
-             { title: "4. 2차 확산", desc: "신뢰도 높은 광고 소재 확보" }
-           ].map((step, idx) => (
-             <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-orange-100 relative">
-                {idx < 3 && <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-orange-300">▶</div>}
-                <div className="font-bold text-[#5d4037] mb-1">{step.title}</div>
-                <div className="text-xs text-gray-500">{step.desc}</div>
-             </div>
-           ))}
-        </div>
-      </section>
-
-      {/* Budget Allocation */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-           <h3 className="text-2xl font-bold text-[#3e2723]">마케팅 예산 배분</h3>
-           <span className="text-sm font-bold bg-[#5d4037] text-white px-3 py-1 rounded-full">Total: 3,500만원 / 연</span>
-        </div>
-        
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-           <div className="flex flex-col md:flex-row gap-8 items-center">
-             <div className="flex-1 w-full space-y-4">
-               <div className="flex justify-between items-end">
-                 <span className="font-bold text-lg text-gray-700">Online Marketing</span>
-                 <span className="text-2xl font-black text-blue-600">60%</span>
-               </div>
-               <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
-                 <div className="bg-blue-500 h-full rounded-full" style={{width: '60%'}}></div>
-               </div>
-               <p className="text-sm text-gray-500">씨앗 뿌리기 - 잠재 고객에게 브랜드를 각인시키다 (2,100만원)</p>
-               <div className="flex gap-2 mt-2">
-                 <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">플랫폼</span>
-                 <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">META광고</span>
-                 <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">지역광고</span>
-               </div>
-             </div>
-             
-             <div className="hidden md:block w-px h-32 bg-gray-200"></div>
-
-             <div className="flex-1 w-full space-y-4">
-               <div className="flex justify-between items-end">
-                 <span className="font-bold text-lg text-gray-700">Offline Event</span>
-                 <span className="text-2xl font-black text-orange-600">40%</span>
-               </div>
-               <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
-                 <div className="bg-orange-500 h-full rounded-full" style={{width: '40%'}}></div>
-               </div>
-               <p className="text-sm text-gray-500">열매 맺기 - 방문객을 충성 고객으로 만들다 (1,400만원)</p>
-               <div className="flex gap-2 mt-2">
-                 <span className="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded">소프트오픈</span>
-                 <span className="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded">오픈테이블</span>
-                 <span className="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded">쇼케이스</span>
-               </div>
-             </div>
-           </div>
-        </div>
-      </section>
-
-      {/* Footer / Future Vision */}
-      <section className="text-center space-y-6 pt-12 border-t border-gray-200">
-        <h3 className="text-2xl font-bold text-[#5d4037]">우리가 함께 만들어갈 Terrazza의 미래</h3>
-        <p className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          우리의 전략은 단순히 공간을 채우는 것을 넘어섭니다.<br/>
-          체계적인 디지털 전략으로 <span className="text-[#5d4037] font-bold">가장 먼저 기억되는 공간</span>이 되고,<br/>
-          진정성 있는 오프라인 경험으로 <span className="text-[#5d4037] font-bold">다시 찾고 싶은 공간</span>이 될 것입니다.
-        </p>
-        <div className="text-sm text-gray-400 mt-8">
-           사람과 이야기가 모이고, 새로운 기회가 시작되는 커뮤니티의 중심
         </div>
       </section>
 
     </div>
   );
 };
+

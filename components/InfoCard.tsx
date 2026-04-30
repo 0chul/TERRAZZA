@@ -8,15 +8,21 @@ interface InfoCardProps {
   colorClass?: string;
 }
 
-export const InfoCard: React.FC<InfoCardProps> = ({ title, value, subValue, icon, colorClass = "bg-white" }) => {
+export const InfoCard: React.FC<InfoCardProps> = ({ title, value, subValue, icon }) => {
   return (
-    <div className={`${colorClass} p-6 rounded-xl shadow-sm border border-gray-100`}>
+    <div style={{
+      background: 'var(--bg-card)',
+      backdropFilter: 'blur(12px)',
+      border: '1px solid rgba(201, 150, 58, 0.15)',
+      borderRadius: '16px',
+      padding: '24px'
+    }}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-        <div className="text-gray-400">{icon}</div>
+        <h3 className="text-sm font-medium" style={{color: 'var(--mist)'}}>{title}</h3>
+        <div style={{color: 'var(--amber)'}}>{icon}</div>
       </div>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
-      {subValue && <div className="text-xs font-medium text-gray-500 mt-1">{subValue}</div>}
+      <div className="text-2xl font-bold" style={{color: 'var(--cream)'}}>{value}</div>
+      {subValue && <div className="text-xs mt-2" style={{color: 'var(--stone)'}}>{subValue}</div>}
     </div>
   );
 };

@@ -21,16 +21,14 @@ import { DEFAULT_CONFIG, INITIAL_TODOS } from './constants';
 import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, Scenario } from './types';
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
-import { TodoTab } from './components/TodoTab';
 import { BusinessPlanTab } from './components/BusinessPlanTab';
 import { InteriorCostTab } from './components/InteriorCostTab';
 import { dbService } from './db';
 
 enum Tab {
+  PLAN = 'plan',
   DASHBOARD = 'dashboard',
   PLANNER = 'planner',
-  TODO = 'todo',
-  PLAN = 'plan',
   INTERIOR = 'interior',
 }
 
@@ -41,7 +39,7 @@ const WEEKEND_MONTHLY_RATE = 861200;
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>(Tab.DASHBOARD);
+  const [activeTab, setActiveTab] = useState<Tab>(Tab.PLAN);
   
   // Load current draft from localStorage or fallback to DEFAULT_CONFIG (Cafe Focused)
   const [config, setConfig] = useState<GlobalConfig>(() => {
@@ -73,7 +71,6 @@ export default function App() {
   }, []);
 
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
-  const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
   const [projectionMonths, setProjectionMonths] = useState(12);
 
   // Automatically persist current draft whenever it changes (auto-save draft only)
@@ -148,24 +145,6 @@ export default function App() {
     if (window.confirm("현재 작업 중인 내용을 초기화하시겠습니까?\n저장되지 않은 변경사항은 삭제됩니다.")) {
        setConfig({ ...DEFAULT_CONFIG });
        setActiveScenarioId(null);
-    }
-  };
-
-  // Todo Actions
-  const handleAddTodo = (category: string, task: string, note: string) => {
-    const newTodo: TodoItem = {
-      id: generateId(),
-      category,
-      task,
-      note,
-      completed: false
-    };
-    setTodos(prev => [newTodo, ...prev]);
-  };
-
-  const handleDeleteTodo = (id: string) => {
-    if (window.confirm("항목을 삭제하시겠습니까?")) {
-      setTodos(prev => prev.filter(t => t.id !== id));
     }
   };
 
@@ -310,18 +289,18 @@ export default function App() {
   }, [monthlyData]);
 
   return (
-    <div className="min-h-screen bg-[#fdfcfb] font-sans text-[#3e2723]">
-      <header className="bg-white border-b border-orange-100 shadow-sm backdrop-blur-md bg-white/90">
+    <div className="min-h-screen font-sans">
+      <header className="bg-[var(--dark)] border-b border-[rgba(201,150,58,0.2)] shadow-sm backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col w-full gap-4 py-4">
             <div className="flex justify-between items-center w-full px-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-[#5d4037] rounded-lg shadow-sm">
-                  <Layout className="text-white" size={20} />
+                <div className="p-2 bg-[var(--charcoal)] border border-[rgba(201,150,58,0.3)] rounded-lg shadow-sm">
+                  <Layout className="text-[var(--amber)]" size={20} />
                 </div>
-                <div className="border-l border-orange-100 pl-3">
-                  <span className="font-bold text-base tracking-tight block leading-tight text-[#5d4037]">Terrazza Lounge</span>
-                  <span className="text-[9px] text-orange-600 font-black uppercase tracking-[0.1em]">Business Planner</span>
+                <div className="border-l border-[rgba(201,150,58,0.2)] pl-3">
+                  <span className="font-bold text-base tracking-tight block leading-tight text-[var(--cream)]" style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: "0.1em" }}>Terrazza Lounge</span>
+                  <span className="text-[9px] text-[var(--amber)] font-black uppercase tracking-[0.2em]">Business Planner</span>
                 </div>
               </div>
             </div>
@@ -329,18 +308,17 @@ export default function App() {
         </div>
       </header>
       
-      <nav className="flex flex-wrap gap-1 bg-orange-50/70 p-1 rounded-xl justify-center mx-4 sticky top-0 z-50 shadow-sm">
+      <nav className="flex flex-wrap gap-1 border p-1.5 rounded-xl justify-center mx-4 sticky top-0 z-50 shadow-sm backdrop-blur-md mt-4" style={{background: 'rgba(42, 36, 32, 0.6)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
         {[
-          { id: Tab.DASHBOARD, label: '대시보드', icon: <TrendingUp size={14} /> },
+          { id: Tab.PLAN, label: '사업계획', icon: <Presentation size={14} /> },
+          { id: Tab.DASHBOARD, label: '재무계획', icon: <TrendingUp size={14} /> },
           { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={14} /> },
-          { id: Tab.TODO, label: '체크리스트', icon: <CheckSquare size={14} /> },
-          { id: Tab.PLAN, label: '사업 계획', icon: <Presentation size={14} /> },
           { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={14} /> },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as Tab)}
-            className={`flex items-center space-x-1 px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[#5d4037] text-white shadow-sm' : 'text-slate-500 hover:text-[#5d4037] hover:bg-white'}`}
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[var(--amber)] text-[var(--black)] shadow-sm' : 'text-[var(--mist)] hover:text-[var(--amber)] hover:bg-[rgba(201,150,58,0.1)]'}`}
           >
             {tab.icon}
             <span>{tab.label}</span>
@@ -348,41 +326,44 @@ export default function App() {
         ))}
       </nav>
 
-      <div className="bg-[#fff9f5] border-b border-orange-100 py-2.5">
+      <div className="bg-[var(--dark)] border-b border-t border-[rgba(201,150,58,0.1)] py-2.5 mt-4">
         <div className="max-w-7xl mx-auto px-4 flex flex-col items-center justify-between gap-4">
           
-          <div className="flex items-center gap-2 text-xs text-orange-800 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100 w-full md:w-auto">
-             <Database size={14} className="text-orange-500"/>
+          <div className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg border w-full md:w-auto" style={{background: 'var(--charcoal)', color: 'var(--mist)', borderColor: 'rgba(201, 150, 58, 0.2)'}}>
+             <Database size={14} className="text-[var(--amber)]"/>
              <span className="font-bold">Database:</span>
              <span>Local IndexedDB Active</span>
           </div>
 
           {/* Right Side: Saved Plans & Draft Actions */}
-          <div className="flex flex-col md:flex-row items-center gap-3 w-full border-t md:border-t-0 pt-2.5 md:pt-0 border-orange-100">
-             <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest whitespace-nowrap flex items-center gap-1">
+          <div className="flex flex-col md:flex-row items-center gap-3 w-full border-t md:border-t-0 pt-2.5 md:pt-0 border-[rgba(201,150,58,0.1)]">
+             <span className="text-[10px] font-black text-[var(--amber)] uppercase tracking-widest whitespace-nowrap flex items-center gap-1">
                <Copy size={12}/> My Plans (DB):
              </span>
              
              {/* Saved Scenarios List */}
              <div className="flex gap-1.5 overflow-x-auto scrollbar-hide items-center w-full md:max-w-none">
               {scenarios.map(s => (
-                <div key={s.id} className={`flex items-center bg-white border rounded-lg pl-2 pr-1 h-7 shadow-sm transition-all group ${activeScenarioId === s.id ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-orange-100 text-slate-600'}`}>
+                <div key={s.id} className={`flex items-center bg-[var(--charcoal)] border rounded-lg pl-2 pr-1 h-7 shadow-sm transition-all group ${activeScenarioId === s.id ? 'border-[var(--amber)] text-[var(--amber)]' : 'border-[rgba(201,150,58,0.2)] text-[var(--mist)]'}`}>
                   <button onClick={() => loadScenario(s.id)} className="text-[10px] font-bold mr-1 whitespace-nowrap">
                     {s.name}
                   </button>
-                  <button onClick={(e) => deleteScenario(s.id, e)} className="p-0.5 text-orange-200 hover:text-rose-500 rounded hover:bg-rose-50 transition-colors"><Trash2 size={10} /></button>
+                  <button onClick={(e) => deleteScenario(s.id, e)} className="p-0.5 text-[var(--mist)] hover:text-red-400 rounded hover:bg-red-400/10 transition-colors"><Trash2 size={10} /></button>
                 </div>
               ))}
-              {scenarios.length === 0 && <span className="text-[10px] text-gray-400 italic">저장된 계획 없음</span>}
+              {scenarios.length === 0 && <span className="text-[10px] text-[var(--stone)] nitalic">저장된 계획 없음</span>}
              </div>
               
               {/* Current Draft Action Buttons */}
-              <div className="flex items-center gap-1 md:ml-2 border-t md:border-t-0 md:border-l border-orange-200 pt-2.5 md:pt-0 md:pl-3 w-full md:w-auto justify-center">
-                 {/* Reset Button: Contextually placed with current draft actions */}
+              <div className="flex items-center gap-1 md:ml-2 border-t md:border-t-0 md:border-l pt-2.5 md:pt-0 md:pl-3 w-full md:w-auto justify-center" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+                 {/* Reset Button */}
                  <button 
                     onClick={resetConfig}
-                    className="px-2 h-7 bg-slate-100 border border-slate-200 text-slate-500 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm hover:bg-slate-200 transition-all whitespace-nowrap"
+                    className="px-2 h-7 rounded-lg text-[10px] border flex items-center gap-1 shadow-sm transition-all whitespace-nowrap"
                     title="입력값 초기화 (현재 드래프트 리셋)"
+                    style={{background: 'var(--charcoal)', color: 'var(--mist)', borderColor: 'rgba(201, 150, 58, 0.2)'}}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(201, 150, 58, 0.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'var(--charcoal)'}
                   >
                     <RotateCcw size={10} />
                  </button>
@@ -390,15 +371,18 @@ export default function App() {
                  {activeScenarioId && (
                   <button 
                     onClick={updateCurrentScenario}
-                    className="px-2 h-7 bg-emerald-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm hover:bg-emerald-700 transition-all whitespace-nowrap"
+                    className="px-2 h-7 border rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm transition-all whitespace-nowrap"
                     title="현재 계획 DB 업데이트"
+                    style={{background: 'rgba(201, 150, 58, 0.1)', color: 'var(--amber)', borderColor: 'rgba(201, 150, 58, 0.3)'}}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(201, 150, 58, 0.2)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(201, 150, 58, 0.1)'}
                   >
                     <RefreshCw size={10}/>
                   </button>
                  )}
                  <button 
                   onClick={() => { const name = prompt("새로운 계획 이름을 입력하세요:"); if(name) saveCurrentScenario(name); }} 
-                  className="px-3 h-7 bg-[#5d4037] text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow-sm hover:bg-[#4e342e] transition-all transform hover:-translate-y-0.5 whitespace-nowrap"
+                  className="px-3 h-7 bg-[var(--amber)] text-[var(--black)] rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow-sm hover:bg-[var(--amber-light)] transition-all transform hover:-translate-y-0.5 whitespace-nowrap"
                  >
                   <Plus size={12}/> {activeScenarioId ? '새로 저장' : 'DB 저장'}
                  </button>
@@ -408,6 +392,10 @@ export default function App() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 py-8 pb-16">
+        {activeTab === Tab.PLAN && (
+          <BusinessPlanTab />
+        )}
+
         {activeTab === Tab.DASHBOARD && (
           <DashboardTab 
             monthlyData={monthlyData}
@@ -427,14 +415,6 @@ export default function App() {
             totalInvestment={currentFinancials.totalInvestment}
             calculatedLaborCost={currentFinancials.laborCost}
           />
-        )}
-
-        {activeTab === Tab.TODO && (
-          <TodoTab />
-        )}
-        
-        {activeTab === Tab.PLAN && (
-          <BusinessPlanTab />
         )}
         
         {activeTab === Tab.INTERIOR && (

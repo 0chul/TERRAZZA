@@ -43,30 +43,30 @@ const TableRow: React.FC<RowProps> = ({
   };
 
   const getRowClass = () => {
-    if (isProfit) return "bg-orange-50 hover:bg-orange-100/50 font-bold border-t-2 border-orange-200";
-    if (isCumulative) return "bg-[#3e2723] text-white font-bold";
-    if (isHeader) return "bg-[#faf7f5] hover:bg-[#f3efec] font-bold text-[#5d4037] border-t border-orange-100";
-    if (isSubItem) return "bg-white hover:bg-orange-50/30 text-xs text-[#8d6e63] italic";
-    return "bg-white hover:bg-orange-50/50 text-[#5d4037] border-t border-orange-50";
+    if (isProfit) return "font-bold border-t-2 border-[rgba(201,150,58,0.3)] bg-[rgba(201,150,58,0.05)] hover:bg-[rgba(201,150,58,0.1)]";
+    if (isCumulative) return "font-bold bg-[var(--amber)] text-[var(--bg-primary)]";
+    if (isHeader) return "bg-[rgba(201,150,58,0.02)] hover:bg-[rgba(201,150,58,0.05)] font-bold text-[var(--cream)] border-t border-[rgba(201,150,58,0.1)]";
+    if (isSubItem) return "bg-transparent hover:bg-[rgba(201,150,58,0.03)] text-xs text-[var(--stone)] italic";
+    return "bg-transparent hover:bg-[rgba(201,150,58,0.05)] text-[var(--mist)] border-t border-[rgba(201,150,58,0.05)]";
   };
 
   const getValueClass = (val: number) => {
-    if (isCumulative) return val >= 0 ? "text-emerald-400" : "text-rose-400";
-    if (isProfit) return val >= 0 ? "text-orange-700" : "text-rose-600";
-    if (formatType === 'negative') return "text-rose-500/80";
+    if (isCumulative) return val >= 0 ? "text-[var(--bg-primary)]" : "text-rose-900";
+    if (isProfit) return val >= 0 ? "text-[var(--amber)]" : "text-rose-500";
+    if (formatType === 'negative') return "text-rose-400";
     return "";
   };
 
   return (
     <tr className={`${getRowClass()} transition-colors group`}>
       <td 
-        className={`px-4 py-3 text-left sticky left-0 z-20 whitespace-nowrap border-r border-orange-100/50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.03)] ${isCumulative ? 'bg-[#3e2723]' : 'bg-inherit'}`}
+        className={`px-4 py-3 text-left sticky left-0 z-20 whitespace-nowrap border-r border-[rgba(201,150,58,0.1)] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.5)] ${isCumulative ? 'bg-[var(--amber)]' : (isHeader ? 'bg-[var(--bg-card)]' : 'bg-[var(--bg-primary)]')}`}
         onClick={onToggle}
         style={{ cursor: hasChildren ? 'pointer' : 'default' }}
       >
         <div className={`flex items-center ${isSubItem ? 'pl-8' : 'pl-1'}`}>
           {hasChildren && (
-            <span className="mr-2 text-orange-300 group-hover:text-orange-600">
+            <span className="mr-2 text-[var(--amber)] group-hover:text-[var(--amber-light)] opacity-70">
               {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             </span>
           )}
@@ -94,12 +94,12 @@ export const FinancialTable: React.FC<FinancialTableProps> = ({ data }) => {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-orange-100 shadow-sm bg-white">
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(201,150,58,0.1)] shadow-sm bg-[var(--bg-primary)]">
       <div className="overflow-x-auto scrollbar-hide">
         <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="bg-[#fff9f5] text-[#8d6e63] font-bold text-[11px] uppercase tracking-wider border-b border-orange-100">
-              <th className="px-4 py-4 text-left sticky left-0 bg-[#fff9f5] z-30 border-r border-orange-100 min-w-[180px]">항목 구분</th>
+            <tr className="bg-[var(--bg-card)] text-[var(--mist)] font-bold text-[11px] uppercase tracking-wider border-b border-[rgba(201,150,58,0.1)]">
+              <th className="px-4 py-4 text-left sticky left-0 bg-[var(--bg-card)] z-30 border-r border-[rgba(201,150,58,0.1)] min-w-[180px]">항목 구분</th>
               {data.map(row => (
                 <th key={row.month} className="px-4 py-4 text-right min-w-[110px]">M+{row.month}</th>
               ))}
@@ -171,7 +171,7 @@ export const FinancialTable: React.FC<FinancialTableProps> = ({ data }) => {
           </tbody>
         </table>
       </div>
-      <div className="bg-[#fff9f5] px-4 py-2 border-t border-orange-100 text-[10px] text-orange-300 flex justify-between italic">
+      <div className="bg-[var(--bg-card)] px-4 py-2 border-t border-[rgba(201,150,58,0.1)] text-[10px] text-[var(--stone)] flex justify-between italic">
         <span>* 항목명을 클릭하면 세부 데이터 확인이 가능합니다.</span>
         <span>Terrazza Lounge Financial System v1.2</span>
       </div>

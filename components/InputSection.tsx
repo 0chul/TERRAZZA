@@ -12,22 +12,30 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, children, isO
   const [isOpen, setIsOpen] = useState(isOpenDefault);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-4">
+    <div style={{
+      background: 'var(--bg-card)',
+      backdropFilter: 'blur(12px)',
+      border: '1px solid rgba(201, 150, 58, 0.15)',
+      borderRadius: '8px',
+      overflow: 'hidden',
+      marginBottom: '16px'
+    }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-6 py-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+        className="w-full px-6 py-4 flex items-center justify-between transition-colors"
+        style={{ background: 'rgba(201, 150, 58, 0.05)' }}
       >
-        <span className="font-semibold text-gray-800 flex-shrink-0">{title}</span>
+        <span className="font-semibold flex-shrink-0" style={{color: 'var(--cream)'}}>{title}</span>
         <div className="flex items-center gap-4">
           {summary && (
             <div className="text-right hidden sm:block">
               {summary}
             </div>
           )}
-          {isOpen ? <ChevronUp size={20} className="text-gray-500 flex-shrink-0" /> : <ChevronDown size={20} className="text-gray-500 flex-shrink-0" />}
+          {isOpen ? <ChevronUp size={20} style={{color: 'var(--mist)'}} className="flex-shrink-0" /> : <ChevronDown size={20} style={{color: 'var(--mist)'}} className="flex-shrink-0" />}
         </div>
       </button>
-      {isOpen && <div className="p-6 border-t border-gray-200">{children}</div>}
+      {isOpen && <div className="p-6 border-t" style={{ borderColor: 'rgba(201, 150, 58, 0.1)' }}>{children}</div>}
     </div>
   );
 };
