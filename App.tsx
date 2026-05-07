@@ -24,10 +24,12 @@ import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { BusinessPlanTab } from './components/BusinessPlanTab';
 import { InteriorCostTab } from './components/InteriorCostTab';
+import { MarketingTab } from './components/MarketingTab';
 import { dbService } from './db';
 
 enum Tab {
   PLAN = 'plan',
+  MARKETING = 'marketing',
   DASHBOARD = 'dashboard',
   PLANNER = 'planner',
   INTERIOR = 'interior',
@@ -342,6 +344,7 @@ export default function App() {
       <nav className="flex flex-wrap gap-2 border p-2 rounded-xl justify-center mx-4 sticky top-0 z-50 shadow-sm backdrop-blur-md mt-4" style={{background: 'rgba(42, 36, 32, 0.6)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
         {[
           { id: Tab.PLAN, label: '사업계획', icon: <Presentation size={18} /> },
+          { id: Tab.MARKETING, label: '마케팅계획', icon: <Presentation size={18} /> },
           { id: Tab.DASHBOARD, label: '재무계획', icon: <TrendingUp size={18} /> },
           { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={18} /> },
           { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={18} /> },
@@ -418,7 +421,7 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 py-8 pb-16">
         {activeTab === Tab.PLAN && (
-          <BusinessPlanTab totalInteriorExpenses={totalInteriorExpenses} config={config} cafeUnitCosts={cafeUnitCosts} />
+          <BusinessPlanTab totalInteriorExpenses={totalInteriorExpenses} config={config} cafeUnitCosts={cafeUnitCosts} monthlyData={monthlyData} />
         )}
 
         {activeTab === Tab.DASHBOARD && (
@@ -444,6 +447,10 @@ export default function App() {
         
         {activeTab === Tab.INTERIOR && (
           <InteriorCostTab />
+        )}
+
+        {activeTab === Tab.MARKETING && (
+          <MarketingTab />
         )}
       </main>
     </div>

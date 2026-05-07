@@ -1,20 +1,19 @@
 
 import React, { useEffect } from 'react';
-import { GlobalConfig, CafeUnitCosts } from '../types';
+import { GlobalConfig, CafeUnitCosts, MonthlyData } from '../types';
+import { ResponsiveContainer, ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 export interface BusinessPlanTabProps {
   totalInteriorExpenses: number;
   config: GlobalConfig;
   cafeUnitCosts: CafeUnitCosts;
+  monthlyData: MonthlyData[];
 }
 
-export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorExpenses, config, cafeUnitCosts }) => {
+export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorExpenses, config, cafeUnitCosts, monthlyData }) => {
   const interiorAmount = totalInteriorExpenses;
-  const equipmentAmount = config.initial.equipment;
-  const designAmount = config.initial.design;
-  const suppliesAmount = config.initial.supplies;
   
-  const totalAmount = interiorAmount + equipmentAmount + designAmount + suppliesAmount;
+  const totalAmount = interiorAmount;
   
   const getWidth = (amount: number) => {
     if (totalAmount === 0) return '0%';
@@ -73,7 +72,7 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
               </div>
               <div style={{display:'flex', gap:'20px', alignItems:'center'}}>
                 <div style={{width:'36px',height:'1px',background:'var(--amber)',flexShrink:0}}></div>
-                <span style={{fontSize:'0.8rem',color:'var(--mist)'}}>CAPEX 4,000~5,000만원 내 고정 — 재건축 전 24개월 임시 운영</span>
+                <span style={{fontSize:'0.8rem',color:'var(--mist)'}}>CAPEX 최소화 (인테리어 실비 중심) — 재건축 전 24개월 임시 운영</span>
               </div>
               <div style={{display:'flex', gap:'20px', alignItems:'center'}}>
                 <div style={{width:'36px',height:'1px',background:'var(--amber)',flexShrink:0}}></div>
@@ -350,29 +349,71 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
           <div className="chart-header">
             <div>
               <div className="section-label reveal">시뮬레이션</div>
-              <h2 className="section-title reveal reveal-delay-1">12개월<br/><em>성장 곡선</em></h2>
+              <h2 className="section-title reveal reveal-delay-1">손익분기점 (BEP)<br/><em>수익 곡선</em></h2>
             </div>
           </div>
-          <div className="chart-wrap reveal reveal-delay-2">
-            <div className="chart-bars">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => {
-                const rev = 1200 + (m * 150) + (Math.random()*200);
-                const prof = rev * (0.15 + (m * 0.015));
-                return (
-                  <div key={m} className="chart-col">
-                    <div className="bar-revenue" style={{height: `${(rev/4000)*100}%`}}>
-                      <div className="bar-profit" style={{height: `${(prof/rev)*100}%`}}></div>
-                    </div>
-                    <div className="chart-tooltip">매출: {Math.round(rev)}만<br/>이익: {Math.round(prof)}만</div>
-                    <div className="month-label">Month {m}</div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          <div className="chart-legend reveal reveal-delay-3">
-            <div className="legend-item"><div className="legend-dot" style={{background: 'linear-gradient(to top, rgba(107,39,55,0.8), rgba(139,58,74,0.4))'}}></div>예상 매출</div>
-            <div className="legend-item"><div className="legend-dot" style={{background: 'linear-gradient(to top, var(--amber), rgba(201,150,58,0.3))'}}></div>예상 이익</div>
+          <div className="chart-wrap reveal reveal-delay-2" style={{ height: '400px', width: '100%', marginTop: '40px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis 
+                  dataKey="month" 
+                  stroke="var(--stone)" 
+                  tickFormatter={(val) => `M+${val}`}
+                  axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                  tickLine={false}
+                />
+                <YAxis 
+                  stroke="var(--stone)" 
+                  tickFormatter={(val) => `${Math.round(val / 10000).toLocaleString()}`}
+                  axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                  tickLine={false}
+                />
+                <Tooltip 
+                  formatter={(value: number, name: string) => {
+                    const label = name === 'totalRevenue' ? '총 매출' : name === 'totalCost' ? '총 비용 (고정+변동)' : name === 'totalFixed' ? '고정 비용' : name;
+                    return [`${Math.round(value / 10000).toLocaleString()}만`, label];
+                  }}
+                  labelFormatter={(label) => `Month ${label}`}
+                  contentStyle={{ background: 'var(--charcoal)', border: '1px solid rgba(201,150,58,0.3)', borderRadius: '8px', color: 'var(--cream)' }}
+                  itemStyle={{ fontSize: '0.8rem' }}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px', color: 'var(--stone)' }} 
+                  formatter={(value) => {
+                    if (value === 'totalRevenue') return '매출선';
+                    if (value === 'totalCost') return '비용선';
+                    if (value === 'totalFixed') return '고정 비용';
+                    return value;
+                  }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="totalFixed" 
+                  name="totalFixed"
+                  fill="rgba(201, 150, 58, 0.1)" 
+                  stroke="none" 
+                />
+                <Line
+                  type="monotone"
+                  dataKey={(d) => d.totalFixed + d.totalCOGS}
+                  name="totalCost"
+                  stroke="#ef4444"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="totalRevenue" 
+                  name="totalRevenue" 
+                  stroke="#3b82f6" 
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: 'var(--black)', stroke: '#3b82f6', strokeWidth: 2 }}
+                  activeDot={{ r: 6 }}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </section>
@@ -382,13 +423,13 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
         <div className="team-inner">
           <div className="section-label reveal">인력 운영 계획</div>
           <h2 className="section-title reveal reveal-delay-1">매니저 중심<br/><em>경량 운영 체계</em></h2>
-          <p className="section-body reveal reveal-delay-2">외식업 평균 인건비 비율을 고려한 효율적 인력 설계. 책임 매니저 중심의 자율 운영 시스템을 지향합니다. 총 인건비 월 920만원 목표.</p>
+          <p className="section-body reveal reveal-delay-2">외식업 평균 인건비 비율을 고려한 효율적 인력 설계. 책임 매니저 중심의 자율 운영 시스템을 지향합니다. 총 인건비 월 790만원 목표.</p>
           <div className="team-grid">
             <div className="team-card reveal">
               <div className="team-role">General Manager</div>
               <div className="team-name">책임 매니저</div>
               <div className="team-hours">주 46~50시간</div>
-              <div className="team-salary">380</div>
+              <div className="team-salary">250</div>
               <div className="team-salary-unit">만원 / 월</div>
               <div className="team-tasks">
                 <div className="team-task">총괄 운영 및 바 운영 주관</div>
@@ -496,21 +537,6 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
                   <div className="capex-bar-label">인테리어 공사</div>
                   <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(interiorAmount)}}></div></div>
                   <div className="capex-bar-value">{(interiorAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                </div>
-                <div className="capex-row">
-                  <div className="capex-bar-label">가구 및 집기</div>
-                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(equipmentAmount), animationDelay: '0.2s'}}></div></div>
-                  <div className="capex-bar-value">{(equipmentAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                </div>
-                <div className="capex-row">
-                  <div className="capex-bar-label">주방/바 설비 (디자인 포함)</div>
-                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(designAmount), animationDelay: '0.4s'}}></div></div>
-                  <div className="capex-bar-value">{(designAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                </div>
-                <div className="capex-row">
-                  <div className="capex-bar-label">운영 비품/기타</div>
-                  <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(suppliesAmount), animationDelay: '0.6s'}}></div></div>
-                  <div className="capex-bar-value">{(suppliesAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                 </div>
               </div>
             </div>
