@@ -21,16 +21,58 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
   };
 
   useEffect(() => {
+    // Custom Cursor Logic
+    const cursor = document.getElementById('biz-cursor');
+    const ring = document.getElementById('biz-cursorRing');
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2, rx = mx, ry = my;
+    let reqId: number;
+
+    const onMouseMove = (e: MouseEvent) => {
+      mx = e.clientX;
+      my = e.clientY;
+      if (cursor) {
+        cursor.style.left = mx - 4 + 'px';
+        cursor.style.top = my - 4 + 'px';
+      }
+    };
+
+    const animate = () => {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      if (ring) {
+        ring.style.left = rx - 18 + 'px';
+        ring.style.top = ry - 18 + 'px';
+      }
+      reqId = requestAnimationFrame(animate);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    animate();
+
     const reveals = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
     }, { threshold: 0.1 });
     reveals.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
+    
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      cancelAnimationFrame(reqId);
+      observer.disconnect();
+    };
   }, []);
 
   return (
-    <div className="terrazza-template">
+    <div className="terrazza-template" style={{ cursor: 'none' }}>
+      <style>{`
+        .terrazza-template .cursor { position: fixed; width: 8px; height: 8px; background: var(--amber); border-radius: 50%; pointer-events: none; z-index: 9999; mix-blend-mode: difference; }
+        .terrazza-template .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(201,150,58,0.5); border-radius: 50%; pointer-events: none; z-index: 9998; transition: all 0.18s ease; }
+        .terrazza-template a, .terrazza-template button, .terrazza-template .recovery-item, .terrazza-template .scenario-card, .terrazza-template .risk-card, .terrazza-template .time-card, .terrazza-template .menu-card, .terrazza-template .space-cell, .terrazza-template .team-card { cursor: none !important; }
+      `}</style>
+      
+      <div className="cursor" id="biz-cursor"></div>
+      <div className="cursor-ring" id="biz-cursorRing"></div>
+
       {/* HERO */}
       <section className="hero">
         <div className="hero-bg"></div>
