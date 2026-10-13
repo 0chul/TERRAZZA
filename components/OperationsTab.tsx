@@ -48,8 +48,8 @@ export const OperationsTab: React.FC<{ config: GlobalConfig; dailySalesCount: nu
       const next: ProgressState = { ...initial, checked: {}, notes: {}, purchased: {}, stock: {}, days: value.days, safetyRatio: value.safetyRatio };
       for (const task of PREPARATION_TASKS) {
         for (const step of task.steps) {
-          if (typeof value.checked[step.id] !== 'boolean') throw new Error('check');
-          next.checked[step.id] = value.checked[step.id];
+          if (value.checked[step.id] !== undefined && typeof value.checked[step.id] !== 'boolean') throw new Error('check');
+          next.checked[step.id] = value.checked[step.id] ?? !!step.complete;
         }
         const note = value.notes[task.id];
         if (note) {

@@ -24,6 +24,11 @@ export const PREPARATION_TASKS: PreparationTask[] = [
     { id: 'sign-print', label: '실사 출력' },
     { id: 'sign-install', label: '부착 위치·설치 일정 확인 및 설치' },
   ] },
+  { id: 'chandelier', title: '샹들리에 설치', category: '조명', nextAction: '설치 위치와 일정을 확인하고 설치 후 점등을 확인합니다.', steps: [
+    { id: 'chandelier-schedule', label: '설치 위치·일정 확인' },
+    { id: 'chandelier-install', label: '샹들리에 설치' },
+    { id: 'chandelier-test', label: '점등 및 고정 상태 확인' },
+  ] },
   { id: 'menu', title: '메뉴 구성', category: '메뉴', nextAction: '기본 4종과 잔당 10,000~12,000원 고급 커피 라인업을 준비합니다.', steps: [
     { id: 'menu-basic', label: '에스프레소·아메리카노·라떼·시럽라떼 레시피 및 판매가 확정' },
     { id: 'menu-premium', label: '고급 커피 원두·추출 방식·판매가 확정' },
