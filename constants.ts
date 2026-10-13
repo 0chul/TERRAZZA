@@ -1,5 +1,6 @@
 
 import { GlobalConfig, CafeSupplies } from './types';
+import { DEFAULT_INTERIOR_TOTAL } from './defaultInteriorCosts';
 
 export const DEFAULT_CAFE_SUPPLIES: CafeSupplies = {
   hotCup: 39,
@@ -69,7 +70,7 @@ export const DEFAULT_CONFIG: GlobalConfig = {
     misc: 100000,
   },
   initial: {
-    interior: 12810950,
+    interior: DEFAULT_INTERIOR_TOTAL,
     equipment: 20000000,
     design: 3000000,
     supplies: 5000000,

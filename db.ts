@@ -1,6 +1,7 @@
 
 import { openDB, DBSchema } from 'idb';
 import { Scenario, InteriorCost } from './types';
+import { DEFAULT_INTERIOR_COSTS, LEGACY_INTERIOR_COSTS, FINANCE_IMPORT_VERSION } from './defaultInteriorCosts';
 
 // Define the DB Schema
 interface TerrazzaDB extends DBSchema {
@@ -12,6 +13,10 @@ interface TerrazzaDB extends DBSchema {
     key: string;
     value: InteriorCost;
   };
+  metadata: {
+    key: string;
+    value: string;
+  };
 }
 
 const DB_NAME = 'terrazza-business-planner-db';
@@ -20,7 +25,7 @@ const INTERIOR_STORE = 'interiorCosts';
 
 // Initialize DB
 export const initDB = async () => {
-  return openDB<TerrazzaDB>(DB_NAME, 3, {
+  return openDB<TerrazzaDB>(DB_NAME, 4, {
     upgrade(db, oldVersion) {
       if (oldVersion < 1) {
         db.createObjectStore(PLANS_STORE, { keyPath: 'id' });
@@ -30,12 +35,32 @@ export const initDB = async () => {
           db.createObjectStore(INTERIOR_STORE, { keyPath: 'id' });
         }
       }
+      if (oldVersion < 4) db.createObjectStore('metadata');
     },
   });
 };
 
 // DB Service Wrapper
 export const dbService = {
+  async importFinanceSource(): Promise<void> {
+    const db = await initDB();
+    const tx = db.transaction(['interiorCosts', 'metadata'], 'readwrite');
+    const metadata = tx.objectStore('metadata');
+    if (await metadata.get('finance-source') === FINANCE_IMPORT_VERSION) {
+      await tx.done;
+      return;
+    }
+    const costs = tx.objectStore(INTERIOR_STORE);
+    const existing = await costs.getAll();
+    for (const source of DEFAULT_INTERIOR_COSTS) {
+      const current = existing.find(row => row.id === source.id);
+      const legacy = LEGACY_INTERIOR_COSTS.find(row => row.id === source.id);
+      const untouched = current && legacy && current.cost === legacy.cost && current.category === legacy.category && current.item === legacy.item && (current.date === legacy.date || current.date === legacy.date.replace('2025-', '2026-'));
+      if (!current || untouched) await costs.put(source);
+    }
+    await metadata.put(FINANCE_IMPORT_VERSION, 'finance-source');
+    await tx.done;
+  },
   // Load all plans
   async getAllPlans(): Promise<Scenario[]> {
     try {

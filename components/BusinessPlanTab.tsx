@@ -195,6 +195,7 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
               <div className="menu-card-cat">Coffee</div>
               <div className="menu-card-title">커피</div>
               <div className="menu-items">
+                <div className="menu-item"><span>에스프레소</span><span className="menu-price" style={{fontSize:'0.8rem'}}>판매가 확정 예정</span></div>
                 <div className="menu-item" style={{flexDirection: 'column', alignItems: 'flex-start'}}>
                   <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
                     <span>아메리카노</span>
@@ -234,6 +235,7 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
                 )}%
               </span></div>
               <div style={{marginTop:'14px',fontSize:'0.75rem',color:'var(--stone)',lineHeight:1.7}}>상세설정의 판매가 및 재료비 연동. 테이크아웃/매장/아이스 비율이 반영된 가중평균 원가입니다.</div>
+              <div style={{marginTop:20,paddingTop:15,borderTop:'1px solid rgba(201,150,58,0.2)',color:'var(--cream-dim)',fontSize:'0.85rem',lineHeight:1.8}}><strong style={{color:'var(--amber)'}}>고급 커피 추가 운영 계획</strong><br />잔당 10,000~12,000원. 싱글오리진·리저브 커피 구성안의 원두·레시피·최종 판매가를 확정합니다.<br /><small>판매 비중과 원가 확정 전 재무 예측은 기존 3종 기준.</small></div>
             </div>
             <div className="menu-card reveal reveal-delay-1">
               <div className="menu-card-cat">Non-Coffee &amp; Wine</div>

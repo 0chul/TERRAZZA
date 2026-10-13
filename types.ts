@@ -114,6 +114,19 @@ export interface InteriorCost {
   item: string;
   cost: number;
   date: string;
+  details?: string;
+  payment?: string;
+  source?: string;
+  rawDate?: string | null;
+  estimated?: boolean;
+}
+
+export interface InteriorDeposit {
+  id: string;
+  amount: number;
+  date: string;
+  note: string;
+  source?: string;
 }
 
 export interface ProductCost {

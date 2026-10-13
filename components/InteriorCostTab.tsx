@@ -1,49 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, DollarSign, Edit2, Check, X } from 'lucide-react';
-import { InteriorCost } from '../types';
+import { InteriorCost, InteriorDeposit } from '../types';
 import { dbService } from '../db';
+import { DEFAULT_INTERIOR_COSTS, DEFAULT_INTERIOR_DEPOSITS, FINANCE_SOURCE } from '../defaultInteriorCosts';
+import { seoulDate } from '../dates';
+import './operations.css';
 
 export const InteriorCostTab: React.FC = () => {
-  const [costs, setCosts] = useState<InteriorCost[]>([]);
+  const [costs, setCosts] = useState<InteriorCost[]>(DEFAULT_INTERIOR_COSTS);
+  const [error, setError] = useState('');
   const [category, setCategory] = useState('');
   const [item, setItem] = useState('');
   const [cost, setCost] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(seoulDate);
+  const [payment, setPayment] = useState('계좌이체');
+  const [estimated, setEstimated] = useState(false);
   const [sortKey, setSortKey] = useState<'date' | 'category' | 'item'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<InteriorCost>>({});
   
-  interface InteriorDeposit {
-    id: string;
-    amount: number;
-    date: string;
-    note: string;
-  }
-  
   const [deposits, setDeposits] = useState<InteriorDeposit[]>(() => {
-    const saved = localStorage.getItem('terrazza_interior_deposits');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) { return []; }
-    }
-    const oldBudget = localStorage.getItem('terrazza_interior_budget');
-    if (oldBudget && Number(oldBudget) > 0) {
-      const initialDeposit = { id: Math.random().toString(36).substring(2, 11), amount: Number(oldBudget), date: new Date().toISOString().split('T')[0], note: '초기 예산' };
-      localStorage.setItem('terrazza_interior_deposits', JSON.stringify([initialDeposit]));
-      return [initialDeposit];
-    }
-    return [];
+    try {
+      const saved = JSON.parse(localStorage.getItem('terrazza_interior_deposits_v2') || 'null');
+      if (Array.isArray(saved) && saved.every(row => typeof row.id === 'string' && Number.isFinite(row.amount) && typeof row.date === 'string' && typeof row.note === 'string')) return saved;
+    } catch {}
+    return DEFAULT_INTERIOR_DEPOSITS;
   });
+  const [oldDeposits] = useState<InteriorDeposit[]>(() => {
+    try { const saved = JSON.parse(localStorage.getItem('terrazza_interior_deposits') || '[]'); return Array.isArray(saved) ? saved : []; } catch { return []; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem('terrazza_interior_deposits_v2', JSON.stringify(deposits)); }
+    catch { setError('입금 내역을 브라우저에 저장하지 못했습니다.'); }
+  }, [deposits]);
 
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
-  const [depositDate, setDepositDate] = useState(new Date().toISOString().split('T')[0]);
+  const [depositDate, setDepositDate] = useState(seoulDate);
   const [depositNote, setDepositNote] = useState('');
 
   const totalBudget = deposits.reduce((sum, d) => sum + d.amount, 0);
 
   const addDeposit = () => {
-    if (!depositAmount || !depositDate) return;
+    if (!depositAmount || !depositDate || !Number.isFinite(Number(depositAmount)) || Number(depositAmount) <= 0) return;
     const newDeposit: InteriorDeposit = {
       id: Math.random().toString(36).substring(2, 11),
       amount: Number(depositAmount),
@@ -52,7 +52,6 @@ export const InteriorCostTab: React.FC = () => {
     };
     const updated = [...deposits, newDeposit];
     setDeposits(updated);
-    localStorage.setItem('terrazza_interior_deposits', JSON.stringify(updated));
     setDepositAmount('');
     setDepositNote('');
   };
@@ -61,28 +60,32 @@ export const InteriorCostTab: React.FC = () => {
     if (window.confirm("이 입금 내역을 삭제하시겠습니까?")) {
       const updated = deposits.filter(d => d.id !== id);
       setDeposits(updated);
-      localStorage.setItem('terrazza_interior_deposits', JSON.stringify(updated));
     }
   };
 
   useEffect(() => {
     const loadCosts = async () => {
-      const loadedCosts = await dbService.getAllInteriorCosts();
-      setCosts(loadedCosts);
+      try {
+        await dbService.importFinanceSource();
+        const loadedCosts = await dbService.getAllInteriorCosts();
+        setCosts(loadedCosts);
+      } catch { setError('지출 내역을 불러오지 못했습니다.'); }
     };
     loadCosts();
   }, []);
 
   const addCost = async () => {
-    if (!category || !item || !cost || !date) return;
+    if (!category.trim() || !item.trim() || !cost || !date || !Number.isFinite(Number(cost)) || Number(cost) <= 0) return;
     const newCost: InteriorCost = { 
       id: Math.random().toString(36).substring(2, 11), 
       category, 
       item, 
       cost: Number(cost), 
-      date 
+      date,
+      payment,
+      estimated
     };
-    await dbService.saveInteriorCost(newCost);
+    try { await dbService.saveInteriorCost(newCost); } catch { setError('지출 추가를 저장하지 못했습니다.'); return; }
     setCosts([...costs, newCost]);
     setCategory('');
     setItem('');
@@ -91,7 +94,7 @@ export const InteriorCostTab: React.FC = () => {
 
   const deleteCost = async (id: string) => {
     if (window.confirm("정말 이 항목을 삭제하시겠습니까?")) {
-      await dbService.deleteInteriorCost(id);
+      try { await dbService.deleteInteriorCost(id); } catch { setError('지출 삭제를 저장하지 못했습니다.'); return; }
       setCosts(costs.filter(c => c.id !== id));
     }
   };
@@ -102,25 +105,29 @@ export const InteriorCostTab: React.FC = () => {
   };
 
   const saveEdit = async () => {
-    if (!editingId || !editForm.category || !editForm.item || !editForm.cost || !editForm.date) return;
+    if (!editingId || !editForm.category || !editForm.item || !Number.isFinite(editForm.cost) || Number(editForm.cost) <= 0) return;
     const updatedCost = { ...editForm } as InteriorCost;
-    await dbService.saveInteriorCost(updatedCost);
+    if (updatedCost.date) updatedCost.rawDate = null;
+    try { await dbService.saveInteriorCost(updatedCost); } catch { setError('지출 수정을 저장하지 못했습니다.'); return; }
     setCosts(costs.map(c => c.id === editingId ? updatedCost : c));
     setEditingId(null);
     setEditForm({});
   };
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = seoulDate();
+  const isEstimated = (c: InteriorCost) => c.estimated ?? (!c.source && c.date > today);
 
-  const actualCosts = costs.filter(c => c.date <= today);
-  const estimatedCosts = costs.filter(c => c.date > today);
+  const actualCosts = costs.filter(c => !isEstimated(c));
+  const estimatedCosts = costs.filter(isEstimated);
 
   const totalActual = actualCosts.reduce((sum, c) => sum + c.cost, 0);
   const totalEstimated = estimatedCosts.reduce((sum, c) => sum + c.cost, 0);
+  const directPurchases = actualCosts.filter(c => c.payment === '직접구매').reduce((sum, c) => sum + c.cost, 0);
+  const cashExpenses = totalActual - directPurchases;
 
-  const categoryTotals = costs.reduce((acc, c) => {
+  const categoryTotals: Record<string, { actual: number; estimated: number }> = costs.reduce((acc, c) => {
     if (!acc[c.category]) acc[c.category] = { actual: 0, estimated: 0 };
-    if (c.date <= today) acc[c.category].actual += c.cost;
+    if (!isEstimated(c)) acc[c.category].actual += c.cost;
     else acc[c.category].estimated += c.cost;
     return acc;
   }, {} as Record<string, { actual: number; estimated: number }>);
@@ -136,7 +143,7 @@ export const InteriorCostTab: React.FC = () => {
 
   const sortedCosts = [...costs].sort((a, b) => {
     let comparison = 0;
-    if (sortKey === 'date') comparison = a.date.localeCompare(b.date);
+    if (sortKey === 'date') comparison = (a.date || '9999').localeCompare(b.date || '9999');
     else if (sortKey === 'category') comparison = a.category.localeCompare(b.category);
     else if (sortKey === 'item') comparison = a.item.localeCompare(b.item);
     
@@ -149,7 +156,10 @@ export const InteriorCostTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ops-page">
+      <div className="finance-source-note"><strong>엑셀 기준 업데이트 · {FINANCE_SOURCE}</strong><br />지출 상세 53건 합계 15,796,450원. 시트 요약 12,810,950원에 빠진 추가 지출을 반영했습니다.<br />총 입금액 16,110,000원은 추가 입금 3,000,000원에 대한 사용자 확인(2026.10.13)을 반영했습니다. 추가 입금일과 도장 추가작업 180,000원의 날짜(원문 2026-10-0)는 확인이 필요합니다.</div>
+      {error && <p className="ops-notice" role="alert">{error}</p>}
+      {oldDeposits.length > 0 && <details className="ops-panel"><summary>이전 버전의 입금 입력 기록 ({oldDeposits.length}건)</summary><p className="ops-muted">원래 입력값은 보존했습니다. 중복 계산 방지를 위해 엑셀 기준 합계에는 포함하지 않았습니다. 추가 입금이 있다면 새 입금 내역에 등록하세요.</p>{oldDeposits.map((row, i) => <p key={i}>{row.date} · {row.note} · {row.amount.toLocaleString()}원</p>)}</details>}
       <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(201, 150, 58, 0.15)' }}>
         <div className="flex justify-between items-center mb-4 px-2">
           <h2 className="text-xl font-bold flex items-center gap-2" style={{color: 'var(--cream)'}}>
@@ -177,13 +187,16 @@ export const InteriorCostTab: React.FC = () => {
               현재: {totalActual.toLocaleString()} / 예상: {totalEstimated.toLocaleString()}
             </div>
           </div>
-          <div className={`p-4 rounded-xl border flex flex-col justify-center items-end`} style={{background: totalBudget - (totalActual + totalEstimated) >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(244, 63, 94, 0.05)', borderColor: totalBudget - (totalActual + totalEstimated) >= 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)'}}>
-            <span className="text-sm font-bold mb-1" style={{color: 'var(--mist)'}}>현재 잔액</span>
-            <span className={`text-2xl font-black ${totalBudget - (totalActual + totalEstimated) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {(totalBudget - (totalActual + totalEstimated)).toLocaleString()} 원
+          <div className={`p-4 rounded-xl border flex flex-col justify-center items-end`} style={{background: totalBudget - cashExpenses >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(244, 63, 94, 0.05)', borderColor: totalBudget - cashExpenses >= 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)'}}>
+            <span className="text-sm font-bold mb-1" style={{color: 'var(--mist)'}}>관리자금 현금 잔액</span>
+            <span className={`text-2xl font-black ${totalBudget - cashExpenses >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {(totalBudget - cashExpenses).toLocaleString()} 원
             </span>
+            <span className="text-xs" style={{color: 'var(--mist)'}}>직접구매를 제외한 현금 지출 기준</span>
           </div>
         </div>
+
+        <p className="ops-muted">현금 지출 {cashExpenses.toLocaleString()}원 · 직접구매 {directPurchases.toLocaleString()}원 · 직접구매·예상 지출까지 반영한 잔여 예산 {(totalBudget - totalActual - totalEstimated).toLocaleString()}원. 라마르조꼬 설치 견적 704,000원은 지출 등록 전 합계에 포함하지 않습니다.</p>
 
         {showDepositForm && (
           <div className="mb-6 p-4 rounded-xl border shadow-sm mx-2" style={{background: 'rgba(16, 185, 129, 0.03)', borderColor: 'rgba(16, 185, 129, 0.2)'}}>
@@ -213,8 +226,8 @@ export const InteriorCostTab: React.FC = () => {
                   <tbody>
                     {[...deposits].sort((a,b) => b.date.localeCompare(a.date)).map(d => (
                       <tr key={d.id} className="border-b transition" style={{borderColor: 'rgba(255,255,255,0.05)', color: 'var(--mist)'}}>
-                        <td className="p-2">{d.date}</td>
-                        <td className="p-2" style={{color: 'var(--cream)'}}>{d.note}</td>
+                        <td className="p-2">{d.date || '입금일 확인 필요'}</td>
+                        <td className="p-2" style={{color: 'var(--cream)'}}>{d.note}<small className="block" style={{color: 'var(--mist)'}}>{d.source}</small></td>
                         <td className="p-2 text-right font-bold text-emerald-400">+{d.amount.toLocaleString()} 원</td>
                         <td className="p-2 text-center">
                           <button onClick={() => deleteDeposit(d.id)} className="text-rose-400 hover:text-rose-300 p-1 transition"><Trash2 size={14}/></button>
@@ -261,12 +274,13 @@ export const InteriorCostTab: React.FC = () => {
             <input style={{background: 'var(--bg-primary)', border: '1px solid rgba(201, 150, 58, 0.2)', color: 'var(--cream)'}} type="text" placeholder="항목" value={item} onChange={(e) => setItem(e.target.value)} className="p-2 rounded-lg w-full" />
           </div>
           <input style={{background: 'var(--bg-primary)', border: '1px solid rgba(201, 150, 58, 0.2)', color: 'var(--cream)'}} type="number" placeholder="비용 (원)" value={cost} onChange={(e) => setCost(e.target.value)} className="p-2 rounded-lg w-full" />
+          <div className="flex gap-4 items-center"><label className="ops-note">결제 구분<select style={{background: 'var(--charcoal)', padding: 8, borderRadius: 6}} value={payment} onChange={e => setPayment(e.target.value)}>{['계좌이체','법인카드','세금계산서','직접구매','기타'].map(value => <option key={value}>{value}</option>)}</select></label><label className="text-sm"><input type="checkbox" checked={estimated} onChange={e => setEstimated(e.target.checked)} /> 예상 지출</label></div>
           <button onClick={addCost} className="p-2 rounded-lg flex items-center justify-center gap-2 w-full transition font-bold" style={{background: 'rgba(201, 150, 58, 0.15)', color: 'var(--amber)'}}>
             <Plus size={16} /> 추가
           </button>
         </div>
 
-        <table className="w-full text-left">
+        <div className="ops-table-wrap"><table className="w-full text-left" style={{minWidth: 900}}>
           <thead>
             <tr className="border-b text-xs" style={{borderColor: 'rgba(201, 150, 58, 0.1)'}}>
               <th className="p-1 cursor-pointer whitespace-nowrap" style={{color: 'var(--amber)'}} onClick={() => handleSort('date')}>
@@ -279,6 +293,7 @@ export const InteriorCostTab: React.FC = () => {
                 항목 {getSortIcon('item')}
               </th>
               <th className="p-1 text-right whitespace-nowrap">비용</th>
+              <th className="p-1 whitespace-nowrap">결제 구분</th>
               <th className="p-1 text-center whitespace-nowrap">삭제</th>
             </tr>
           </thead>
@@ -291,6 +306,7 @@ export const InteriorCostTab: React.FC = () => {
                     <td className="p-2"><input type="text" value={editForm.category} onChange={(e) => setEditForm({...editForm, category: e.target.value})} className="p-1 rounded w-full" style={{background: 'var(--bg-primary)', border: '1px solid rgba(201,150,58,0.2)', color: 'var(--cream)'}} /></td>
                     <td className="p-2"><input type="text" value={editForm.item} onChange={(e) => setEditForm({...editForm, item: e.target.value})} className="p-1 rounded w-full" style={{background: 'var(--bg-primary)', border: '1px solid rgba(201,150,58,0.2)', color: 'var(--cream)'}} /></td>
                     <td className="p-2"><input type="number" value={editForm.cost} onChange={(e) => setEditForm({...editForm, cost: Number(e.target.value)})} className="p-1 rounded w-full" style={{background: 'var(--bg-primary)', border: '1px solid rgba(201,150,58,0.2)', color: 'var(--cream)'}} /></td>
+                    <td className="p-2"><select aria-label="수정 결제 구분" value={editForm.payment || '기타'} onChange={e => setEditForm({...editForm, payment: e.target.value})} style={{background: 'var(--charcoal)'}}>{[...new Set(['계좌이체','법인카드','세금계산서','직접구매','기타',editForm.payment || '기타'])].map(value => <option key={value}>{value}</option>)}</select></td>
                     <td className="p-2 text-center flex gap-2">
                       <button onClick={saveEdit} className="text-emerald-400 hover:text-emerald-300 transition"><Check size={16} /></button>
                       <button onClick={() => setEditingId(null)} className="text-rose-400 hover:text-rose-300 transition"><X size={16} /></button>
@@ -298,10 +314,11 @@ export const InteriorCostTab: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <td className="p-1 text-xs whitespace-nowrap">{c.date.substring(5)} {c.date > today && <span className="text-[10px] font-bold px-1 rounded ml-1" style={{background: 'rgba(201, 150, 58, 0.2)', color: 'var(--amber)'}}>예측</span>}</td>
+                    <td className="p-1 text-xs whitespace-nowrap">{c.date || '2026-10 · 일자 확인 필요'} {isEstimated(c) && <span className="text-[10px] font-bold px-1 rounded ml-1" style={{background: 'rgba(201, 150, 58, 0.2)', color: 'var(--amber)'}}>예측</span>}</td>
                     <td className="p-1 text-xs whitespace-nowrap" style={{color: 'var(--mist)'}}>{c.category}</td>
-                    <td className="p-1 text-xs whitespace-nowrap">{c.item}</td>
+                    <td className="p-1 text-xs">{c.item}<small className="block" style={{color: 'var(--mist)'}}>{c.details}{c.source && ` · ${c.source}`}</small></td>
                     <td className="p-1 text-xs text-right whitespace-nowrap">{c.cost.toLocaleString()} 원</td>
+                    <td className="p-1 text-xs whitespace-nowrap">{c.payment || '미등록'}</td>
                     <td className="p-1 text-center flex gap-1 justify-center">
                       <button onClick={() => startEdit(c)} className="text-blue-400 hover:text-blue-300 transition"><Edit2 size={14} /></button>
                       <button onClick={() => deleteCost(c.id)} className="text-rose-400 hover:text-rose-300 transition"><Trash2 size={14} /></button>
@@ -311,7 +328,7 @@ export const InteriorCostTab: React.FC = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
   );

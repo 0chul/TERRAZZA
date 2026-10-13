@@ -14,17 +14,20 @@ import {
   RefreshCw,
   RotateCcw,
   Database,
-  Presentation
+  Presentation,
+  BookOpen
 } from 'lucide-react';
 
-import { DEFAULT_CONFIG, INITIAL_TODOS } from './constants';
-import { DEFAULT_INTERIOR_COSTS } from './defaultInteriorCosts';
-import { GlobalConfig, MonthlyData, TodoItem, CafeUnitCosts, Scenario, InteriorCost } from './types';
+import { DEFAULT_CONFIG } from './constants';
+import { DEFAULT_INTERIOR_COSTS, DEFAULT_INTERIOR_TOTAL } from './defaultInteriorCosts';
+import { GlobalConfig, MonthlyData, CafeUnitCosts, Scenario, InteriorCost } from './types';
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { BusinessPlanTab } from './components/BusinessPlanTab';
 import { InteriorCostTab } from './components/InteriorCostTab';
 import { MarketingTab } from './components/MarketingTab';
+import { OperationsTab } from './components/OperationsTab';
+import { ManualTab } from './components/ManualTab';
 import { dbService } from './db';
 
 enum Tab {
@@ -33,6 +36,8 @@ enum Tab {
   DASHBOARD = 'dashboard',
   PLANNER = 'planner',
   INTERIOR = 'interior',
+  OPERATIONS = 'operations',
+  MANUAL = 'manual',
 }
 
 const WEEKDAY_MONTHLY_RATE = 2156880; 
@@ -42,7 +47,16 @@ const WEEKEND_MONTHLY_RATE = 861200;
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>(Tab.PLAN);
+  const [activeTab, setActiveTab] = useState<Tab>(() => Object.values(Tab).includes(location.hash.slice(1) as Tab) ? location.hash.slice(1) as Tab : Tab.OPERATIONS);
+  useEffect(() => {
+    const onHashChange = () => {
+      const value = location.hash.slice(1) as Tab;
+      if (Object.values(Tab).includes(value)) setActiveTab(value);
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+  const navigate = (tab: Tab) => { setActiveTab(tab); location.hash = tab; window.scrollTo({ top: 0 }); };
   
   // Load current draft from localStorage or fallback to DEFAULT_CONFIG (Cafe Focused)
   const [config, setConfig] = useState<GlobalConfig>(() => {
@@ -53,8 +67,8 @@ export default function App() {
         if (parsed.cafe && parsed.cafe.seatCount === 60) {
           parsed.cafe.seatCount = 30; // Apply new default for existing drafts
         }
-        if (parsed.initial && parsed.initial.interior === 60000000) {
-          parsed.initial.interior = 12810950;
+        if (parsed.initial && [60000000, 12810950].includes(parsed.initial.interior)) {
+          parsed.initial.interior = DEFAULT_INTERIOR_TOTAL;
         }
         if (parsed.space && parsed.space.hourlyRate !== undefined) {
           parsed.space = DEFAULT_CONFIG.space; // overwrite old space config
@@ -69,29 +83,20 @@ export default function App() {
 
   // Load scenarios from Database
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [interiorCosts, setInteriorCosts] = useState<InteriorCost[]>([]);
+  const [interiorCosts, setInteriorCosts] = useState<InteriorCost[]>(DEFAULT_INTERIOR_COSTS);
 
   useEffect(() => {
     // Initial load from DB
     const loadData = async () => {
       try {
+        await dbService.importFinanceSource();
         const [loadedPlans, loadedCosts] = await Promise.all([
           dbService.getAllPlans(),
           dbService.getAllInteriorCosts()
         ]);
         setScenarios(loadedPlans);
         
-        const oldSum = loadedCosts.reduce((acc, curr) => acc + curr.cost, 0);
-        
-        if (loadedCosts.length === 0 || oldSum === 13768520) {
-          await dbService.clearInteriorCosts();
-          for (const item of DEFAULT_INTERIOR_COSTS) {
-            await dbService.saveInteriorCost(item as InteriorCost);
-          }
-          setInteriorCosts(DEFAULT_INTERIOR_COSTS as InteriorCost[]);
-        } else {
-          setInteriorCosts(loadedCosts);
-        }
+        setInteriorCosts(loadedCosts);
       } catch (e) {
         console.error("Failed to load data from DB", e);
       }
@@ -341,17 +346,20 @@ export default function App() {
         </div>
       </header>
       
-      <nav className="flex flex-wrap gap-2 border p-2 rounded-xl justify-center mx-4 sticky top-0 z-50 shadow-sm backdrop-blur-md mt-4" style={{background: 'rgba(42, 36, 32, 0.6)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
+      <nav aria-label="주요 페이지" className="flex flex-nowrap sm:flex-wrap overflow-x-auto scrollbar-hide gap-2 border p-2 rounded-xl justify-start sm:justify-center mx-4 sticky top-0 z-50 shadow-sm backdrop-blur-md mt-4" style={{background: 'rgba(42, 36, 32, 0.6)', borderColor: 'rgba(201, 150, 58, 0.1)'}}>
         {[
+          { id: Tab.OPERATIONS, label: '진행 체크', icon: <CheckSquare size={18} /> },
           { id: Tab.PLAN, label: '사업계획', icon: <Presentation size={18} /> },
           { id: Tab.MARKETING, label: '마케팅계획', icon: <Presentation size={18} /> },
           { id: Tab.DASHBOARD, label: '재무계획', icon: <TrendingUp size={18} /> },
           { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={18} /> },
           { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={18} /> },
+          { id: Tab.MANUAL, label: '운영 매뉴얼', icon: <BookOpen size={18} /> },
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as Tab)}
+            onClick={() => navigate(tab.id as Tab)}
+            aria-current={activeTab === tab.id ? 'page' : undefined}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === tab.id ? 'bg-[var(--amber)] text-[var(--black)] shadow-sm' : 'text-[var(--mist)] hover:text-[var(--amber)] hover:bg-[rgba(201,150,58,0.1)]'}`}
           >
             {tab.icon}
@@ -360,7 +368,7 @@ export default function App() {
         ))}
       </nav>
 
-      <div className="bg-[var(--dark)] border-b border-t border-[rgba(201,150,58,0.1)] py-2.5 mt-4">
+      {activeTab !== Tab.OPERATIONS && activeTab !== Tab.MANUAL && <div className="bg-[var(--dark)] border-b border-t border-[rgba(201,150,58,0.1)] py-2.5 mt-4">
         <div className="max-w-7xl mx-auto px-4 flex flex-col items-center justify-between gap-4">
           
           {/* Right Side: Saved Plans & Draft Actions */}
@@ -417,9 +425,11 @@ export default function App() {
               </div>
           </div>
         </div>
-      </div>
+      </div>}
 
       <main className="max-w-7xl mx-auto px-4 py-8 pb-16">
+        {activeTab === Tab.OPERATIONS && <OperationsTab config={config} dailySalesCount={currentFinancials.salesCount} onNavigate={value => navigate(value === 'manual' ? Tab.MANUAL : value === 'interior' ? Tab.INTERIOR : Tab.PLANNER)} />}
+        {activeTab === Tab.MANUAL && <ManualTab config={config} />}
         {activeTab === Tab.PLAN && (
           <BusinessPlanTab totalInteriorExpenses={totalInteriorExpenses} config={config} cafeUnitCosts={cafeUnitCosts} monthlyData={monthlyData} />
         )}

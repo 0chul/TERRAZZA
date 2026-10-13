@@ -1,20 +1,17 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# TERRAZZA 운영 및 사업 계획
 
-# Run and deploy your AI Studio app
+[사이트 열기](https://0chul.github.io/TERRAZZA/)
 
-This contains everything you need to run your app locally.
+진행 체크에서 POS·라마르조꼬·간판·메뉴·일회용품·매뉴얼 준비를 관리합니다. 체크, 담당자, 목표일, 메모는 브라우저에 자동 저장됩니다. 기기 간 이동에는 진행 체크의 JSON 백업/불러오기를 사용하세요. 공동 실시간 동기화는 제공하지 않습니다.
 
-View your app in AI Studio: https://ai.studio/apps/0b44ab8b-5b98-42a6-9fe7-f2b63c22828c
+일회용품 발주 수량은 상세 설정의 일 판매량, HOT/ICE 및 포장 비율과 단가에 연결됩니다. 안전재고와 현재 재고를 조정하고 CSV 구매 목록을 내려받을 수 있습니다. 컵·뚜껑 규격과 실제 묶음 수량은 발주 전 확인하세요.
 
-## Run Locally
+운영 매뉴얼에는 첨부된 v0.9의 9개 장, 검색, 원본 PDF/Word, 날짜별 현장 체크가 있습니다. 매뉴얼의 가격·운영 정책은 초안입니다. 고급 커피는 잔당 10,000~12,000원 구성안이며 판매 비중과 원가 확정 전 재무 예측은 기존 3종을 사용합니다.
 
-**Prerequisites:**  Node.js
+인테리어는 `떼라짜_자금표 및 공사내역_20260824.xls`의 지출 상세 53건을 가져왔습니다. 총 지출 15,796,450원, 직접구매 389,500원, 현금 지출 15,406,950원입니다. 총 입금 16,110,000원에는 사용자 확인을 받은 추가 입금 3,000,000원이 포함됩니다. 현금 잔액은 703,050원입니다. 추가 입금일과 원문 `2026-10-0`의 작업일은 미확정으로 남겼습니다.
 
+기존 IndexedDB의 수정되지 않은 기본 내역만 최신 엑셀 값으로 바꿉니다. 사용자 수정 내역과 추가 내역은 보존합니다. 이전 입금 입력 기록은 따로 보관하며 중복 계산을 방지하기 위해 새 합계에서 제외합니다.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 로컬 실행
+
+Node.js 20 이상에서 `npm ci`, `npm run dev`를 실행합니다. 타입 검사는 `npx tsc --noEmit`, 배포 빌드는 `npm run build`를 사용합니다. `main` 브랜치에 반영되면 GitHub Actions가 GitHub Pages에 배포합니다.

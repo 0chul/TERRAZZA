@@ -65,7 +65,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
   }, [monthlyData]);
 
   const maxRevenue = useMemo(() => {
-    const vals = monthlyData.map(m => m.totalRevenue);
+    const vals = monthlyData.map(m => m.revenue);
     return vals.length > 0 ? Math.max(...vals) : 10000000;
   }, [monthlyData]);
 
