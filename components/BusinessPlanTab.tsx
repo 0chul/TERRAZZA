@@ -578,7 +578,7 @@ export const BusinessPlanTab: React.FC<BusinessPlanTabProps> = ({ totalInteriorE
               </div>
               <div className="capex-breakdown">
                 <div className="capex-row">
-                  <div className="capex-bar-label">인테리어 공사</div>
+                  <div className="capex-bar-label">현장 총실비</div>
                   <div className="capex-bar-track"><div className="capex-bar-fill" style={{width: getWidth(interiorAmount)}}></div></div>
                   <div className="capex-bar-value">{(interiorAmount / 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                 </div>

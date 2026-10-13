@@ -547,7 +547,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                    <TrendingUp size={20} style={{color: 'var(--amber)'}}/>
                  </div>
                  <div>
-                   <div className="text-xs" style={{color: 'var(--stone)'}}>인테리어 지출 내역 합계</div>
+                   <div className="text-xs" style={{color: 'var(--stone)'}}>현장 총실비 · 실제 지출 합계</div>
                    <div className="text-sm font-semibold" style={{color: 'var(--cream)'}}>총 초기 투자비</div>
                  </div>
                </div>
@@ -555,7 +555,7 @@ export const PlannerTab: React.FC<PlannerTabProps> = ({
                  {totalInvestment.toLocaleString()}원
                </div>
             </div>
-            <p className="text-[10px] mt-2" style={{color: 'var(--stone)'}}>* 상세 지출 내역은 '인테리어' 탭에서 관리할 수 있으며, 해당 합계가 자동으로 반영됩니다.</p>
+            <p className="text-[10px] mt-2" style={{color: 'var(--stone)'}}>* '자금 집행' 탭의 현장 총실비가 반영됩니다. 개인·고객 결제도 포함하며 예상·제외 비용과 정산 중복은 제외합니다.</p>
         </div>
       </InputSection>
     </div>

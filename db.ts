@@ -102,7 +102,7 @@ export const dbService = {
       return await db.getAll(INTERIOR_STORE);
     } catch (error) {
       console.error('Failed to load interior costs from DB:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -116,6 +116,12 @@ export const dbService = {
       console.error('Failed to save interior cost to DB:', error);
       throw error;
     }
+  },
+  async saveInteriorCosts(costs: InteriorCost[]): Promise<void> {
+    const db = await initDB();
+    const tx = db.transaction(INTERIOR_STORE, 'readwrite');
+    for (const cost of costs) await tx.store.put(cost);
+    await tx.done;
   },
 
   // Delete an interior cost

@@ -120,6 +120,6 @@ export const OperationsTab: React.FC<{ config: GlobalConfig; dailySalesCount: nu
       <p className="ops-muted">발주 수량 = 예상 사용량 + 안전재고 − 현재 사용가능재고 (최소 0개). 캐리어는 기존 원가 모델의 포장 음료당 1개 가정을 따릅니다. 대관 추가 수요와 묶음 구매 단위는 발주 시 조정하세요.</p>
       <p className="ops-muted">원두·우유·시럽·정수물·얼음은 원재료, 식기세척비는 관리비로 분리해 일회용품 목록에서 제외했습니다.</p>
     </section>
-    <div className="ops-footer-link"><span>엑셀 기준 자금·공사 내역을 함께 확인하세요.</span><button className="ops-text-button" onClick={() => onNavigate('interior')}>인테리어 자금표 <ArrowRight size={15} /></button></div>
+    <div className="ops-footer-link"><span>고객 입금과 결제 주체별 지출을 함께 확인하세요.</span><button className="ops-text-button" onClick={() => onNavigate('funds')}>자금 집행 열기 <ArrowRight size={15} /></button></div>
   </div>;
 };

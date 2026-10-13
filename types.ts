@@ -108,6 +108,9 @@ export interface Scenario {
   timestamp: number;
 }
 
+export type ExpensePayer = 'company' | 'personal' | 'customer' | 'unclassified';
+export type ExpenseScope = 'construction' | 'equipment' | 'operations' | 'incidental' | 'unclassified' | 'excluded';
+
 export interface InteriorCost {
   id: string;
   category: string;
@@ -119,6 +122,11 @@ export interface InteriorCost {
   source?: string;
   rawDate?: string | null;
   estimated?: boolean;
+  payer?: ExpensePayer;
+  scope?: ExpenseScope;
+  reimbursedAmount?: number;
+  reimbursementDate?: string;
+  settlementConfirmed?: boolean;
 }
 
 export interface InteriorDeposit {

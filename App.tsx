@@ -24,7 +24,8 @@ import { GlobalConfig, MonthlyData, CafeUnitCosts, Scenario, InteriorCost } from
 import { DashboardTab } from './components/DashboardTab';
 import { PlannerTab } from './components/PlannerTab';
 import { BusinessPlanTab } from './components/BusinessPlanTab';
-import { InteriorCostTab } from './components/InteriorCostTab';
+import { FundsTab } from './components/FundsTab';
+import { projectActualTotal } from './funds';
 import { MarketingTab } from './components/MarketingTab';
 import { OperationsTab } from './components/OperationsTab';
 import { ManualTab } from './components/ManualTab';
@@ -35,7 +36,7 @@ enum Tab {
   MARKETING = 'marketing',
   DASHBOARD = 'dashboard',
   PLANNER = 'planner',
-  INTERIOR = 'interior',
+  FUNDS = 'funds',
   OPERATIONS = 'operations',
   MANUAL = 'manual',
 }
@@ -47,10 +48,10 @@ const WEEKEND_MONTHLY_RATE = 861200;
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>(() => Object.values(Tab).includes(location.hash.slice(1) as Tab) ? location.hash.slice(1) as Tab : Tab.OPERATIONS);
+  const [activeTab, setActiveTab] = useState<Tab>(() => location.hash === '#interior' ? Tab.FUNDS : Object.values(Tab).includes(location.hash.slice(1) as Tab) ? location.hash.slice(1) as Tab : Tab.OPERATIONS);
   useEffect(() => {
     const onHashChange = () => {
-      const value = location.hash.slice(1) as Tab;
+      const value = location.hash === '#interior' ? Tab.FUNDS : location.hash.slice(1) as Tab;
       if (Object.values(Tab).includes(value)) setActiveTab(value);
     };
     window.addEventListener('hashchange', onHashChange);
@@ -105,7 +106,7 @@ export default function App() {
   }, [activeTab]); // Refresh when switching tabs as Interior tab modifies DB
 
   const totalInteriorExpenses = useMemo(() => {
-    return interiorCosts.reduce((sum, c) => sum + c.cost, 0);
+    return projectActualTotal(interiorCosts);
   }, [interiorCosts]);
 
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
@@ -353,7 +354,7 @@ export default function App() {
           { id: Tab.MARKETING, label: '마케팅계획', icon: <Presentation size={18} /> },
           { id: Tab.DASHBOARD, label: '재무계획', icon: <TrendingUp size={18} /> },
           { id: Tab.PLANNER, label: '상세 설정', icon: <Calculator size={18} /> },
-          { id: Tab.INTERIOR, label: '인테리어', icon: <Calculator size={18} /> },
+          { id: Tab.FUNDS, label: '자금 집행', icon: <Calculator size={18} /> },
           { id: Tab.MANUAL, label: '운영 매뉴얼', icon: <BookOpen size={18} /> },
         ].map((tab) => (
           <button
@@ -368,7 +369,7 @@ export default function App() {
         ))}
       </nav>
 
-      {activeTab !== Tab.OPERATIONS && activeTab !== Tab.MANUAL && <div className="bg-[var(--dark)] border-b border-t border-[rgba(201,150,58,0.1)] py-2.5 mt-4">
+      {activeTab !== Tab.OPERATIONS && activeTab !== Tab.MANUAL && activeTab !== Tab.FUNDS && <div className="bg-[var(--dark)] border-b border-t border-[rgba(201,150,58,0.1)] py-2.5 mt-4">
         <div className="max-w-7xl mx-auto px-4 flex flex-col items-center justify-between gap-4">
           
           {/* Right Side: Saved Plans & Draft Actions */}
@@ -428,7 +429,7 @@ export default function App() {
       </div>}
 
       <main className="max-w-7xl mx-auto px-4 py-8 pb-16">
-        {activeTab === Tab.OPERATIONS && <OperationsTab config={config} dailySalesCount={currentFinancials.salesCount} onNavigate={value => navigate(value === 'manual' ? Tab.MANUAL : value === 'interior' ? Tab.INTERIOR : Tab.PLANNER)} />}
+        {activeTab === Tab.OPERATIONS && <OperationsTab config={config} dailySalesCount={currentFinancials.salesCount} onNavigate={value => navigate(value === 'manual' ? Tab.MANUAL : value === 'funds' ? Tab.FUNDS : Tab.PLANNER)} />}
         {activeTab === Tab.MANUAL && <ManualTab config={config} />}
         {activeTab === Tab.PLAN && (
           <BusinessPlanTab totalInteriorExpenses={totalInteriorExpenses} config={config} cafeUnitCosts={cafeUnitCosts} monthlyData={monthlyData} />
@@ -455,8 +456,8 @@ export default function App() {
           />
         )}
         
-        {activeTab === Tab.INTERIOR && (
-          <InteriorCostTab />
+        {activeTab === Tab.FUNDS && (
+          <FundsTab />
         )}
 
         {activeTab === Tab.MARKETING && (
